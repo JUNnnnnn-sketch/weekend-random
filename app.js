@@ -1,6 +1,6 @@
 import { subwayLines } from "./data/subway.js";
 import { places } from "./data/places.js";
-import { activities } from "./data/activities.js";
+import { activities, activityDataAsOf } from "./data/activities.js";
 import { pickDestination, randomItem, recommend, freshness } from "./recommendation.js";
 
 const STORAGE_KEY = "weekend-dont-think-v02";
@@ -32,7 +32,7 @@ function updateContinue() { continueBtn.disabled = !(state.party && state.durati
 function restoreSelectionUI() { document.querySelectorAll(".chip").forEach((chip) => chip.classList.toggle("is-selected", state[chip.dataset.group] === chip.dataset.value)); updateContinue(); }
 
 function setupMode(mode) { state.mode = mode; document.getElementById("setup-title").textContent = mode === "fortune" ? "先告诉命运一点情报" : "先告诉这次怎么探索"; showScreen("setup"); }
-document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => { if (button.dataset.mode === "recent") { state.mode = "recent"; showScreen("recent"); return; } setupMode(button.dataset.mode); }));
+document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => { if (button.dataset.mode === "recent") { state.mode = "recent"; showScreen("recent"); renderRecent(); return; } setupMode(button.dataset.mode); }));
 document.querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => { state[chip.dataset.group] = chip.dataset.value; restoreSelectionUI(); saveSession(); }));
 document.querySelectorAll("[data-back]").forEach((button) => button.addEventListener("click", goBack));
 document.querySelectorAll("[data-home]").forEach((button) => button.addEventListener("click", goHome));
@@ -40,6 +40,98 @@ document.getElementById("btn-continue").addEventListener("click", startRoll);
 document.getElementById("btn-retry").addEventListener("click", startRoll);
 document.getElementById("btn-accept").addEventListener("click", () => { document.querySelector("#screen-locked .subtitle").textContent = `${state.destination.label || state.destination.name} 已经锁定。出门就好。`; showScreen("locked"); });
 document.getElementById("btn-home").addEventListener("click", goHome);
+
+/* ---------- 最近在玩（recent）模式：只读已接入的城市日历活动，不做热度/推荐 ---------- */
+// 筛选标签 → 来源官方类别（其余类别无独立标签，只出现在“全部”下）
+const CAT_TABS = { 全部: null, 展览: "博物馆展览", 演出: "文化演出", 体育: "体育赛事", 游园: "游园活动", 展会: "展会活动" };
+// 明显非休闲的政务/民生噪声：展示层直接过滤，不参与“最近有什么可以去”
+const NON_LEISURE = new Set(["招考招聘", "惠企活动"]);
+let recentCat = "全部";
+let recentDistrict = "全部";
+let currentPick = null;
+
+function parseActivityDate(s) {
+  if (!s || typeof s !== "string") return null;
+  const m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) { const Y = +m[1], M = +m[2], D = +m[3]; if (M >= 1 && M <= 12 && D >= 1 && D <= 31) return new Date(Y, M - 1, D); }
+  return null;
+}
+// 以数据基准日为锚（快照模式固定为抓取日；联网脚本会写为运行当日），避免用浏览器实时日期误判静态快照
+function activityRefDate() { const [Y, M, D] = activityDataAsOf.split("-").map(Number); return new Date(Y, M - 1, D); }
+function activityStatusRank(a, ref, plus7) {
+  const sd = parseActivityDate(a.start_date), ed = parseActivityDate(a.end_date);
+  if (!sd && !ed) return 2;          // 日期待定
+  if (sd && sd > ref) return 0;      // 即将开始
+  if (ed && ed >= ref) return 1;     // 正在进行
+  return 1;
+}
+function isShowable(a, ref, plus7) {
+  if (NON_LEISURE.has(a.category)) return false;     // 过滤招考招聘/惠企等噪声
+  const sd = parseActivityDate(a.start_date), ed = parseActivityDate(a.end_date);
+  if (ed && ed < ref) return false;                  // 已结束
+  if (sd && sd > plus7) return false;                // 超过未来 7 天
+  return true;                                       // 其余展示（含日期不明确的，由卡片标注）
+}
+function dateKey(a) { const sd = parseActivityDate(a.start_date); if (sd) return sd.getTime(); const ed = parseActivityDate(a.end_date); return ed ? ed.getTime() : Infinity; }
+function filterSortActivities() {
+  const ref = activityRefDate();
+  const plus7 = new Date(ref); plus7.setDate(ref.getDate() + 7);
+  let list = activities.filter((a) => isShowable(a, ref, plus7));
+  const want = CAT_TABS[recentCat];
+  if (want) list = list.filter((a) => a.category === want);
+  if (recentDistrict && recentDistrict !== "全部") list = list.filter((a) => a.district === recentDistrict);
+  // 排序：即将开始(0) → 正在进行(1) → 日期待定(2)；同组按开始日期升序；再随机打散（每次打开顺序不同）
+  return list.slice().sort((x, y) => {
+    const rx = activityStatusRank(x, ref, plus7), ry = activityStatusRank(y, ref, plus7);
+    if (rx !== ry) return rx - ry;
+    const dx = dateKey(x), dy = dateKey(y);
+    if (dx !== dy) return dx - dy;
+    return Math.random() - 0.5;
+  });
+}
+function esc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function dateLabel(a) { const s = a.start_date, e = a.end_date; if (s && e && s !== e) return `${s} ~ ${e}`; return s || e || "日期待定"; }
+function dateUnclear(a) { return (a.start_date && !parseActivityDate(a.start_date)) || (a.end_date && !parseActivityDate(a.end_date)); }
+function renderActivityCard(a) {
+  const card = document.createElement("article"); card.className = "place-card activity-card";
+  const warn = dateUnclear(a) ? '<span class="place-freshness warn">⚠ 日期信息不完整</span>' : "";
+  card.innerHTML = `
+    <div><p class="place-category">${esc(a.category)}</p><h3>${esc(a.name)}</h3></div>
+    <p class="activity-meta">${esc(a.district)} · ${esc(a.venue)}</p>
+    <p class="activity-date">📅 ${dateLabel(a)} ${warn}</p>
+    <p class="activity-desc">${esc(a.description)}</p>
+    <p class="place-freshness">数据更新 ${esc(a.collected_at)} · 来源 ${esc(a.source)}</p>
+    <a class="activity-detail" href="${esc(a.source_url)}" target="_blank" rel="noreferrer">查看活动详情 ↗</a>`;
+  return card;
+}
+function renderRecent() {
+  const list = filterSortActivities();
+  const container = document.getElementById("activity-list");
+  container.replaceChildren();
+  document.getElementById("recent-empty").hidden = list.length > 0;
+  list.forEach((a) => container.append(renderActivityCard(a)));
+}
+function pickRandomActivity() {
+  const ref = activityRefDate();
+  const plus7 = new Date(ref); plus7.setDate(ref.getDate() + 7);
+  const pool = activities.filter((a) => isShowable(a, ref, plus7) && a.source_url);
+  return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+}
+function renderPick() {
+  const list = document.getElementById("pick-list");
+  const a = pickRandomActivity();
+  currentPick = a;
+  if (!a) { list.innerHTML = '<p class="empty">当前没有可推荐的有效活动。系统不会编造。</p>'; return; }
+  list.replaceChildren(renderActivityCard(a));
+}
+function populateDistricts() {
+  const sel = document.getElementById("recent-district");
+  const districts = [...new Set(activities.map((a) => a.district).filter(Boolean))].sort();
+  sel.replaceChildren();
+  const all = document.createElement("option"); all.value = "全部"; all.textContent = "全部"; sel.append(all);
+  districts.forEach((d) => { const o = document.createElement("option"); o.value = d; o.textContent = d; sel.append(o); });
+  recentDistrict = "全部";
+}
 
 async function spinTo(pool, finalValue, status, runId) {
   rollStatus.textContent = status; reel.classList.add("is-spinning");
@@ -116,9 +208,24 @@ function restoreSession() {
   const saved = sessionStorage.getItem(STORAGE_KEY); if (!saved) return restoreSelectionUI();
   try {
     const previous = JSON.parse(saved); Object.assign(state, previous.state); navigationStack = previous.navigationStack || []; restoreSelectionUI();
+    if (previous.currentScreen === "recent") { renderRecent(); showScreen("recent", { remember: false }); return; }
+    if (previous.currentScreen === "pick") { renderPick(); showScreen("pick", { remember: false }); return; }
     if (previous.currentScreen === "result" && state.destination && (state.mode !== "wander" || state.result)) { renderResult(); showScreen("result", { remember: false }); return; }
     // 刷新时不伪造未完成动画，回到可继续的条件页。
     showScreen(previous.currentScreen === "roll" ? "setup" : (previous.currentScreen || "home"), { remember: false });
   } catch { sessionStorage.removeItem(STORAGE_KEY); restoreSelectionUI(); }
 }
+
+/* recent 模式交互绑定（不改动命运/随便逛逛/locked 等其它屏幕） */
+document.getElementById("recent-cats").querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => {
+  recentCat = chip.dataset.cat;
+  document.getElementById("recent-cats").querySelectorAll(".chip").forEach((c) => { const on = c === chip; c.classList.toggle("is-selected", on); c.setAttribute("aria-selected", String(on)); });
+  renderRecent();
+}));
+document.getElementById("recent-district").addEventListener("change", (e) => { recentDistrict = e.target.value; renderRecent(); });
+document.getElementById("btn-recent-pick").addEventListener("click", () => { renderPick(); showScreen("pick"); });
+document.getElementById("btn-pick-go").addEventListener("click", () => { if (currentPick && currentPick.source_url) window.open(currentPick.source_url, "_blank", "noreferrer"); });
+document.getElementById("btn-pick-again").addEventListener("click", () => { renderPick(); });
+populateDistricts();
+
 restoreSession();

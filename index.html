@@ -101,17 +101,47 @@
 
       <section class="screen" id="screen-recent" data-screen="recent" hidden>
         <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
-        <p class="brand">🔥 最近在玩</p>
-        <h2 class="result-title">新鲜灵感<br />应该在这里出现</h2>
-        <p class="result-meta">这里只显示可核验、尚未结束且带更新时间的近期活动。</p>
-        <div class="freshness-filter" aria-label="未来的新鲜度筛选">
-          <span>24小时内</span><span>3天内</span><span>7天内</span>
+        <p class="brand">🔥 近期新鲜</p>
+        <h2 class="result-title">最近有什么可以去？</h2>
+        <p class="result-meta">这周北京有什么值得去？数据来自北京市政府「城市日历」公开接口，仅展示当前有效或未来 7 天内的活动。</p>
+
+        <div class="recent-toolbar">
+          <div class="chips recent-cats" id="recent-cats" role="tablist" aria-label="活动类型">
+            <button class="chip is-selected" type="button" data-cat="全部" role="tab" aria-selected="true">全部</button>
+            <button class="chip" type="button" data-cat="展览" role="tab" aria-selected="false">展览</button>
+            <button class="chip" type="button" data-cat="演出" role="tab" aria-selected="false">演出</button>
+            <button class="chip" type="button" data-cat="体育" role="tab" aria-selected="false">体育</button>
+            <button class="chip" type="button" data-cat="游园" role="tab" aria-selected="false">游园</button>
+            <button class="chip" type="button" data-cat="展会" role="tab" aria-selected="false">展会</button>
+          </div>
+          <label class="recent-district">
+            <span>区域</span>
+            <select id="recent-district" aria-label="区域筛选"></select>
+          </label>
         </div>
-        <article class="empty stream-empty">
-          <p class="place-category">数据暂未接入</p>
-          <h3>暂无可展示的近期玩法</h3>
-          <p>为了不制造“热门”的错觉，这里暂时保持为空。</p>
+
+        <div class="recent-actions">
+          <button class="btn btn-primary" id="btn-recent-pick" type="button">🎲 替我挑一个</button>
+        </div>
+
+        <div class="activity-list" id="activity-list"></div>
+
+        <article class="empty recent-empty" id="recent-empty" hidden>
+          <p class="place-category">暂时没有符合条件的活动</p>
+          <h3>这会儿没匹配上</h3>
+          <p>换个类型或区域，或者过阵子再来看看。系统不会编造推荐。</p>
         </article>
+      </section>
+
+      <section class="screen" id="screen-pick" data-screen="pick" hidden>
+        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
+        <p class="brand">🎲 替你挑好了</p>
+        <h2 class="result-title">今天就去这个？</h2>
+        <div class="activity-list" id="pick-list"></div>
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-pick-go" type="button">去看看</button>
+          <button class="btn btn-ghost" id="btn-pick-again" type="button">再抽一个</button>
+        </div>
       </section>
 
       <section class="screen" id="screen-locked" data-screen="locked" hidden>
