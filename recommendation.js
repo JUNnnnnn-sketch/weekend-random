@@ -1,7 +1,37 @@
 const DAY = 24 * 60 * 60 * 1000;
 
 export function randomItem(items) { return items[Math.floor(Math.random() * items.length)]; }
-export function pickDestination(lines) { const line = randomItem(lines); return { line, station: randomItem(line.stations) }; }
+
+/**
+ * 命运模式的随机阶段：只决定“去哪”。
+ * 随机一条真实线路 -> 随机该线路上的一个真实站点。
+ * 完全不依赖坐标：latitude/longitude 为 null 的站点同样可以被抽中。
+ * 这里不做任何“附近有什么”的筛选，那是独立的后续阶段。
+ */
+export function pickDestination(lines) {
+  const usable = lines.filter((line) => line.stations && line.stations.length);
+  if (!usable.length) return null;
+  const line = randomItem(usable);
+  const station = randomItem(line.stations);
+  return {
+    line,
+    station,
+    destination: {
+      kind: "station",
+      line_id: line.line_id,
+      line_name: line.line_name,
+      station_id: station.station_id,
+      physical_station_id: station.physical_station_id,
+      station_name: station.station_name,
+      station_order: station.station_order,
+      latitude: station.latitude,
+      longitude: station.longitude,
+      has_coordinates: station.latitude !== null && station.longitude !== null,
+      name: station.station_name,
+      label: `${line.line_name} · ${station.station_name}`,
+    },
+  };
+}
 
 export function distanceKm(a, b) {
   const rad = (value) => (value * Math.PI) / 180;
@@ -28,7 +58,10 @@ export function freshness(updatedAt, now = new Date()) {
 function freshnessScore(updatedAt, now) { return { "24小时内更新": 4, "3天内更新": 3, "7天内更新": 2, "超过7天": 1 }[freshness(updatedAt, now)]; }
 function radiusFor(duration) { return { "2-3小时": 2, "半天": 5, "一整天": 12 }[duration]; }
 
-/** 真地点 -> 人数 -> 时长 -> 去掉已结束活动 -> 距离/新鲜度排序 -> 从优先候选池随机抽取。 */
+/**
+ * “附近有什么”阶段：真地点 -> 人数 -> 时长 -> 去掉已结束活动 -> 距离/新鲜度排序 -> 从优先候选池随机抽取。
+ * 依赖 destination 的坐标，目前只由“随便逛逛”模式调用；命运模式的抽签不经过这里。
+ */
 export function recommend({ destination, people, duration, places, activities, now = new Date() }) {
   const radius = radiusFor(duration);
   const items = [

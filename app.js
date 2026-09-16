@@ -38,7 +38,7 @@ document.querySelectorAll("[data-back]").forEach((button) => button.addEventList
 document.querySelectorAll("[data-home]").forEach((button) => button.addEventListener("click", goHome));
 document.getElementById("btn-continue").addEventListener("click", startRoll);
 document.getElementById("btn-retry").addEventListener("click", startRoll);
-document.getElementById("btn-accept").addEventListener("click", () => { document.querySelector("#screen-locked .subtitle").textContent = `${state.destination.name} 已经锁定。出门就好。`; showScreen("locked"); });
+document.getElementById("btn-accept").addEventListener("click", () => { document.querySelector("#screen-locked .subtitle").textContent = `${state.destination.label || state.destination.name} 已经锁定。出门就好。`; showScreen("locked"); });
 document.getElementById("btn-home").addEventListener("click", goHome);
 
 async function spinTo(pool, finalValue, status, runId) {
@@ -52,12 +52,19 @@ async function startRoll() {
   document.getElementById("roll-kicker").textContent = isFortune ? "命运正在抽签" : "探索路线正在生成";
   showScreen("roll");
   if (isFortune) {
-    const destination = pickDestination(subwayLines);
-    state.destination = { ...destination.station, name: destination.station.name, lineName: destination.line.name, kind: "station" };
-    addLog("正在决定地铁线……"); if (!await spinTo(subwayLines.map((line) => line.name), destination.line.name, "正在决定地铁线……", runId)) return;
-    addLog(destination.line.name, true); await wait(350); addLog("正在决定车站……");
-    if (!await spinTo(destination.line.stations.map((station) => station.name), destination.station.name, "正在决定车站……", runId)) return;
-    addLog(destination.station.name, true);
+    // 命运模式只做一件事：随机线路 -> 随机站点。不看坐标，也不在这里找“附近有什么”。
+    const picked = pickDestination(subwayLines);
+    if (!picked) { addLog("暂时没有可用的地铁线路数据", true); return; }
+    const { line, station, destination } = picked;
+    state.destination = destination;
+    addLog("正在决定地铁线……"); if (!await spinTo(subwayLines.map((item) => item.line_name), line.line_name, "正在决定地铁线……", runId)) return;
+    addLog(line.line_name, true); await wait(350); addLog("正在决定车站……");
+    if (!await spinTo(line.stations.map((item) => item.station_name), station.station_name, "正在决定车站……", runId)) return;
+    addLog(station.station_name, true);
+    if (runId !== rollRunId) return;
+    state.result = null; // 抽签阶段到此结束；“附近有什么”是独立的下一阶段。
+    await wait(350); renderResult(); showScreen("result");
+    return;
   } else {
     const area = randomItem(places);
     state.destination = { ...area, name: area.name, kind: "area" };
@@ -72,17 +79,33 @@ async function startRoll() {
 }
 
 function renderResult() {
-  const { picks, candidates, radius } = state.result; const wander = state.mode === "wander";
+  const wander = state.mode === "wander";
   document.querySelector("#screen-result .actions").hidden = false;
   document.getElementById("result-kicker").textContent = wander ? "这一带，值得逛逛" : "命运已揭晓";
   document.querySelector(".result-title").innerHTML = wander ? "🗺️ 今日探索区域<br /><span id=\"result-station\"></span>" : "🎯 今天的目的地<br /><span id=\"result-station\"></span>";
-  document.getElementById("result-station").textContent = state.destination.name;
-  document.getElementById("result-meta").textContent = wander ? `${state.party} · ${state.duration} · 在区域周边 ${radius} km 内探索` : `${state.party} · ${state.duration} · ${state.destination.lineName} · 搜索半径 ${radius} km`;
-  const task = document.getElementById("explore-task"); task.hidden = !wander;
-  task.innerHTML = wander ? `<p class="place-category">轻量探索任务</p><strong>在 ${state.destination.name} 附近，离开主路走 15 分钟；遇到一家以前没进过的店或一个想停留的角落，就进去看看。</strong>` : "";
+  document.getElementById("result-station").textContent = state.destination.label || state.destination.name;
+  if (!wander) { renderDestinationOnly(); return; }
+  const { picks, candidates, radius } = state.result;
+  document.getElementById("result-meta").textContent = `${state.party} · ${state.duration} · 在区域周边 ${radius} km 内探索`;
+  document.querySelector(".result-lead").textContent = "📍 附近发现";
+  const task = document.getElementById("explore-task"); task.hidden = false;
+  task.innerHTML = `<p class="place-category">轻量探索任务</p><strong>在 ${state.destination.name} 附近，离开主路走 15 分钟；遇到一家以前没进过的店或一个想停留的角落，就进去看看。</strong>`;
   const list = document.getElementById("place-list"); list.replaceChildren();
   if (!candidates.length) { list.innerHTML = '<p class="empty">当前测试数据中，没有符合条件的真实地点。系统不会编造推荐；换个条件或再抽一次吧。</p>'; return; }
   picks.forEach((item) => list.append(renderPlace(item)));
+}
+
+/** 命运模式的结果页：只公布目的地（线路 + 站点），并为下一阶段留出入口。缺坐标不影响展示。 */
+function renderDestinationOnly() {
+  const { line_name, station_order, has_coordinates } = state.destination;
+  document.getElementById("result-meta").textContent = `${state.party} · ${state.duration} · ${line_name} 第 ${station_order} 站`;
+  document.getElementById("explore-task").hidden = true;
+  document.querySelector(".result-lead").textContent = "🚇 下一步";
+  const list = document.getElementById("place-list"); list.replaceChildren();
+  const card = document.createElement("article"); card.className = "place-card";
+  const coordNote = has_coordinates ? "" : '<p class="place-freshness">这个站还没有公开坐标，不影响它成为今天的目的地。</p>';
+  card.innerHTML = `<div><p class="place-category">下一步</p><h3>看看附近有什么</h3></div><p>目的地已经定了。附近玩法还没接入可核验的数据，接上之后会在这里展开。</p>${coordNote}<button class="btn btn-ghost" type="button" disabled>看看附近有什么（即将开放）</button>`;
+  list.append(card);
 }
 function renderPlace(item) {
   const card = document.createElement("article"); card.className = "place-card";
@@ -93,7 +116,7 @@ function restoreSession() {
   const saved = sessionStorage.getItem(STORAGE_KEY); if (!saved) return restoreSelectionUI();
   try {
     const previous = JSON.parse(saved); Object.assign(state, previous.state); navigationStack = previous.navigationStack || []; restoreSelectionUI();
-    if (previous.currentScreen === "result" && state.result && state.destination) { renderResult(); showScreen("result", { remember: false }); return; }
+    if (previous.currentScreen === "result" && state.destination && (state.mode !== "wander" || state.result)) { renderResult(); showScreen("result", { remember: false }); return; }
     // 刷新时不伪造未完成动画，回到可继续的条件页。
     showScreen(previous.currentScreen === "roll" ? "setup" : (previous.currentScreen || "home"), { remember: false });
   } catch { sessionStorage.removeItem(STORAGE_KEY); restoreSelectionUI(); }
