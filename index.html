@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b0a12" />
+    <title>周末别想了</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <main class="app" id="app">
+      <section class="screen is-active" id="screen-home" data-screen="home">
+        <p class="brand">周末别想了</p>
+        <div class="hero">
+          <p class="orb" aria-hidden="true">🎲</p>
+          <h1>这个周末，去哪？</h1>
+          <p class="subtitle">不用想，让命运决定。</p>
+        </div>
+        <div class="mode-list">
+          <button class="mode-card" type="button" data-mode="fortune"><span>🎲</span><strong>命运模式</strong><small>交给随机</small></button>
+          <button class="mode-card" type="button" data-mode="recent"><span>🔥</span><strong>最近在玩</strong><small>看看最近有什么新鲜的</small></button>
+          <button class="mode-card" type="button" data-mode="wander"><span>🗺️</span><strong>随便逛逛</strong><small>去一个平时不会主动去的地方</small></button>
+        </div>
+        <p class="hint">把选择权交出去，周末会轻松一点。</p>
+      </section>
+
+      <section class="screen" id="screen-setup" data-screen="setup" hidden>
+        <header class="topbar">
+          <button class="back" data-back type="button">← 返回</button>
+        <p class="brand" id="setup-title">先告诉命运一点情报</p>
+        </header>
+
+        <fieldset class="choice-block">
+          <legend>和谁一起</legend>
+          <div class="chips" role="radiogroup" aria-label="人数">
+            <button class="chip" type="button" data-group="party" data-value="一个人">
+              一个人
+            </button>
+            <button class="chip" type="button" data-group="party" data-value="两个人">
+              两个人
+            </button>
+            <button class="chip" type="button" data-group="party" data-value="一群人">
+              一群人
+            </button>
+          </div>
+        </fieldset>
+
+        <fieldset class="choice-block">
+          <legend>有多少时间</legend>
+          <div class="chips" role="radiogroup" aria-label="时长">
+            <button class="chip" type="button" data-group="duration" data-value="2-3小时">
+              2-3小时
+            </button>
+            <button class="chip" type="button" data-group="duration" data-value="半天">
+              半天
+            </button>
+            <button class="chip" type="button" data-group="duration" data-value="一整天">
+              一整天
+            </button>
+          </div>
+        </fieldset>
+
+        <button class="btn btn-primary" id="btn-continue" type="button" disabled>
+          继续
+        </button>
+      </section>
+
+      <section class="screen" id="screen-roll" data-screen="roll" hidden>
+        <header class="topbar"><button class="back" data-back type="button">← 返回</button></header>
+        <p class="brand pulse" id="roll-kicker">命运正在抽签</p>
+        <div class="reel-stage" aria-live="polite">
+          <p class="roll-status" id="roll-status">正在决定地铁线……</p>
+          <div class="reel" id="reel">
+            <span class="reel-value" id="reel-value">?</span>
+          </div>
+        </div>
+        <ol class="log" id="roll-log"></ol>
+      </section>
+
+      <section class="screen" id="screen-result" data-screen="result" hidden>
+        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
+        <p class="brand" id="result-kicker">命运已揭晓</p>
+        <h2 class="result-title">🎯 今天的目的地<br /><span id="result-station">青年路</span></h2>
+        <p class="result-meta" id="result-meta"></p>
+        <p class="result-lead">📍 附近发现</p>
+        <div class="place-list" id="place-list"></div>
+        <div class="explore-task" id="explore-task" hidden></div>
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-accept" type="button">
+            就去这里
+          </button>
+          <button class="btn btn-ghost" id="btn-retry" type="button">
+            我认输，再抽一次
+          </button>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-recent" data-screen="recent" hidden>
+        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
+        <p class="brand">🔥 最近在玩</p>
+        <h2 class="result-title">新鲜灵感<br />应该在这里出现</h2>
+        <p class="result-meta">这里只显示可核验、尚未结束且带更新时间的近期活动。</p>
+        <div class="freshness-filter" aria-label="未来的新鲜度筛选">
+          <span>24小时内</span><span>3天内</span><span>7天内</span>
+        </div>
+        <article class="empty stream-empty">
+          <p class="place-category">数据暂未接入</p>
+          <h3>暂无可展示的近期玩法</h3>
+          <p>为了不制造“热门”的错觉，这里暂时保持为空。</p>
+        </article>
+      </section>
+
+      <section class="screen" id="screen-locked" data-screen="locked" hidden>
+        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
+        <p class="orb" aria-hidden="true">✨</p>
+        <h2>周末别想了。</h2>
+        <p class="subtitle">青年路已经锁定。出门就好。</p>
+        <button class="btn btn-ghost" id="btn-home" type="button">回到开始</button>
+      </section>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
