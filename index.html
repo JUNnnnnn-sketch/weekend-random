@@ -24,6 +24,7 @@
           <button class="mode-card" type="button" data-mode="fortune"><span>🎲</span><strong>命运模式</strong><small>交给随机</small></button>
           <button class="mode-card" type="button" data-mode="recent"><span>🔥</span><strong>最近在玩</strong><small>看看最近有什么新鲜的</small></button>
           <button class="mode-card" type="button" data-mode="wander"><span>🗺️</span><strong>随便逛逛</strong><small>去一个平时不会主动去的地方</small></button>
+          <button class="mode-card" type="button" data-mode="plan"><span>🎯</span><strong>周末方案</strong><small>让它帮你凑一套玩法</small></button>
         </div>
         <p class="hint">把选择权交出去，周末会轻松一点。</p>
       </section>
@@ -131,6 +132,19 @@
           <h3>这会儿没匹配上</h3>
           <p>换个类型或区域，或者过阵子再来看看。系统不会编造推荐。</p>
         </article>
+      </section>
+
+      <section class="screen" id="screen-plan" data-screen="plan" hidden>
+        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
+        <p class="brand">🎯 周末方案</p>
+        <h2 class="result-title">今天这么过</h2>
+        <p class="result-meta" id="plan-subtitle"></p>
+        <div class="plan-list" id="plan-list"></div>
+        <p class="plan-note">每个玩法最多换 3 次；同一方案内不会重复。剩下的交给命运。</p>
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-plan-lock" type="button">🔒 就这个了</button>
+          <button class="btn btn-ghost" id="btn-plan-regenerate" type="button">🎲 重新生成</button>
+        </div>
       </section>
 
       <section class="screen" id="screen-pick" data-screen="pick" hidden>

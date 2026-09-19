@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { places } from "./data/places.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
-import { pickDestination, randomItem, recommend, freshness } from "./recommendation.js";
+import { pickDestination, randomItem, recommend, freshness, buildWeekendPlan, pickExperience } from "./recommendation.js";
 
 const STORAGE_KEY = "weekend-dont-think-v02";
 const state = { mode: "fortune", party: "", duration: "", destination: null, result: null };
@@ -19,7 +19,7 @@ function saveSession() { sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ st
 function showScreen(name, { remember = true } = {}) {
   if (remember && currentScreen !== name) navigationStack.push(currentScreen);
   currentScreen = name;
-  if (name === "setup") document.getElementById("setup-title").textContent = state.mode === "fortune" ? "先告诉命运一点情报" : "先告诉这次怎么探索";
+  if (name === "setup") document.getElementById("setup-title").textContent = setupTitleFor(state.mode);
   if (name === "roll") document.getElementById("roll-kicker").textContent = state.mode === "fortune" ? "命运正在抽签" : "探索路线正在生成";
   Object.entries(screens).forEach(([key, screen]) => { const active = key === name; screen.classList.toggle("is-active", active); screen.toggleAttribute("hidden", !active); screen.setAttribute("aria-hidden", String(!active)); });
   saveSession();
@@ -31,12 +31,13 @@ function addLog(text, done = false) { const item = document.createElement("li");
 function updateContinue() { continueBtn.disabled = !(state.party && state.duration); }
 function restoreSelectionUI() { document.querySelectorAll(".chip").forEach((chip) => chip.classList.toggle("is-selected", state[chip.dataset.group] === chip.dataset.value)); updateContinue(); }
 
-function setupMode(mode) { state.mode = mode; document.getElementById("setup-title").textContent = mode === "fortune" ? "先告诉命运一点情报" : "先告诉这次怎么探索"; showScreen("setup"); }
+function setupTitleFor(mode) { return mode === "fortune" ? "先告诉命运一点情报" : mode === "plan" ? "先告诉它会怎么过" : "先告诉这次怎么探索"; }
+function setupMode(mode) { state.mode = mode; document.getElementById("setup-title").textContent = setupTitleFor(mode); showScreen("setup"); }
 document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => { if (button.dataset.mode === "recent") { state.mode = "recent"; showScreen("recent"); renderRecent(); return; } setupMode(button.dataset.mode); }));
 document.querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => { state[chip.dataset.group] = chip.dataset.value; restoreSelectionUI(); saveSession(); }));
 document.querySelectorAll("[data-back]").forEach((button) => button.addEventListener("click", goBack));
 document.querySelectorAll("[data-home]").forEach((button) => button.addEventListener("click", goHome));
-document.getElementById("btn-continue").addEventListener("click", startRoll);
+document.getElementById("btn-continue").addEventListener("click", () => { if (state.mode === "plan") { startPlan(); return; } startRoll(); });
 document.getElementById("btn-retry").addEventListener("click", startRoll);
 document.getElementById("btn-accept").addEventListener("click", () => { document.querySelector("#screen-locked .subtitle").textContent = `${state.destination.label || state.destination.name} 已经锁定。出门就好。`; showScreen("locked"); });
 document.getElementById("btn-home").addEventListener("click", goHome);
@@ -204,12 +205,67 @@ function renderPlace(item) {
   card.innerHTML = `<div><p class="place-category">${item.category}</p><h3>${item.name}</h3></div><p>${item.category} · ${state.party}</p><p>距离 ${item.distance_km.toFixed(1)} km · 约 ${state.duration}</p><p class="place-freshness">数据${freshness(item.updated_at)}</p><a href="${item.source_url}" target="_blank" rel="noreferrer">查看数据来源 ↗</a>`;
   return card;
 }
+/* ---------- 周末方案（plan）模式：基于 experiences taxonomy 推荐，纯前端，不接外部数据 ---------- */
+// 当前展示的方案、各模块换次数、各模块历史（避免连续重复同一 Experience）
+let planExperiences = [];
+let planSwapCounts = [];
+let planModuleHistory = [];
+
+function startPlan() {
+  const plan = buildWeekendPlan({ people: state.party, duration: state.duration });
+  if (!plan || plan.empty || !plan.experiences.length) { showScreen("setup"); return; }
+  planExperiences = plan.experiences.slice();
+  planSwapCounts = planExperiences.map(() => 0);
+  planModuleHistory = planExperiences.map(() => []);
+  renderPlan();
+  showScreen("plan");
+}
+
+function scopeLabel(scope) { return scope === "suburban" ? "京郊" : scope === "urban" ? "城市" : "城市 / 京郊"; }
+
+function renderPlan() {
+  const container = document.getElementById("plan-list");
+  container.replaceChildren();
+  document.getElementById("plan-subtitle").textContent = `${state.party} · ${state.duration} · 共 ${planExperiences.length} 个玩法`;
+  planExperiences.forEach((exp, i) => {
+    const card = document.createElement("article");
+    card.className = "place-card plan-card " + (exp.role === "support" ? "is-support" : "is-core");
+    const isSupport = exp.role === "support";
+    const swapped = planSwapCounts[i] >= 3;
+    const tags = (exp.vibe || []).map((v) => `<span class="tag">${esc(v)}</span>`).join("");
+    card.innerHTML = `
+      <div><p class="place-category">${isSupport ? "辅助活动" : "核心活动"}</p><h3>${esc(exp.name)}</h3></div>
+      <p class="activity-meta">${esc(exp.main_type)} · ${esc(exp.sub_type || "")}</p>
+      <p class="activity-date">⏱ ${exp.duration_min}–${exp.duration_max} 分钟 · ${scopeLabel(exp.location_scope)}</p>
+      ${tags ? `<p class="plan-vibe">${tags}</p>` : ""}
+      <button class="btn btn-ghost btn-swap" type="button" data-index="${i}" ${swapped ? "disabled" : ""}>${swapped ? "命运已定 ✦" : "换一个"}</button>`;
+    container.append(card);
+  });
+  container.querySelectorAll(".btn-swap").forEach((btn) => btn.addEventListener("click", () => swapModule(Number(btn.dataset.index))));
+}
+
+function swapModule(i) {
+  if (i < 0 || i >= planExperiences.length || planSwapCounts[i] >= 3) return;
+  const role = planExperiences[i].role;
+  const displayedIds = planExperiences.map((e) => e.id);
+  const exclude = [...new Set([...displayedIds, ...planModuleHistory[i]])];
+  let next = pickExperience({ people: state.party, duration: state.duration, role, exclude });
+  if (!next) next = pickExperience({ people: state.party, duration: state.duration, role, exclude: [planExperiences[i].id] });
+  if (!next) next = pickExperience({ people: state.party, duration: state.duration, role });
+  if (!next) return;
+  planModuleHistory[i].push(planExperiences[i].id);
+  planExperiences[i] = next;
+  planSwapCounts[i] += 1;
+  renderPlan();
+}
+
 function restoreSession() {
   const saved = sessionStorage.getItem(STORAGE_KEY); if (!saved) return restoreSelectionUI();
   try {
     const previous = JSON.parse(saved); Object.assign(state, previous.state); navigationStack = previous.navigationStack || []; restoreSelectionUI();
     if (previous.currentScreen === "recent") { renderRecent(); showScreen("recent", { remember: false }); return; }
     if (previous.currentScreen === "pick") { renderPick(); showScreen("pick", { remember: false }); return; }
+    if (previous.currentScreen === "plan") { showScreen("setup", { remember: false }); return; }
     if (previous.currentScreen === "result" && state.destination && (state.mode !== "wander" || state.result)) { renderResult(); showScreen("result", { remember: false }); return; }
     // 刷新时不伪造未完成动画，回到可继续的条件页。
     showScreen(previous.currentScreen === "roll" ? "setup" : (previous.currentScreen || "home"), { remember: false });
@@ -227,5 +283,12 @@ document.getElementById("btn-recent-pick").addEventListener("click", () => { ren
 document.getElementById("btn-pick-go").addEventListener("click", () => { if (currentPick && currentPick.source_url) window.open(currentPick.source_url, "_blank", "noreferrer"); });
 document.getElementById("btn-pick-again").addEventListener("click", () => { renderPick(); });
 populateDistricts();
+
+/* plan 模式交互绑定（不改动命运/随便逛逛/recent/locked 等其它屏幕） */
+document.getElementById("btn-plan-lock").addEventListener("click", () => {
+  document.querySelector("#screen-locked .subtitle").textContent = "你的周末方案已经锁定。出门就好。";
+  showScreen("locked");
+});
+document.getElementById("btn-plan-regenerate").addEventListener("click", startPlan);
 
 restoreSession();
