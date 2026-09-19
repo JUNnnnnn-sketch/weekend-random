@@ -22,6 +22,8 @@
 export const experiences = [
   {
     "id": "music_festival",
+    "duration_type": "full_day",
+    "suburban_special": false,
     "name": "音乐节",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "户外音乐节",
@@ -52,6 +54,8 @@ export const experiences = [
   },
   {
     "id": "live_house",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "Live House",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "现场演出",
@@ -79,6 +83,8 @@ export const experiences = [
   },
   {
     "id": "jazz_live",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "爵士现场",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "现场演出",
@@ -106,6 +112,8 @@ export const experiences = [
   },
   {
     "id": "concert",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "演唱会",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "大型演出",
@@ -135,6 +143,8 @@ export const experiences = [
   },
   {
     "id": "concert_hall",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "音乐厅",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "古典/交响",
@@ -165,6 +175,8 @@ export const experiences = [
   },
   {
     "id": "theater",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "剧院/话剧",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "戏剧",
@@ -193,6 +205,8 @@ export const experiences = [
   },
   {
     "id": "standup",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "脱口秀",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "开放麦/商演",
@@ -220,6 +234,8 @@ export const experiences = [
   },
   {
     "id": "beijing_opera",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "京剧",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "传统戏曲",
@@ -247,6 +263,8 @@ export const experiences = [
   },
   {
     "id": "quyi",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "曲艺/小曲",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "传统曲艺",
@@ -274,6 +292,8 @@ export const experiences = [
   },
   {
     "id": "party",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "派对",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "私人/主题派对",
@@ -302,6 +322,8 @@ export const experiences = [
   },
   {
     "id": "clubbing",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "蹦迪",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "夜店",
@@ -329,6 +351,8 @@ export const experiences = [
   },
   {
     "id": "cocktail_event",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "鸡尾酒活动",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "品鉴/调酒秀",
@@ -358,6 +382,8 @@ export const experiences = [
   },
   {
     "id": "ktv",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "KTV",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "量贩/商务KTV",
@@ -384,6 +410,8 @@ export const experiences = [
   },
   {
     "id": "themed_party",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "主题派对",
     "main_type": "音乐/舞台/夜生活",
     "sub_type": "变装/主题派对",
@@ -413,6 +441,8 @@ export const experiences = [
   },
   {
     "id": "pottery",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "陶艺",
     "main_type": "手作/体验",
     "sub_type": "陶艺拉坯",
@@ -440,6 +470,8 @@ export const experiences = [
   },
   {
     "id": "jewelry",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "首饰制作",
     "main_type": "手作/体验",
     "sub_type": "银饰/串珠",
@@ -467,6 +499,8 @@ export const experiences = [
   },
   {
     "id": "floral",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "花艺",
     "main_type": "手作/体验",
     "sub_type": "花艺/插花",
@@ -495,6 +529,8 @@ export const experiences = [
   },
   {
     "id": "baking",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "烘焙体验",
     "main_type": "手作/体验",
     "sub_type": "甜点/面包",
@@ -522,6 +558,8 @@ export const experiences = [
   },
   {
     "id": "diy",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "DIY",
     "main_type": "手作/体验",
     "sub_type": "综合手作",
@@ -548,6 +586,8 @@ export const experiences = [
   },
   {
     "id": "painting",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "绘画体验",
     "main_type": "手作/体验",
     "sub_type": "油画/水彩",
@@ -576,6 +616,8 @@ export const experiences = [
   },
   {
     "id": "perfume",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "香水制作",
     "main_type": "手作/体验",
     "sub_type": "调香",
@@ -603,6 +645,8 @@ export const experiences = [
   },
   {
     "id": "bartending",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "调酒体验",
     "main_type": "手作/体验",
     "sub_type": "家庭调酒课",
@@ -630,6 +674,8 @@ export const experiences = [
   },
   {
     "id": "instrument_lesson",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "乐器体验课",
     "main_type": "手作/体验",
     "sub_type": "钢琴/吉他等",
@@ -657,6 +703,8 @@ export const experiences = [
   },
   {
     "id": "hanfu",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "汉服体验",
     "main_type": "手作/体验",
     "sub_type": "汉服妆造/拍摄",
@@ -685,6 +733,8 @@ export const experiences = [
   },
   {
     "id": "photography",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "摄影体验",
     "main_type": "手作/体验",
     "sub_type": "人像/街拍课",
@@ -713,6 +763,8 @@ export const experiences = [
   },
   {
     "id": "other_class",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "其他体验课",
     "main_type": "手作/体验",
     "sub_type": "手工/非遗等",
@@ -739,6 +791,8 @@ export const experiences = [
   },
   {
     "id": "karting",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "卡丁车",
     "main_type": "游戏/轻刺激",
     "sub_type": "室内/室外卡丁车",
@@ -767,6 +821,8 @@ export const experiences = [
   },
   {
     "id": "bowling",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "保龄球",
     "main_type": "游戏/轻刺激",
     "sub_type": "保龄球",
@@ -793,6 +849,8 @@ export const experiences = [
   },
   {
     "id": "billiards",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "台球",
     "main_type": "游戏/轻刺激",
     "sub_type": "台球/斯诺克",
@@ -819,6 +877,8 @@ export const experiences = [
   },
   {
     "id": "archery",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "射箭",
     "main_type": "游戏/轻刺激",
     "sub_type": "反曲/复合弓",
@@ -846,6 +906,8 @@ export const experiences = [
   },
   {
     "id": "shooting",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "射击体验",
     "main_type": "游戏/轻刺激",
     "sub_type": "气枪/靶场",
@@ -875,6 +937,8 @@ export const experiences = [
   },
   {
     "id": "climbing",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "攀岩体验",
     "main_type": "游戏/轻刺激",
     "sub_type": "室内攀岩",
@@ -904,6 +968,8 @@ export const experiences = [
   },
   {
     "id": "vr",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "VR",
     "main_type": "游戏/轻刺激",
     "sub_type": "VR体验馆",
@@ -932,6 +998,8 @@ export const experiences = [
   },
   {
     "id": "arcade",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "电玩城",
     "main_type": "游戏/轻刺激",
     "sub_type": "街机/抓娃娃",
@@ -960,6 +1028,8 @@ export const experiences = [
   },
   {
     "id": "escape_room",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "密室逃脱",
     "main_type": "游戏/轻刺激",
     "sub_type": "主题密室",
@@ -987,6 +1057,8 @@ export const experiences = [
   },
   {
     "id": "jubensha",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "剧本杀",
     "main_type": "游戏/轻刺激",
     "sub_type": "实景/桌面剧本",
@@ -1014,6 +1086,8 @@ export const experiences = [
   },
   {
     "id": "trpg",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "跑团",
     "main_type": "游戏/轻刺激",
     "sub_type": "TRPG/桌游团",
@@ -1041,6 +1115,8 @@ export const experiences = [
   },
   {
     "id": "board_game",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "桌游",
     "main_type": "游戏/轻刺激",
     "sub_type": "桌游吧",
@@ -1068,6 +1144,8 @@ export const experiences = [
   },
   {
     "id": "horse_riding",
+    "duration_type": "short",
+    "suburban_special": true,
     "name": "骑马体验",
     "main_type": "游戏/轻刺激",
     "sub_type": "马术/骑乘",
@@ -1097,6 +1175,8 @@ export const experiences = [
   },
   {
     "id": "ice_skating",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "滑冰",
     "main_type": "游戏/轻刺激",
     "sub_type": "真冰/仿真冰",
@@ -1123,6 +1203,8 @@ export const experiences = [
   },
   {
     "id": "sim_racing",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "模拟赛车",
     "main_type": "游戏/轻刺激",
     "sub_type": "赛车模拟器",
@@ -1150,6 +1232,8 @@ export const experiences = [
   },
   {
     "id": "sim_flight",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "模拟飞行",
     "main_type": "游戏/轻刺激",
     "sub_type": "飞行模拟器",
@@ -1177,6 +1261,8 @@ export const experiences = [
   },
   {
     "id": "pickleball",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "匹克球",
     "main_type": "游戏/轻刺激",
     "sub_type": "新兴球类",
@@ -1204,6 +1290,8 @@ export const experiences = [
   },
   {
     "id": "squash",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "壁球",
     "main_type": "游戏/轻刺激",
     "sub_type": "壁球",
@@ -1228,6 +1316,8 @@ export const experiences = [
   },
   {
     "id": "mini_golf",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "迷你高尔夫",
     "main_type": "游戏/轻刺激",
     "sub_type": "室内/户外迷你高尔夫",
@@ -1256,6 +1346,8 @@ export const experiences = [
   },
   {
     "id": "hot_spring_bath",
+    "duration_type": "full_day",
+    "suburban_special": false,
     "name": "汤泉",
     "main_type": "放松",
     "sub_type": "城市汤泉",
@@ -1282,6 +1374,8 @@ export const experiences = [
   },
   {
     "id": "onsen",
+    "duration_type": "full_day",
+    "suburban_special": true,
     "name": "温泉",
     "main_type": "放松",
     "sub_type": "温泉度假",
@@ -1310,6 +1404,8 @@ export const experiences = [
   },
   {
     "id": "sauna",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "桑拿",
     "main_type": "放松",
     "sub_type": "桑拿/汗蒸",
@@ -1336,6 +1432,8 @@ export const experiences = [
   },
   {
     "id": "spa",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "SPA",
     "main_type": "放松",
     "sub_type": "水疗护理",
@@ -1363,6 +1461,8 @@ export const experiences = [
   },
   {
     "id": "massage",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "按摩",
     "main_type": "放松",
     "sub_type": "推拿/按摩",
@@ -1389,6 +1489,8 @@ export const experiences = [
   },
   {
     "id": "afternoon_tea",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "下午茶",
     "main_type": "放松",
     "sub_type": "下午茶",
@@ -1417,6 +1519,8 @@ export const experiences = [
   },
   {
     "id": "cocktail",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "鸡尾酒",
     "main_type": "放松",
     "sub_type": "小酌鸡尾酒",
@@ -1443,6 +1547,8 @@ export const experiences = [
   },
   {
     "id": "bar",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "酒吧",
     "main_type": "放松",
     "sub_type": "清吧/小酒馆",
@@ -1470,6 +1576,8 @@ export const experiences = [
   },
   {
     "id": "night_view",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "看夜景",
     "main_type": "放松",
     "sub_type": "城市夜景",
@@ -1499,6 +1607,8 @@ export const experiences = [
   },
   {
     "id": "sunset",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "看日落",
     "main_type": "放松",
     "sub_type": "日落观测",
@@ -1530,6 +1640,8 @@ export const experiences = [
   },
   {
     "id": "picnic",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "野餐",
     "main_type": "放松",
     "sub_type": "公园野餐",
@@ -1559,6 +1671,8 @@ export const experiences = [
   },
   {
     "id": "hiking",
+    "duration_type": "half_day",
+    "suburban_special": true,
     "name": "徒步",
     "main_type": "自然/户外",
     "sub_type": "近郊徒步",
@@ -1588,6 +1702,8 @@ export const experiences = [
   },
   {
     "id": "mountain",
+    "duration_type": "full_day",
+    "suburban_special": true,
     "name": "爬山",
     "main_type": "自然/户外",
     "sub_type": "登山",
@@ -1617,6 +1733,8 @@ export const experiences = [
   },
   {
     "id": "cycling",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "骑行",
     "main_type": "自然/户外",
     "sub_type": "绿道/公路骑行",
@@ -1643,6 +1761,8 @@ export const experiences = [
   },
   {
     "id": "camping",
+    "duration_type": "full_day",
+    "suburban_special": true,
     "name": "露营",
     "main_type": "自然/户外",
     "sub_type": "营地露营",
@@ -1671,6 +1791,8 @@ export const experiences = [
   },
   {
     "id": "overnight_camp",
+    "duration_type": "multi_day",
+    "suburban_special": true,
     "name": "野营过夜",
     "main_type": "自然/户外",
     "sub_type": "过夜露营",
@@ -1699,6 +1821,8 @@ export const experiences = [
   },
   {
     "id": "fishing",
+    "duration_type": "half_day",
+    "suburban_special": true,
     "name": "钓鱼",
     "main_type": "自然/户外",
     "sub_type": "休闲垂钓",
@@ -1729,6 +1853,8 @@ export const experiences = [
   },
   {
     "id": "boating",
+    "duration_type": "short",
+    "suburban_special": true,
     "name": "划船",
     "main_type": "自然/户外",
     "sub_type": "游船/划艇",
@@ -1758,6 +1884,8 @@ export const experiences = [
   },
   {
     "id": "rafting",
+    "duration_type": "half_day",
+    "suburban_special": true,
     "name": "漂流",
     "main_type": "自然/户外",
     "sub_type": "峡谷/河道漂流",
@@ -1787,6 +1915,8 @@ export const experiences = [
   },
   {
     "id": "picking",
+    "duration_type": "half_day",
+    "suburban_special": true,
     "name": "采摘",
     "main_type": "自然/户外",
     "sub_type": "果园/农场采摘",
@@ -1817,6 +1947,8 @@ export const experiences = [
   },
   {
     "id": "sup",
+    "duration_type": "short",
+    "suburban_special": true,
     "name": "桨板",
     "main_type": "自然/户外",
     "sub_type": "SUP桨板",
@@ -1846,13 +1978,15 @@ export const experiences = [
     "novelty": "niche"
   },
   {
-    "id": "water_sports",
-    "name": "水上运动",
+    "id": "jet_ski",
+    "name": "摩托艇",
     "main_type": "自然/户外",
-    "sub_type": "摩托艇/帆板等",
+    "sub_type": "摩托艇/水上摩托",
     "role": "core",
+    "duration_type": "short",
+    "suburban_special": true,
     "duration_min": 90,
-    "duration_max": 240,
+    "duration_max": 180,
     "suitable_people": [
       "1",
       "2",
@@ -1873,11 +2007,45 @@ export const experiences = [
       "water_open",
       "rental_available"
     ],
-    "combinable": true,
+    "combinable": false,
     "novelty": "normal"
   },
   {
+    "id": "windsurf",
+    "name": "帆板",
+    "main_type": "自然/户外",
+    "sub_type": "帆板/风力冲浪",
+    "role": "core",
+    "duration_type": "short",
+    "suburban_special": true,
+    "duration_min": 120,
+    "duration_max": 180,
+    "suitable_people": [
+      "1",
+      "2",
+      "3+"
+    ],
+    "location_scope": "suburban",
+    "vibe": [
+      "outdoors",
+      "high_energy"
+    ],
+    "physical_demand": "medium",
+    "excitement": 2,
+    "season": "summer",
+    "reservation_required": true,
+    "first_time_friendly": true,
+    "requirements": [
+      "water_open",
+      "rental_available"
+    ],
+    "combinable": true,
+    "novelty": "niche"
+  },
+  {
     "id": "sunrise",
+    "duration_type": "short",
+    "suburban_special": true,
     "name": "看日出",
     "main_type": "自然/户外",
     "sub_type": "日出观测",
@@ -1908,6 +2076,8 @@ export const experiences = [
   },
   {
     "id": "stargazing",
+    "duration_type": "short",
+    "suburban_special": true,
     "name": "观星",
     "main_type": "自然/户外",
     "sub_type": "天文观测",
@@ -1939,6 +2109,8 @@ export const experiences = [
   },
   {
     "id": "amusement_park",
+    "duration_type": "full_day",
+    "suburban_special": false,
     "name": "游乐园",
     "main_type": "乐园/大型目的地",
     "sub_type": "机动游乐园",
@@ -1967,6 +2139,8 @@ export const experiences = [
   },
   {
     "id": "theme_park",
+    "duration_type": "full_day",
+    "suburban_special": false,
     "name": "主题公园",
     "main_type": "乐园/大型目的地",
     "sub_type": "IP主题公园",
@@ -1996,6 +2170,8 @@ export const experiences = [
   },
   {
     "id": "large_resort",
+    "duration_type": "full_day",
+    "suburban_special": false,
     "name": "大型乐园",
     "main_type": "乐园/大型目的地",
     "sub_type": "综合度假区",
@@ -2023,6 +2199,8 @@ export const experiences = [
   },
   {
     "id": "water_park",
+    "duration_type": "full_day",
+    "suburban_special": false,
     "name": "水上乐园",
     "main_type": "乐园/大型目的地",
     "sub_type": "水上乐园",
@@ -2050,6 +2228,8 @@ export const experiences = [
   },
   {
     "id": "botanical_garden",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "大型园区/植物园",
     "main_type": "乐园/大型目的地",
     "sub_type": "植物园/大园区",
@@ -2078,6 +2258,8 @@ export const experiences = [
   },
   {
     "id": "zoo",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "动物园",
     "main_type": "乐园/大型目的地",
     "sub_type": "动物园",
@@ -2106,6 +2288,8 @@ export const experiences = [
   },
   {
     "id": "quirky_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "奇趣博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "脑洞/怪奇博物馆",
@@ -2134,6 +2318,8 @@ export const experiences = [
   },
   {
     "id": "art_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "艺术博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "艺术类博物馆",
@@ -2161,6 +2347,8 @@ export const experiences = [
   },
   {
     "id": "history_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "历史博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "历史类博物馆",
@@ -2188,6 +2376,8 @@ export const experiences = [
   },
   {
     "id": "science_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "科技博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "科技类博物馆",
@@ -2215,6 +2405,8 @@ export const experiences = [
   },
   {
     "id": "nature_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "自然博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "自然类博物馆",
@@ -2242,6 +2434,8 @@ export const experiences = [
   },
   {
     "id": "military_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "军事博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "军事类博物馆",
@@ -2268,6 +2462,8 @@ export const experiences = [
   },
   {
     "id": "car_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "汽车博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "汽车类博物馆",
@@ -2294,6 +2490,8 @@ export const experiences = [
   },
   {
     "id": "industry_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "工业博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "工业类博物馆",
@@ -2321,6 +2519,8 @@ export const experiences = [
   },
   {
     "id": "food_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "食物博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "食物类博物馆",
@@ -2348,6 +2548,8 @@ export const experiences = [
   },
   {
     "id": "folk_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "民俗博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "民俗类博物馆",
@@ -2375,6 +2577,8 @@ export const experiences = [
   },
   {
     "id": "obscure_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "冷门博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "冷门类博物馆",
@@ -2402,6 +2606,8 @@ export const experiences = [
   },
   {
     "id": "general_museum",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "普通主题博物馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "综合类博物馆",
@@ -2429,6 +2635,8 @@ export const experiences = [
   },
   {
     "id": "art_gallery",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "美术馆",
     "main_type": "文化/奇趣探索",
     "sub_type": "当代美术馆",
@@ -2456,6 +2664,8 @@ export const experiences = [
   },
   {
     "id": "niche_exhibition",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "小众展览",
     "main_type": "文化/奇趣探索",
     "sub_type": "独立/小众展览",
@@ -2484,6 +2694,8 @@ export const experiences = [
   },
   {
     "id": "cultural_space",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "特色文化空间",
     "main_type": "文化/奇趣探索",
     "sub_type": "文创/复合空间",
@@ -2512,6 +2724,8 @@ export const experiences = [
   },
   {
     "id": "weird_exhibition",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "奇怪的主题展览",
     "main_type": "文化/奇趣探索",
     "sub_type": "怪奇主题展",
@@ -2540,6 +2754,8 @@ export const experiences = [
   },
   {
     "id": "city_walk",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "City Walk",
     "main_type": "城市探索",
     "sub_type": "城市漫步",
@@ -2568,6 +2784,8 @@ export const experiences = [
   },
   {
     "id": "hutong_night",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "胡同夜游",
     "main_type": "城市探索",
     "sub_type": "胡同夜游",
@@ -2596,6 +2814,8 @@ export const experiences = [
   },
   {
     "id": "old_architecture",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "老建筑探索",
     "main_type": "城市探索",
     "sub_type": "老建筑/名人故居",
@@ -2624,6 +2844,8 @@ export const experiences = [
   },
   {
     "id": "neighborhood",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "街区探索",
     "main_type": "城市探索",
     "sub_type": "街区漫游",
@@ -2652,6 +2874,8 @@ export const experiences = [
   },
   {
     "id": "night_route",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "夜游路线",
     "main_type": "城市探索",
     "sub_type": "夜间city walk",
@@ -2680,6 +2904,8 @@ export const experiences = [
   },
   {
     "id": "random_district",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "随机城区探索",
     "main_type": "城市探索",
     "sub_type": "随机城区漫游",
@@ -2708,6 +2934,8 @@ export const experiences = [
   },
   {
     "id": "walk",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "散步",
     "main_type": "城市探索",
     "sub_type": "街区短路线",
@@ -2734,6 +2962,8 @@ export const experiences = [
   },
   {
     "id": "racing_watch",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "赛车观赛",
     "main_type": "赛事/观赏",
     "sub_type": "赛车现场",
@@ -2761,6 +2991,8 @@ export const experiences = [
   },
   {
     "id": "equestrian_watch",
+    "duration_type": "half_day",
+    "suburban_special": false,
     "name": "马术观赛",
     "main_type": "赛事/观赏",
     "sub_type": "马术比赛",
@@ -2789,6 +3021,8 @@ export const experiences = [
   },
   {
     "id": "figure_skating_watch",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "花滑观赛",
     "main_type": "赛事/观赏",
     "sub_type": "花样滑冰赛",
@@ -2816,6 +3050,8 @@ export const experiences = [
   },
   {
     "id": "esports_watch",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "电竞观赛",
     "main_type": "赛事/观赏",
     "sub_type": "电竞赛事",
@@ -2845,6 +3081,8 @@ export const experiences = [
   },
   {
     "id": "live_sport_other",
+    "duration_type": "short",
+    "suburban_special": false,
     "name": "其他低门槛现场赛事",
     "main_type": "赛事/观赏",
     "sub_type": "球类/小众赛事",

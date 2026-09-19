@@ -97,12 +97,25 @@ const DURATION_WINDOW = {
   "一整天": [300, 600],
 };
 
-// 三种时长的组合结构：core = 核心玩法，support = 辅助玩法。
-const PLAN_STRUCTURE = {
-  "2-3小时": { core: 1, support: 0 },
-  "半天": { core: 1, support: 1 },
-  "一整天": { core: 2, support: 1 },
+// 每个时长档位的总时间预算（分钟上限），用于可行性校验（support 不能让总时间明显超预算）。
+const DURATION_BUDGET = {
+  "2-3小时": 180,
+  "半天": 300,
+  "一整天": 600,
 };
+
+// 每个时长档位允许出现的 duration_type。multi_day 在任何 MVP 档位都不参与（需住宿的京郊目的地直接排除）。
+const ALLOW_TYPE = {
+  "2-3小时": ["short"],
+  "半天": ["short", "half_day"],
+  "一整天": ["short", "half_day", "full_day"],
+};
+
+// 地点兼容：避免让用户在城市与京郊之间来回跑。任一方为 both 则互通；否则必须同 scope。
+function compatibleScope(a, b) {
+  if (a.location_scope === "both" || b.location_scope === "both") return true;
+  return a.location_scope === b.location_scope;
+}
 
 function peopleCodeOf(people) { return PEOPLE_CODE[people] ?? people; }
 
@@ -117,13 +130,16 @@ function durationOverlap(min, max, win) { return min <= win[1] && max >= win[0];
 
 /**
  * 按人数 / 时长 / 城市范围过滤 Experience，返回分离后的 core 与 support 候选池。
- * - core：时长须与本档窗口重叠，可单独构成主体活动。
- * - support：作为搭配，时长上限不超过本档窗口上限且不超过 240 分钟（短搭配）。
+ * 新增两层约束（与 buildWeekendPlan 共用，保证「换一个」也遵循同一套可行性规则）：
+ *   - duration_type 必须属于本档位允许的集合（multi_day 在任何档位都被排除）。
+ *   - suburban（京郊）Experience 只在「一整天」进入候选；2-3小时 / 半天完全不出现京郊。
  * 返回真实存在于 data/experiences.js 的 Experience 对象，不自行生成任何名称。
  */
 export function filterExperiences({ people, duration, locationScope } = {}) {
   const code = peopleCodeOf(people);
   const win = DURATION_WINDOW[duration] || [0, Number.MAX_SAFE_INTEGER];
+  const allowType = ALLOW_TYPE[duration] || ["short"];
+  const suburbanAllowed = duration === "一整天";
   const supportCap = Math.min(win[1], 240);
   const core = [];
   const support = [];
@@ -131,9 +147,13 @@ export function filterExperiences({ people, duration, locationScope } = {}) {
     if (!exp.suitable_people.includes(code)) continue;
     if (!scopeMatch(exp, locationScope)) continue;
     if (exp.role === "support") {
+      if (!allowType.includes(exp.duration_type)) continue;
       if (exp.duration_max <= supportCap) support.push(exp);
-    } else if (durationOverlap(exp.duration_min, exp.duration_max, win)) {
-      core.push(exp);
+    } else {
+      if (!allowType.includes(exp.duration_type)) continue;            // 排除 multi_day / 不匹配时长档
+      if (exp.location_scope === "suburban" && !suburbanAllowed) continue; // 京郊仅「一整天」
+      if (exp.duration_type !== "full_day" && exp.duration_max > win[1]) continue; // 非整日玩法不能超过本档上限
+      if (durationOverlap(exp.duration_min, exp.duration_max, win)) core.push(exp);
     }
   }
   return { core, support };
@@ -153,35 +173,69 @@ export function pickExperience({ people, duration, locationScope, role = "core",
 }
 
 /**
- * 构建一个周末计划（结构化数据，不触碰 UI）。
- * 组合结构由 duration 档位决定：
- *   - 2-3小时：1 个 core
- *   - 半天：    1 个 core + 1 个 support
- *   - 一整天：  2 个 core + 1 个 support
- * 同一计划内不重复选同一 Experience；exclude 可跨次传入以避免连续重复。
+ * 构建一个「现实中可以完成」的周末计划（结构化数据，不触碰 UI）。
+ *
+ * 设计原则（可行性 > 丰富度）：
+ *   1. 先筛合法 core，再判断它是 short / half_day / full_day / multi_day。
+ *   2. multi_day 任何档位都不参与；京郊(suburban)只在「一整天」出现，且作为完整出行场景。
+ *   3. full_day core 或 combinable:false 的 core 单独成方案（情况A），不强行叠加。
+ *   4. 其余情况在「剩余时间预算」内尝试补充，且补充项必须与 primary core 地点兼容、不超时。
+ *   5. 宁可少一张卡，也不生成明显不合理的行程。
+ *
+ * 接口保持稳定：{ people, duration, locationScope, exclude } -> { people, duration, locationScope, structure, experiences, empty }
  */
 export function buildWeekendPlan({ people, duration, locationScope, exclude = [] } = {}) {
-  const struct = PLAN_STRUCTURE[duration] || PLAN_STRUCTURE["2-3小时"];
+  const ctx = { people, duration, locationScope: locationScope || "both" };
+  const budget = DURATION_BUDGET[duration] ?? Number.MAX_SAFE_INTEGER;
+  const { core: corePool, support: supportPool } = filterExperiences({ people, duration, locationScope });
   const used = new Set(exclude);
-  const picks = [];
-  for (let i = 0; i < struct.core; i++) {
-    const exp = pickExperience({ people, duration, locationScope, role: "core", exclude: [...used] });
-    if (!exp) break;
-    picks.push(exp);
-    used.add(exp.id);
+  const candidateCores = corePool.filter((e) => !used.has(e.id));
+  if (!candidateCores.length) {
+    return { ...ctx, structure: { type: "empty", moduleCount: 0 }, experiences: [], empty: true };
   }
-  for (let i = 0; i < struct.support; i++) {
-    const exp = pickExperience({ people, duration, locationScope, role: "support", exclude: [...used] });
-    if (!exp) break;
-    picks.push(exp);
-    used.add(exp.id);
+  const plan = [randomItem(candidateCores)];
+  used.add(plan[0].id);
+
+  // 2-3小时：一个 short core 即成立，不强行加 support。
+  if (duration === "2-3小时") return finalize(plan, ctx, "single_core");
+  // full_day core 或不可组合的 core：单独成方案（情况A）。
+  if (plan[0].duration_type === "full_day" || plan[0].combinable === false) {
+    return finalize(plan, ctx, plan[0].duration_type === "full_day" ? "full_day_core" : "non_combinable_core");
   }
-  return {
-    people,
-    duration,
-    locationScope: locationScope || "both",
-    structure: struct,
-    experiences: picks,
-    empty: picks.length === 0,
-  };
+
+  // 半天 / 一整天：在剩余预算内尝试补充（不强制），至多 2 个 core + 1 个 support。
+  const MAX_MODULES = 3;
+  let remaining = budget - plan[0].duration_max;
+  let coreCount = 1;
+  let supportCount = 0;
+  let guard = 0;
+  while (plan.length < MAX_MODULES && guard < 6) {
+    guard += 1;
+    if (remaining < 60) break;
+    const primary = plan[0];
+    const coreOpts = coreCount < 2
+      ? corePool.filter((e) => e.id !== primary.id && !used.has(e.id) && compatibleScope(e, primary) && e.duration_max <= remaining)
+      : [];
+    const supOpts = supportCount < 1
+      ? supportPool.filter((e) => !used.has(e.id) && compatibleScope(e, primary) && e.duration_max <= remaining)
+      : [];
+    let pick = null;
+    if (coreOpts.length && remaining >= 180) pick = randomItem(coreOpts);
+    else if (supOpts.length) pick = randomItem(supOpts);
+    else if (coreOpts.length) pick = randomItem(coreOpts);
+    else if (supOpts.length) pick = randomItem(supOpts);
+    if (!pick) break;
+    plan.push(pick);
+    used.add(pick.id);
+    remaining -= pick.duration_max;
+    if (pick.role === "support") supportCount += 1; else coreCount += 1;
+  }
+  const type = plan.length >= 3 ? "multi_module"
+    : plan.length === 2 && plan[1].role === "support" ? "core_support"
+    : "multi_core";
+  return finalize(plan, ctx, type);
+}
+
+function finalize(plan, ctx, type) {
+  return { ...ctx, structure: { type, moduleCount: plan.length }, experiences: plan, empty: plan.length === 0 };
 }
