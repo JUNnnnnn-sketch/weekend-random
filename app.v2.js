@@ -1,7 +1,8 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, freshness, buildWeekendPlan, pickExperience } from "./recommendation.js";
+import { pickDestination, fortuneScopeLines, findNearbyPois, freshness, buildWeekendPlan, pickExperience, FORTUNE_SCOPE_KM, NEARBY_RADIUS_KM } from "./recommendation.js";
+import { poiSource } from "./data/station_pois.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
 const CATEGORY_BLACKLIST = new Set(["便民活动", "招考招聘", "惠企活动"]);
@@ -178,12 +179,13 @@ async function startRoll() {
   const runId = ++rollRunId; rollLog.replaceChildren();
   document.getElementById("roll-kicker").textContent = "命运正在抽签";
   showScreen("roll");
-  // 命运模式只做一件事：随机线路 -> 随机站点。不看坐标，也不在这里找“附近有什么”。
+  // 命运模式只做一件事：在覆盖范围内随机线路 -> 随机站点。“附近有什么”是下一阶段。
+  const scopedLines = fortuneScopeLines(subwayLines);
   const picked = pickDestination(subwayLines);
   if (!picked) { addLog("暂时没有可用的地铁线路数据", true); return; }
   const { line, station, destination } = picked;
   state.destination = destination;
-  addLog("正在决定地铁线……"); if (!await spinTo(subwayLines.map((item) => item.line_name), line.line_name, "正在决定地铁线……", runId)) return;
+  addLog("正在决定地铁线……"); if (!await spinTo(scopedLines.map((item) => item.line_name), line.line_name, "正在决定地铁线……", runId)) return;
   addLog(line.line_name, true); await wait(350); addLog("正在决定车站……");
   if (!await spinTo(line.stations.map((item) => item.station_name), station.station_name, "正在决定车站……", runId)) return;
   addLog(station.station_name, true);
@@ -202,15 +204,39 @@ function renderResult() {
 
 /** 命运模式的结果页：只公布目的地（线路 + 站点），并为下一阶段留出入口。缺坐标不影响展示。 */
 function renderDestinationOnly() {
-  const { line_name, station_order, has_coordinates } = state.destination;
+  const { line_name, station_order } = state.destination;
   document.getElementById("result-meta").textContent = `${state.party} · ${state.duration} · ${line_name} 第 ${station_order} 站`;
   document.getElementById("explore-task").hidden = true;
-  document.querySelector(".result-lead").textContent = "🚇 下一步";
+
+  const pois = findNearbyPois(state.destination);
   const list = document.getElementById("place-list"); list.replaceChildren();
-  const card = document.createElement("article"); card.className = "place-card";
-  const coordNote = has_coordinates ? "" : '<p class="place-freshness">这个站还没有公开坐标，不影响它成为今天的目的地。</p>';
-  card.innerHTML = `<div><p class="place-category">下一步</p><h3>看看附近有什么</h3></div><p>目的地已经定了。附近玩法还没接入可核验的数据，接上之后会在这里展开。</p>${coordNote}<button class="btn btn-ghost" type="button" disabled>看看附近有什么（即将开放）</button>`;
-  list.append(card);
+
+  if (!pois.length) {
+    document.querySelector(".result-lead").textContent = "🚇 这一站";
+    list.innerHTML = '<p class="empty">这站附近还没有收录到值得推荐的地方。系统不会为了凑数扩大范围——出门随便走走也不错。</p>';
+    return;
+  }
+
+  document.querySelector(".result-lead").textContent = `📍 ${state.destination.station_name}附近`;
+  // 按品类分组展示；组内按距离升序。同一个站每次结果一致，随机性只发生在抽站那一步。
+  const groups = new Map();
+  pois.forEach((poi) => {
+    if (!groups.has(poi.category)) groups.set(poi.category, []);
+    groups.get(poi.category).push(poi);
+  });
+  groups.forEach((items, category) => {
+    const card = document.createElement("article"); card.className = "place-card";
+    const rows = items.slice(0, 5).map((poi) =>
+      `<p><strong>${poi.name}</strong> · ${poi.subtype}<br /><span class="place-freshness">步行约 ${Math.round(poi.distance_km * 1000)} 米 · <a href="${poi.source_url}" target="_blank" rel="noreferrer">地图 ↗</a></span></p>`).join("");
+    const more = items.length > 5 ? `<p class="place-freshness">另有 ${items.length - 5} 个未列出</p>` : "";
+    card.innerHTML = `<div><p class="place-category">${category}</p><h3>${items.length} 个</h3></div>${rows}${more}`;
+    list.append(card);
+  });
+
+  const note = document.createElement("p");
+  note.className = "place-freshness";
+  note.innerHTML = `范围 ${NEARBY_RADIUS_KM} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
+  list.append(note);
 }
 function renderPlace(item) {
   const card = document.createElement("article"); card.className = "place-card";

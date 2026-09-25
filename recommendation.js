@@ -1,5 +1,6 @@
 import { experiences } from "./data/experiences.js";
 import { stationCoordinates } from "./data/station_coordinates.js";
+import { nearbyPois } from "./data/station_pois.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -19,13 +20,37 @@ function coordinatesOf(station) {
 }
 
 /**
+ * 命运模式的覆盖范围：距市中心（天安门）这个公里数以内的车站。
+ *
+ * 为什么要划范围：远郊站周边几乎没有可推荐的地方（12km 以外只有约 48% 的站
+ * 能找到内容，20km 以外只有 29%），不设范围的话超过一半的抽签会落空。
+ * 划定范围不是把骰子做手脚——范围公开写在界面上，范围之内仍是真随机。
+ *
+ * 8 km 覆盖 121 个站，其中 93% 能给出附近推荐，是覆盖面与命中率的平衡点。
+ */
+const CITY_CENTER = { latitude: 39.9087, longitude: 116.3975 };
+export const FORTUNE_SCOPE_KM = 8;
+export const NEARBY_RADIUS_KM = 1.2;
+
+function inFortuneScope(station) {
+  const hit = stationCoordinates[station.physical_station_id];
+  return Boolean(hit) && distanceKm(CITY_CENTER, hit) <= FORTUNE_SCOPE_KM;
+}
+
+/** 把线路裁剪到覆盖范围内；裁剪后没有站的线路整条去掉。 */
+export function fortuneScopeLines(lines) {
+  return lines
+    .map((line) => ({ ...line, stations: (line.stations || []).filter(inFortuneScope) }))
+    .filter((line) => line.stations.length);
+}
+
+/**
  * 命运模式的随机阶段：只决定“去哪”。
- * 随机一条真实线路 -> 随机该线路上的一个真实站点。
- * 完全不依赖坐标：latitude/longitude 为 null 的站点同样可以被抽中。
+ * 在覆盖范围内随机一条真实线路 -> 随机该线路上的一个真实站点。
  * 这里不做任何“附近有什么”的筛选，那是独立的后续阶段。
  */
 export function pickDestination(lines) {
-  const usable = lines.filter((line) => line.stations && line.stations.length);
+  const usable = fortuneScopeLines(lines);
   if (!usable.length) return null;
   const line = randomItem(usable);
   const station = randomItem(line.stations);
@@ -49,6 +74,22 @@ export function pickDestination(lines) {
       label: `${line.line_name} · ${station.station_name}`,
     },
   };
+}
+
+/**
+ * 「附近有什么」阶段：找出目的地周边的真实场所，按距离升序。
+ *
+ * 结果是稳定的——同一个站每次返回同样的清单。随机性已经在上一步
+ * “命运把你送到哪一站”里用掉了，附近推荐本来就不该每次都变。
+ *
+ * 没有坐标、或周边确实没有收录的场所时，返回空数组。不扩大半径去凑数。
+ */
+export function findNearbyPois(destination, { radiusKm = NEARBY_RADIUS_KM } = {}) {
+  if (!destination || destination.latitude === null || destination.longitude === null) return [];
+  return nearbyPois
+    .map((poi) => ({ ...poi, distance_km: distanceKm(destination, poi) }))
+    .filter((poi) => poi.distance_km <= radiusKm)
+    .sort((a, b) => a.distance_km - b.distance_km);
 }
 
 export function distanceKm(a, b) {

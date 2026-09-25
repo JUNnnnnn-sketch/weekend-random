@@ -1,0 +1,10 @@
+# Overpass 原始响应缓存：体积大、可随时重新抓取，不入库
+tools/.cache/
+
+# Python 运行产物
+__pycache__/
+*.pyc
+
+# 云 IDE / 编辑器的本地配置
+.cloudstudio
+.codebuddy/

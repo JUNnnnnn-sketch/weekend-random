@@ -1,0 +1,250 @@
+# -*- coding: utf-8 -*-
+"""抓取地铁站周边「值得专门去」的 POI，输出 data/station_pois.js。
+
+用法（项目根目录）：
+    python tools/fetch_station_pois.py            # 缺哪组抓哪组，然后生成文件
+    python tools/fetch_station_pois.py --rebuild  # 只用已缓存的响应重新生成，不联网
+    python tools/fetch_station_pois.py --force    # 忽略缓存，全部重抓
+
+输入：Overpass API（OpenStreetMap），北京 bbox
+输出：data/station_pois.js —— 扁平的 POI 列表（不预先按站分组）
+
+为什么是扁平列表而不是「每站一个清单」：
+  同一个博物馆会落在好几个站的范围内，按站分组会大量重复；而且半径一改就得
+  重新生成。扁平列表由前端在运行时按距离匹配，改半径不用重跑脚本。
+
+分批抓取：
+  Overpass 是公共服务，一次把所有品类拉回来响应太大（实测 667KB 处传输中断），
+  且容易触发 429。因此按品类分组、逐组请求、组间停顿；每组的原始响应缓存到
+  tools/.cache/ 下，被 429 中断后下次运行只补缺的组，不会重复拉已经拿到的。
+
+  遇到 429 立即停止后续请求——这是服务端明确的退让信号，不是可以重试的错误。
+  传输中断（IncompleteRead 之类）则重试一次，那是链路问题不是服务端拒绝。
+
+刻意不收的品类：
+  - amenity=restaurant：北京有上万条，且绝大多数不是「值得专门坐地铁去」的地方。
+  - amenity=cafe：838 条里 426 条是连锁（星巴克/瑞幸/喜茶），
+    剩下的也无从判断好坏——OSM 里只有 111 条带营业时间或网站。
+  - tourism=attraction：820 条里大量是「簋街雕像」「帽儿胡同」这类地图要素。
+  收进来只会稀释真正值得推荐的那几百条。等有了人气信号再说。
+
+许可：POI 数据来自 OpenStreetMap contributors，ODbL 1.0。
+     使用须保留署名并履行 ODbL 义务。
+"""
+
+import argparse
+import json
+import os
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from collections import Counter
+from datetime import datetime, timezone
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CACHE = os.path.join(ROOT, "tools", ".cache")
+OUT = os.path.join(ROOT, "data", "station_pois.js")
+
+UA = "weekend-random/0.1 (personal hobby project; POI near subway stations)"
+OVERPASS = "https://overpass-api.de/api/interpreter"
+# 由 data/station_coordinates.js 的坐标范围加约 2km 余量得出
+BBOX = "39.49,115.95,40.26,116.76"
+GAP_SECONDS = 3
+
+# 分组抓取：每组单独请求、单独缓存
+GROUPS = {
+    "culture":     [("tourism", "museum"), ("tourism", "gallery"), ("amenity", "arts_centre")],
+    "performance": [("amenity", "theatre"), ("amenity", "cinema"), ("amenity", "nightclub")],
+    "nightlife":   [("amenity", "bar"), ("amenity", "pub")],
+}
+
+# OSM 标签 -> 展示品类
+CATEGORY = {
+    ("tourism", "museum"):      ("🎨 艺术 / 展览", "博物馆"),
+    ("tourism", "gallery"):     ("🎨 艺术 / 展览", "美术馆 / 画廊"),
+    ("amenity", "arts_centre"): ("🎨 艺术 / 展览", "艺术中心"),
+    ("amenity", "theatre"):     ("🎵 音乐 / 演出", "剧场"),
+    ("amenity", "cinema"):      ("🎵 音乐 / 演出", "影院"),
+    ("amenity", "nightclub"):   ("🎵 音乐 / 演出", "Live House / 夜店"),
+    ("amenity", "bar"):         ("🍸 夜生活", "酒吧"),
+    ("amenity", "pub"):         ("🍸 夜生活", "酒馆"),
+}
+
+
+def build_query(tags):
+    clauses = "\n".join('  nwr["%s"="%s"]["name"](%s);' % (k, v, BBOX) for k, v in tags)
+    return "[out:json][timeout:180];\n(\n%s\n);\nout center tags;\n" % clauses
+
+
+class RateLimited(Exception):
+    """Overpass 明确要求退让，应当停止本次全部后续请求。"""
+
+
+def fetch_group(label, tags, attempt=1):
+    request = urllib.request.Request(
+        OVERPASS,
+        data=urllib.parse.urlencode({"data": build_query(tags)}).encode(),
+        headers={"User-Agent": UA},
+    )
+    started = time.time()
+    try:
+        with urllib.request.urlopen(request, timeout=240) as response:
+            raw = response.read()
+        print("  ✅ %-12s %.1fs  %d KB" % (label, time.time() - started, len(raw) // 1024))
+        return raw
+    except urllib.error.HTTPError as e:
+        if e.code == 429:
+            raise RateLimited(label)
+        print("  ❌ %-12s HTTP %s %s" % (label, e.code, e.reason))
+        return None
+    except Exception as e:
+        # 传输中断是链路问题，重试一次；再失败就放弃这一组
+        if attempt == 1:
+            print("  ⚠️  %-12s %s，传输中断，隔 10s 重试一次" % (label, type(e).__name__))
+            time.sleep(10)
+            return fetch_group(label, tags, 2)
+        print("  ❌ %-12s 两次均失败，跳过" % label)
+        return None
+
+
+def collect(force=False, offline=False):
+    os.makedirs(CACHE, exist_ok=True)
+    raws, missing = {}, []
+    pending = []
+    for label in GROUPS:
+        path = os.path.join(CACHE, "poi_%s.json" % label)
+        if os.path.exists(path) and not force:
+            raws[label] = open(path, "rb").read()
+            print("  📁 %-12s 用缓存" % label)
+        elif offline:
+            missing.append(label)
+        else:
+            pending.append(label)
+
+    for i, label in enumerate(pending):
+        if i:
+            time.sleep(GAP_SECONDS)
+        try:
+            raw = fetch_group(label, GROUPS[label])
+        except RateLimited:
+            print("  ⛔ %-12s HTTP 429 —— 服务端要求退让，本次停止抓取剩余分组" % label)
+            missing.extend(pending[i:])
+            break
+        if raw is None:
+            missing.append(label)
+            continue
+        open(os.path.join(CACHE, "poi_%s.json" % label), "wb").write(raw)
+        raws[label] = raw
+    return raws, missing
+
+
+def parse(raws):
+    pois, seen = [], set()
+    for raw in raws.values():
+        for element in json.loads(raw.decode("utf-8"))["elements"]:
+            tags = element.get("tags") or {}
+            name = (tags.get("name") or "").strip()
+            lat, lon = element.get("lat"), element.get("lon")
+            if lat is None and element.get("center"):
+                lat, lon = element["center"]["lat"], element["center"]["lon"]
+            if not name or lat is None:
+                continue
+            category = subtype = None
+            for key, value in CATEGORY.items():
+                if tags.get(key[0]) == key[1]:
+                    category, subtype = value
+                    break
+            if not category:
+                continue
+            osm_id = "%s/%s" % (element["type"], element["id"])
+            if osm_id in seen:
+                continue
+            seen.add(osm_id)
+            pois.append({
+                "id": osm_id,
+                "name": name,
+                "category": category,
+                "subtype": subtype,
+                "latitude": round(lat, 6),
+                "longitude": round(lon, 6),
+                "source_url": "https://www.openstreetmap.org/%s/%s" % (element["type"], element["id"]),
+                "website": tags.get("website") or tags.get("contact:website") or None,
+                "opening_hours": tags.get("opening_hours") or None,
+            })
+    pois.sort(key=lambda p: (p["category"], p["name"]))
+    return pois
+
+
+def write_js(pois, missing):
+    now = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+    by_category = Counter(p["category"] for p in pois)
+    lines = []
+    w = lines.append
+    w("/**")
+    w(" * 地铁站周边「值得专门去」的 POI，扁平列表，由前端按距离匹配到站点。")
+    w(" *")
+    w(" * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。")
+    w(" * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。")
+    w(" * 获取时间：%s" % now)
+    w(" *")
+    w(" * 共 %d 条：" % len(pois))
+    for name, count in by_category.most_common():
+        w(" *   %s  %d" % (name, count))
+    if missing:
+        w(" *")
+        w(" * ⚠️ 本次未取到的分组：%s" % "、".join(missing))
+        w(" *   （多因 Overpass 限流；重跑脚本会只补这些分组，已有缓存不会重复请求）")
+    w(" *")
+    w(" * 刻意不收餐厅、咖啡、泛化景点——理由见 tools/fetch_station_pois.py 的说明。")
+    w(" * 坐标为 WGS84，与 data/station_coordinates.js 同一坐标系。")
+    w(" *")
+    w(" * 本文件由 tools/fetch_station_pois.py 生成，不要手工编辑。")
+    w(" */")
+    w("export const nearbyPois = [")
+    for p in pois:
+        w("  { id: %s, name: %s, category: %s, subtype: %s, latitude: %s, longitude: %s, source_url: %s },"
+          % (json.dumps(p["id"]), json.dumps(p["name"], ensure_ascii=False),
+             json.dumps(p["category"], ensure_ascii=False), json.dumps(p["subtype"], ensure_ascii=False),
+             p["latitude"], p["longitude"], json.dumps(p["source_url"])))
+    w("];")
+    w("")
+    w("/** POI 来源署名，展示这些内容时应当带上。 */")
+    w("export const poiSource = {")
+    w('  name: "OpenStreetMap contributors",')
+    w('  url: "https://www.openstreetmap.org/copyright",')
+    w('  license: "ODbL 1.0",')
+    w('  fetched_at: "%s",' % now)
+    w("};")
+    w("")
+    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines))
+
+
+def main():
+    parser = argparse.ArgumentParser(description="抓取地铁站周边 POI")
+    parser.add_argument("--rebuild", action="store_true", help="只用缓存重新生成，不联网")
+    parser.add_argument("--force", action="store_true", help="忽略缓存，全部重抓")
+    args = parser.parse_args()
+
+    print("分组抓取（组间停顿 %ds，遇 429 立即停止）：" % GAP_SECONDS)
+    raws, missing = collect(force=args.force, offline=args.rebuild)
+    if not raws:
+        raise SystemExit("一组都没取到，本次不生成文件。")
+
+    pois = parse(raws)
+    print()
+    print("解析得到 %d 条 POI：" % len(pois))
+    for name, count in Counter(p["category"] for p in pois).most_common():
+        print("   %-16s %d" % (name, count))
+    if missing:
+        print()
+        print("⚠️ 未取到的分组：%s —— 稍后重跑脚本即可只补这些" % "、".join(missing))
+
+    write_js(pois, missing)
+    print()
+    print("已写出：%s" % OUT)
+
+
+if __name__ == "__main__":
+    main()
