@@ -1,0 +1,46 @@
+# 一次性连通性测试：确认 GitHub Actions 的美国服务器能否访问国内公开数据源。
+# 手动触发，不定时。测完即可删除本文件。
+name: connectivity-test
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Runner 位置
+        run: |
+          echo "--- runner 出口 IP 与地区 ---"
+          curl -sS --max-time 20 https://ipinfo.io/json || echo "(取不到)"
+          echo
+
+      - name: 探查国内公开站点
+        run: |
+          UA="weekend-random-connectivity-test/0.1 (personal hobby project)"
+          for url in \
+            "https://www.chncpa.org/" \
+            "https://www.bjwhy.org.cn/" \
+            "https://www.beijing.gov.cn/"
+          do
+            echo "=== $url"
+            curl -sS -o /tmp/body -A "$UA" --max-time 30 \
+              -w "http_code=%{http_code}  time=%{time_total}s  size=%{size_download}B\n" \
+              "$url" || echo "!!! 请求失败"
+            echo "--- 响应开头 120 字符:"
+            head -c 120 /tmp/body | tr '\n' ' '; echo
+            echo
+          done
+
+      - name: 探查北京群众文化云 API（真正要用的接口）
+        run: |
+          UA="weekend-random-connectivity-test/0.1 (personal hobby project)"
+          API="https://www.bjwhy.org.cn/bjggwhy/activity/getActivityByPageAndOrderByType?pageNum=1&pageSize=5&orderByType=1"
+          echo "=== $API"
+          curl -sS -o /tmp/api.json -A "$UA" --max-time 30 \
+            -w "http_code=%{http_code}  time=%{time_total}s  size=%{size_download}B\n" \
+            "$API" || echo "!!! 请求失败"
+          echo "--- 响应开头 400 字符:"
+          head -c 400 /tmp/api.json | tr '\n' ' '; echo
