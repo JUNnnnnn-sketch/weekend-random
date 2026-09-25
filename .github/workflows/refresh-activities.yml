@@ -1,0 +1,92 @@
+# 刷新「最近在玩」的活动数据。
+# 目前只支持手动触发；跑通并确认无误后，再加 schedule 改成每天自动。
+name: refresh-activities
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 两个抓取脚本只用标准库，不需要 pip install
+
+      - name: 记录刷新前的条数
+        id: before
+        run: |
+          cal=$(grep -c '"source_url"' data/activities.js || true)
+          ncpa=$(grep -c '"source_url"' data/activities_chncpa.js || true)
+          echo "cal=${cal:-0}"   >> "$GITHUB_OUTPUT"
+          echo "ncpa=${ncpa:-0}" >> "$GITHUB_OUTPUT"
+          echo "刷新前：城市日历 ${cal:-0} 条 / 国家大剧院 ${ncpa:-0} 条"
+
+      - name: 抓取城市日历
+        working-directory: tools
+        run: python update_recent_activities.py
+
+      - name: 抓取国家大剧院
+        working-directory: tools
+        run: python fetch_chncpa.py
+
+      # 安全闸：最危险的情况不是抓取失败（那很明显），
+      # 而是接口返回 200 但内容为空，脚本老实写了个空文件提交上去，
+      # 网站被悄悄清空。宁可让任务失败报警，也不要提交可疑数据。
+      - name: 安全闸 — 条数骤降则中止
+        run: |
+          set -euo pipefail
+          check() {
+            local name="$1" file="$2" before="$3"
+            local after
+            after=$(grep -c '"source_url"' "$file" || true)
+            after=${after:-0}
+            echo "$name：$before -> $after"
+            if [ "$after" -eq 0 ]; then
+              echo "::error::$name 刷新后为 0 条，判定为异常，中止提交"
+              return 1
+            fi
+            if [ "$before" -gt 0 ] && [ $((after * 2)) -lt "$before" ]; then
+              echo "::error::$name 条数不足刷新前的一半（$before -> $after），判定为异常，中止提交"
+              return 1
+            fi
+            return 0
+          }
+          ok=0
+          check "城市日历"   data/activities.js        "${{ steps.before.outputs.cal }}"  || ok=1
+          check "国家大剧院" data/activities_chncpa.js "${{ steps.before.outputs.ncpa }}" || ok=1
+          exit $ok
+
+      - name: 有变化才提交
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- data/; then
+            echo "数据无变化，跳过提交"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/activities.js data/activities_chncpa.js
+          git commit -m "chore: 自动刷新活动数据 $(TZ=Asia/Shanghai date +%F)"
+          git push
+          echo "已提交并推送"
+
+      - name: 摘要
+        if: always()
+        run: |
+          {
+            echo "### 活动数据刷新结果"
+            echo ""
+            echo "| 来源 | 刷新前 | 刷新后 |"
+            echo "| --- | ---: | ---: |"
+            echo "| 城市日历 | ${{ steps.before.outputs.cal }} | $(grep -c '\"source_url\"' data/activities.js || echo 0) |"
+            echo "| 国家大剧院 | ${{ steps.before.outputs.ncpa }} | $(grep -c '\"source_url\"' data/activities_chncpa.js || echo 0) |"
+          } >> "$GITHUB_STEP_SUMMARY"
