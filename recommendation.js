@@ -1,8 +1,22 @@
 import { experiences } from "./data/experiences.js";
+import { stationCoordinates } from "./data/station_coordinates.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 
 export function randomItem(items) { return items[Math.floor(Math.random() * items.length)]; }
+
+/**
+ * 坐标只认 data/station_coordinates.js（来自 OSM，WGS84），不回退到 subway.js 里的值。
+ *
+ * 原因：Excel 带来的那 20 条坐标经比对确认是 GCJ-02（把 OSM 的 WGS84 做一次
+ * WGS84->GCJ-02 变换后，与 Excel 值的平均差距从 499 m 降到 76 m），与 OSM 的
+ * WGS84 不是同一个坐标系。两者混用会在那几个站上引入约 500 m 的系统性误差，
+ * 足以毁掉按距离做的“附近有什么”。宁可缺坐标，也不要混坐标系。
+ */
+function coordinatesOf(station) {
+  const hit = stationCoordinates[station.physical_station_id];
+  return hit ? { latitude: hit.latitude, longitude: hit.longitude } : { latitude: null, longitude: null };
+}
 
 /**
  * 命运模式的随机阶段：只决定“去哪”。
@@ -15,6 +29,7 @@ export function pickDestination(lines) {
   if (!usable.length) return null;
   const line = randomItem(usable);
   const station = randomItem(line.stations);
+  const { latitude, longitude } = coordinatesOf(station);
   return {
     line,
     station,
@@ -26,9 +41,10 @@ export function pickDestination(lines) {
       physical_station_id: station.physical_station_id,
       station_name: station.station_name,
       station_order: station.station_order,
-      latitude: station.latitude,
-      longitude: station.longitude,
-      has_coordinates: station.latitude !== null && station.longitude !== null,
+      latitude,
+      longitude,
+      has_coordinates: latitude !== null && longitude !== null,
+      coordinate_source: latitude !== null ? "OpenStreetMap contributors (ODbL 1.0)" : null,
       name: station.station_name,
       label: `${line.line_name} · ${station.station_name}`,
     },
