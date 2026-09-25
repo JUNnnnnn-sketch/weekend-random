@@ -1,8 +1,11 @@
 # 刷新「最近在玩」的活动数据。
-# 目前只支持手动触发；跑通并确认无误后，再加 schedule 改成每天自动。
+# 手动跑通验证后（run 于 2026-09-25，城市日历 328 -> 271），已开启每日定时。
 name: refresh-activities
 
 on:
+  schedule:
+    # 22:00 UTC = 次日 06:00 北京时间，周末早上打开时数据是新的
+    - cron: "0 22 * * *"
   workflow_dispatch:
 
 permissions:
