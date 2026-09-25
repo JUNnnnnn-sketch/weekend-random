@@ -1,6 +1,30 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
+import { activitiesChncpa } from "./data/activities_chncpa.js";
 import { pickDestination, freshness, buildWeekendPlan, pickExperience } from "./recommendation.js";
+
+/* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
+const CATEGORY_BLACKLIST = new Set(["便民活动", "招考招聘", "惠企活动"]);
+const TITLE_KEYWORD_BLACKLIST = new Set(["党史", "反诈", "普法", "宣讲", "进社区", "义诊", "招聘", "政策解读", "安全生产", "消防", "主题教育", "表彰"]);
+function applyActivityFilters(list) {
+  return list.filter((a) => {
+    if (CATEGORY_BLACKLIST.has(a.category)) return false;
+    const n = a.name || "";
+    for (const k of TITLE_KEYWORD_BLACKLIST) if (n.includes(k)) return false;
+    return true;
+  });
+}
+// 合并现有来源（城市日历）与新来源（国家大剧院），统一过两层过滤
+const allActivities = applyActivityFilters([...activities, ...activitiesChncpa]);
+
+/* 排序信号（三信号简单分档，非加权；与 activity_filter.py 一致） */
+const VENUE_WHITELIST = new Set(["国家大剧院", "中国国家博物馆", "国家博物馆", "故宫博物院", "首都博物馆", "中国美术馆", "北京天文馆", "中国科学技术馆", "国家自然博物馆", "中国地质博物馆", "中国园林博物馆", "清华大学艺术博物馆", "北京汽车博物馆", "中国人民革命军事博物馆", "中国人民抗日战争纪念馆", "国家典籍博物馆", "中国现代文学馆", "中国电影博物馆", "中国妇女儿童博物馆", "中国铁道博物馆", "中国铁道博物馆正阳门展馆", "北京天文馆-北京古观象台", "北京民俗博物馆", "北京城市图书馆", "北京中华民族博物院", "首都图书馆", "梅兰芳大剧院", "中央歌剧院剧场", "国家话剧院剧场", "北京音乐厅", "北京天桥艺术中心", "国家大剧院-歌剧院", "国家大剧院-音乐厅", "国家大剧院-戏剧场"]);
+const CENTRAL_DISTRICTS = new Set(["东城区", "西城区", "朝阳区", "海淀区"]);
+const MID_DISTRICTS = new Set(["丰台区", "石景山区", "通州区", "昌平区", "门头沟区", "北京市", "线上"]);
+const GRASS_RE = /街道|社区|村|乡/;
+function venueTier(v) { return VENUE_WHITELIST.has(v) ? 0 : 1; }
+function districtTier(d) { return CENTRAL_DISTRICTS.has(d) ? 0 : (MID_DISTRICTS.has(d) ? 1 : 2); }
+function organizerTier(a) { return GRASS_RE.test([a.venue, a.address, a.name].filter(Boolean).join(" ")) ? 1 : 0; }
 
 const STORAGE_KEY = "weekend-dont-think-v02";
 const state = { mode: "fortune", party: "", duration: "", destination: null, result: null };
@@ -56,8 +80,9 @@ function parseActivityDate(s) {
   if (m) { const Y = +m[1], M = +m[2], D = +m[3]; if (M >= 1 && M <= 12 && D >= 1 && D <= 31) return new Date(Y, M - 1, D); }
   return null;
 }
-// 以数据基准日为锚（快照模式固定为抓取日；联网脚本会写为运行当日），避免用浏览器实时日期误判静态快照
-function activityRefDate() { const [Y, M, D] = activityDataAsOf.split("-").map(Number); return new Date(Y, M - 1, D); }
+// 「现在」以浏览器真实当前日期为锚（即打开页面当天），不再用 activityDataAsOf 当时间窗口基准；
+// activityDataAsOf 仅作为「数据更新于」展示（见 renderRecent），不参与窗口判断。
+function activityRefDate() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
 function activityStatusRank(a, ref, plus7) {
   const sd = parseActivityDate(a.start_date), ed = parseActivityDate(a.end_date);
   if (!sd && !ed) return 2;          // 日期待定
@@ -72,22 +97,31 @@ function isShowable(a, ref, plus7) {
   if (sd && sd > plus7) return false;                // 超过未来 7 天
   return true;                                       // 其余展示（含日期不明确的，由卡片标注）
 }
-function dateKey(a) { const sd = parseActivityDate(a.start_date); if (sd) return sd.getTime(); const ed = parseActivityDate(a.end_date); return ed ? ed.getTime() : Infinity; }
+// 单条活动的「信号分档」：状态(即将开始0/进行中1/日期待定2) → 主办方层级(街道/社区/村/乡沉底) → 场馆白名单 → 中心城区
+// 先按分档排序，档内随机打散（不再用日期做固定尾序，避免每次进入顺序雷同）。
+function signalTier(a, ref, plus7) {
+  return JSON.stringify([activityStatusRank(a, ref, plus7), organizerTier(a), venueTier(a.venue), districtTier(a.district)]);
+}
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
 function filterSortActivities() {
   const ref = activityRefDate();
   const plus7 = new Date(ref); plus7.setDate(ref.getDate() + 7);
-  let list = activities.filter((a) => isShowable(a, ref, plus7));
+  let list = allActivities.filter((a) => isShowable(a, ref, plus7));
   const want = CAT_TABS[recentCat];
   if (want) list = list.filter((a) => a.category === want);
   if (recentDistrict && recentDistrict !== "全部") list = list.filter((a) => a.district === recentDistrict);
-  // 排序：即将开始(0) → 正在进行(1) → 日期待定(2)；同组按开始日期升序；再随机打散（每次打开顺序不同）
-  return list.slice().sort((x, y) => {
-    const rx = activityStatusRank(x, ref, plus7), ry = activityStatusRank(y, ref, plus7);
-    if (rx !== ry) return rx - ry;
-    const dx = dateKey(x), dy = dateKey(y);
-    if (dx !== dy) return dx - dy;
-    return Math.random() - 0.5;
-  });
+  // 先按信号分档，档内随机打散
+  const buckets = new Map();
+  for (const a of list) {
+    const t = signalTier(a, ref, plus7);
+    if (!buckets.has(t)) buckets.set(t, []);
+    buckets.get(t).push(a);
+  }
+  return [...buckets.keys()].sort().flatMap((t) => shuffle(buckets.get(t)));
 }
 function esc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 function dateLabel(a) { const s = a.start_date, e = a.end_date; if (s && e && s !== e) return `${s} ~ ${e}`; return s || e || "日期待定"; }
@@ -105,6 +139,7 @@ function renderActivityCard(a) {
   return card;
 }
 function renderRecent() {
+  const asofEl = document.getElementById("recent-asof"); if (asofEl) asofEl.textContent = activityDataAsOf;
   const list = filterSortActivities();
   const container = document.getElementById("activity-list");
   container.replaceChildren();
@@ -114,7 +149,7 @@ function renderRecent() {
 function pickRandomActivity() {
   const ref = activityRefDate();
   const plus7 = new Date(ref); plus7.setDate(ref.getDate() + 7);
-  const pool = activities.filter((a) => isShowable(a, ref, plus7) && a.source_url);
+  const pool = allActivities.filter((a) => isShowable(a, ref, plus7) && a.source_url);
   return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
 }
 function renderPick() {
@@ -126,7 +161,7 @@ function renderPick() {
 }
 function populateDistricts() {
   const sel = document.getElementById("recent-district");
-  const districts = [...new Set(activities.map((a) => a.district).filter(Boolean))].sort();
+  const districts = [...new Set(allActivities.map((a) => a.district).filter(Boolean))].sort();
   sel.replaceChildren();
   const all = document.createElement("option"); all.value = "全部"; all.textContent = "全部"; sel.append(all);
   districts.forEach((d) => { const o = document.createElement("option"); o.value = d; o.textContent = d; sel.append(o); });
