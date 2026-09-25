@@ -34,7 +34,10 @@ body {
 
 body {
   min-height: 100dvh;
-  overflow: hidden;
+  /* 不要在这里写 overflow: hidden。
+     它会屏蔽滚轮和触摸手势，内容一超出视口就再也够不着——
+     命运模式附近推荐较多时整页滑不动，就是这么来的。
+     需要独立滚动区域的屏幕各自用 overflow-y: auto，不要动这里。 */
 }
 
 button {
