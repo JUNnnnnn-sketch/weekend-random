@@ -32,16 +32,50 @@ const CITY_CENTER = { latitude: 39.9087, longitude: 116.3975 };
 export const FORTUNE_SCOPE_KM = 8;
 export const NEARBY_RADIUS_KM = 1.2;
 
+/**
+ * 时长决定愿意走多远。这是「有多少时间」对命运模式的真实作用——
+ * 时间多就愿意多走几步，而不是印在页面上当装饰。
+ */
+const DURATION_RADIUS_KM = { "2-3小时": 0.8, "半天": 1.2, "一整天": 2 };
+export function radiusForDuration(duration) {
+  return DURATION_RADIUS_KM[duration] ?? NEARBY_RADIUS_KM;
+}
+
 function inFortuneScope(station) {
   const hit = stationCoordinates[station.physical_station_id];
   return Boolean(hit) && distanceKm(CITY_CENTER, hit) <= FORTUNE_SCOPE_KM;
 }
 
-/** 把线路裁剪到覆盖范围内；裁剪后没有站的线路整条去掉。 */
-export function fortuneScopeLines(lines) {
-  return lines
-    .map((line) => ({ ...line, stations: (line.stations || []).filter(inFortuneScope) }))
-    .filter((line) => line.stations.length);
+/**
+ * 命运模式的候选站：在覆盖范围内、且该半径下附近确实有地方可去。
+ *
+ * 把「附近什么都没有」的站排除在抽签池外，而不是抽中了再告诉用户没有。
+ * 这跟公开声明覆盖范围是同一件事——范围的定义就是「市区、且有地方可去」，
+ * 范围之内仍然是真随机。
+ *
+ * 按物理站去重后再抽，而不是先抽线路再抽站：后者会让范围内只剩两三站的
+ * 线路（如 17 号线南段）权重被放大好几倍。换乘站也只算一个，不因为停靠
+ * 多条线就更容易被抽中。
+ *
+ * 结果按半径缓存——lines 在本项目里恒为 subwayLines，无需纳入缓存键。
+ */
+const candidateCache = new Map();
+export function fortuneCandidates(lines, { radiusKm = NEARBY_RADIUS_KM } = {}) {
+  if (candidateCache.has(radiusKm)) return candidateCache.get(radiusKm);
+  const byPhysical = new Map();
+  lines.forEach((line) => {
+    (line.stations || []).forEach((station) => {
+      if (!inFortuneScope(station)) return;
+      const coords = coordinatesOf(station);
+      if (!findNearbyPois(coords, { radiusKm }).length) return;
+      const entry = byPhysical.get(station.physical_station_id) || { station, lines: [] };
+      if (!entry.lines.includes(line)) entry.lines.push(line);
+      byPhysical.set(station.physical_station_id, entry);
+    });
+  });
+  const result = [...byPhysical.values()];
+  candidateCache.set(radiusKm, result);
+  return result;
 }
 
 /**
@@ -49,15 +83,22 @@ export function fortuneScopeLines(lines) {
  * 在覆盖范围内随机一条真实线路 -> 随机该线路上的一个真实站点。
  * 这里不做任何“附近有什么”的筛选，那是独立的后续阶段。
  */
-export function pickDestination(lines) {
-  const usable = fortuneScopeLines(lines);
-  if (!usable.length) return null;
-  const line = randomItem(usable);
-  const station = randomItem(line.stations);
+export function pickDestination(lines, { radiusKm = NEARBY_RADIUS_KM } = {}) {
+  const candidates = fortuneCandidates(lines, { radiusKm });
+  if (!candidates.length) return null;
+  const entry = randomItem(candidates);
+  const station = entry.station;
+  const line = randomItem(entry.lines);          // 换乘站随机取一条线来展示
   const { latitude, longitude } = coordinatesOf(station);
+  // 抽签动画的滚动池：只滚候选范围内的内容，不滚抽不到的东西
+  const lineNames = [...new Set(candidates.flatMap((c) => c.lines.map((l) => l.line_name)))];
+  const stationNames = [...new Set(
+    candidates.filter((c) => c.lines.includes(line)).map((c) => c.station.station_name))];
   return {
     line,
     station,
+    lineNames,
+    stationNames,
     destination: {
       kind: "station",
       line_id: line.line_id,

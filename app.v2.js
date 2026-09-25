@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, fortuneScopeLines, findNearbyPois, freshness, buildWeekendPlan, pickExperience, FORTUNE_SCOPE_KM, NEARBY_RADIUS_KM } from "./recommendation.js";
+import { pickDestination, findNearbyPois, radiusForDuration, freshness, buildWeekendPlan, pickExperience, FORTUNE_SCOPE_KM } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
@@ -52,18 +52,36 @@ function goBack() { rollRunId += 1; showScreen(navigationStack.pop() || "home", 
 function goHome() { rollRunId += 1; navigationStack = []; showScreen("home", { remember: false }); }
 function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 function addLog(text, done = false) { const item = document.createElement("li"); item.textContent = text; item.classList.toggle("is-done", done); rollLog.append(item); }
-function updateContinue() { continueBtn.disabled = !(state.party && state.duration); }
-function restoreSelectionUI() { document.querySelectorAll(".chip").forEach((chip) => chip.classList.toggle("is-selected", state[chip.dataset.group] === chip.dataset.value)); updateContinue(); }
+/** 命运模式只用时长（决定愿意走多远）；人数对「附近有什么」没有真实作用，故不问。 */
+function needsParty(mode) { return mode !== "fortune"; }
+function updateContinue() { continueBtn.disabled = !(state.duration && (!needsParty(state.mode) || state.party)); }
+function syncSetupFields() { document.getElementById("block-party").hidden = !needsParty(state.mode); }
+function restoreSelectionUI() { document.querySelectorAll(".chip").forEach((chip) => chip.classList.toggle("is-selected", state[chip.dataset.group] === chip.dataset.value)); syncSetupFields(); updateContinue(); }
 
 function setupTitleFor(mode) { return mode === "fortune" ? "先告诉命运一点情报" : mode === "plan" ? "先告诉它会怎么过" : "先告诉这次怎么探索"; }
-function setupMode(mode) { state.mode = mode; document.getElementById("setup-title").textContent = setupTitleFor(mode); showScreen("setup"); }
+function setupMode(mode) { state.mode = mode; document.getElementById("setup-title").textContent = setupTitleFor(mode); syncSetupFields(); updateContinue(); showScreen("setup"); }
 document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => { if (button.dataset.mode === "recent") { state.mode = "recent"; showScreen("recent"); renderRecent(); return; } setupMode(button.dataset.mode); }));
 document.querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => { state[chip.dataset.group] = chip.dataset.value; restoreSelectionUI(); saveSession(); }));
 document.querySelectorAll("[data-back]").forEach((button) => button.addEventListener("click", goBack));
 document.querySelectorAll("[data-home]").forEach((button) => button.addEventListener("click", goHome));
 document.getElementById("btn-continue").addEventListener("click", () => { if (state.mode === "plan") { startPlan(); return; } startRoll(); });
 document.getElementById("btn-retry").addEventListener("click", startRoll);
-document.getElementById("btn-accept").addEventListener("click", () => { document.querySelector("#screen-locked .subtitle").textContent = `${state.destination.label || state.destination.name} 已经锁定。出门就好。`; showScreen("locked"); });
+/**
+ * 锁定不该把前面看到的东西清空——锁完还得照着去玩，甚至截图发给朋友。
+ * 这里把结果页的内容整块搬进锁定页，只改标题和状态。
+ */
+function lockWith(subtitle, sourceNode) {
+  document.getElementById("locked-subtitle").textContent = subtitle;
+  const detail = document.getElementById("locked-detail");
+  detail.replaceChildren();
+  if (sourceNode) [...sourceNode.children].forEach((node) => detail.append(node.cloneNode(true)));
+  detail.querySelectorAll("button").forEach((btn) => btn.remove());  // 锁定页不留可操作按钮
+  showScreen("locked");
+}
+document.getElementById("btn-accept").addEventListener("click", () => {
+  lockWith(`${state.destination.label || state.destination.name} 已经锁定。出门就好。`,
+           document.getElementById("place-list"));
+});
 document.getElementById("btn-home").addEventListener("click", goHome);
 
 /* ---------- 最近在玩（recent）模式：只读已接入的城市日历活动，不做热度/推荐 ---------- */
@@ -180,14 +198,14 @@ async function startRoll() {
   document.getElementById("roll-kicker").textContent = "命运正在抽签";
   showScreen("roll");
   // 命运模式只做一件事：在覆盖范围内随机线路 -> 随机站点。“附近有什么”是下一阶段。
-  const scopedLines = fortuneScopeLines(subwayLines);
-  const picked = pickDestination(subwayLines);
+  const radiusKm = radiusForDuration(state.duration);
+  const picked = pickDestination(subwayLines, { radiusKm });
   if (!picked) { addLog("暂时没有可用的地铁线路数据", true); return; }
-  const { line, station, destination } = picked;
+  const { line, station, destination, lineNames, stationNames } = picked;
   state.destination = destination;
-  addLog("正在决定地铁线……"); if (!await spinTo(scopedLines.map((item) => item.line_name), line.line_name, "正在决定地铁线……", runId)) return;
+  addLog("正在决定地铁线……"); if (!await spinTo(lineNames, line.line_name, "正在决定地铁线……", runId)) return;
   addLog(line.line_name, true); await wait(350); addLog("正在决定车站……");
-  if (!await spinTo(line.stations.map((item) => item.station_name), station.station_name, "正在决定车站……", runId)) return;
+  if (!await spinTo(stationNames, station.station_name, "正在决定车站……", runId)) return;
   addLog(station.station_name, true);
   if (runId !== rollRunId) return;
   state.result = null; // 抽签阶段到此结束；“附近有什么”是独立的下一阶段。
@@ -205,10 +223,11 @@ function renderResult() {
 /** 命运模式的结果页：只公布目的地（线路 + 站点），并为下一阶段留出入口。缺坐标不影响展示。 */
 function renderDestinationOnly() {
   const { line_name, station_order } = state.destination;
-  document.getElementById("result-meta").textContent = `${state.party} · ${state.duration} · ${line_name} 第 ${station_order} 站`;
+  const radiusKm = radiusForDuration(state.duration);
+  document.getElementById("result-meta").textContent = `${state.duration} · ${line_name} 第 ${station_order} 站 · 步行 ${radiusKm} km 内`;
   document.getElementById("explore-task").hidden = true;
 
-  const pois = findNearbyPois(state.destination);
+  const pois = findNearbyPois(state.destination, { radiusKm });
   const list = document.getElementById("place-list"); list.replaceChildren();
 
   if (!pois.length) {
@@ -235,7 +254,7 @@ function renderDestinationOnly() {
 
   const note = document.createElement("p");
   note.className = "place-freshness";
-  note.innerHTML = `范围 ${NEARBY_RADIUS_KM} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
+  note.innerHTML = `范围 ${radiusKm} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
   list.append(note);
 }
 function renderPlace(item) {
@@ -324,8 +343,8 @@ populateDistricts();
 
 /* plan 模式交互绑定（不改动命运/随便逛逛/recent/locked 等其它屏幕） */
 document.getElementById("btn-plan-lock").addEventListener("click", () => {
-  document.querySelector("#screen-locked .subtitle").textContent = "你的周末方案已经锁定。出门就好。";
-  showScreen("locked");
+  lockWith(`${state.party} · ${state.duration} 的周末方案已经锁定。出门就好。`,
+           document.getElementById("plan-list"));
 });
 document.getElementById("btn-plan-regenerate").addEventListener("click", startPlan);
 

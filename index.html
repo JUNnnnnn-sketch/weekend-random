@@ -34,7 +34,7 @@
         <p class="brand" id="setup-title">先告诉命运一点情报</p>
         </header>
 
-        <fieldset class="choice-block">
+        <fieldset class="choice-block" id="block-party">
           <legend>和谁一起</legend>
           <div class="chips" role="radiogroup" aria-label="人数">
             <button class="chip" type="button" data-group="party" data-value="一个人">
@@ -161,7 +161,8 @@
         <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
         <p class="orb" aria-hidden="true">✨</p>
         <h2>周末别想了。</h2>
-        <p class="subtitle">青年路已经锁定。出门就好。</p>
+        <p class="subtitle" id="locked-subtitle">已经锁定。出门就好。</p>
+        <div class="place-list" id="locked-detail"></div>
         <button class="btn btn-ghost" id="btn-home" type="button">回到开始</button>
       </section>
     </main>
