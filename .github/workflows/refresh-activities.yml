@@ -15,6 +15,12 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
 
+    # runner 默认是 UTC，而定时设在北京时间 06:00（= 前一天 22:00 UTC），
+    # 于是脚本里的 date.today() 会拿到前一天的日期——既让「数据更新于」显示
+    # 晚一天，也让「已结束活动」的过滤基准日偏早。整个 job 统一用北京时间。
+    env:
+      TZ: Asia/Shanghai
+
     steps:
       - uses: actions/checkout@v4
 
