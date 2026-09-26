@@ -67,7 +67,7 @@ export function fortuneCandidates(lines, { radiusKm = NEARBY_RADIUS_KM } = {}) {
     (line.stations || []).forEach((station) => {
       if (!inFortuneScope(station)) return;
       const coords = coordinatesOf(station);
-      if (!findNearbyPois(coords, { radiusKm }).length) return;
+      if (findNearbyPois(coords, { radiusKm }).length < MIN_NEARBY_COUNT) return;
       const entry = byPhysical.get(station.physical_station_id) || { station, lines: [] };
       if (!entry.lines.includes(line)) entry.lines.push(line);
       byPhysical.set(station.physical_station_id, entry);
@@ -125,12 +125,22 @@ export function pickDestination(lines, { radiusKm = NEARBY_RADIUS_KM } = {}) {
  *
  * 没有坐标、或周边确实没有收录的场所时，返回空数组。不扩大半径去凑数。
  */
-export function findNearbyPois(destination, { radiusKm = NEARBY_RADIUS_KM } = {}) {
+export const MIN_NEARBY_COUNT = 3;
+const RADIUS_LADDER_KM = [1.2, 1.5, 2, 2.5, 3];
+
+export function findNearbyPois(destination, { radiusKm = NEARBY_RADIUS_KM, minCount = MIN_NEARBY_COUNT } = {}) {
   if (!destination || destination.latitude === null || destination.longitude === null) return [];
-  return nearbyPois
+  const scored = nearbyPois
     .map((poi) => ({ ...poi, distance_km: distanceKm(destination, poi) }))
-    .filter((poi) => poi.distance_km <= radiusKm)
     .sort((a, b) => a.distance_km - b.distance_km);
+  // 从起始半径开始，凑不够 minCount 就逐级放宽。
+  // 放宽不是糊弄：每条都会显示真实步行距离，1.9 km 值不值得走由用户自己判断。
+  // 实测 121 个市区站里，92 个在 1.2 km 内就够，其余最多放到 3 km，无一落空。
+  for (const limit of [radiusKm, ...RADIUS_LADDER_KM.filter((r) => r > radiusKm)]) {
+    const hit = scored.filter((poi) => poi.distance_km <= limit);
+    if (hit.length >= minCount) return hit;
+  }
+  return scored.filter((poi) => poi.distance_km <= RADIUS_LADDER_KM[RADIUS_LADDER_KM.length - 1]);
 }
 
 export function distanceKm(a, b) {

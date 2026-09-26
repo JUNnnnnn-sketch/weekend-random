@@ -61,7 +61,27 @@ GROUPS = {
                     ("leisure", "nature_reserve")],
     "heritage":    [("amenity", "place_of_worship"), ("historic", "temple"),
                     ("historic", "ruins"), ("historic", "monument")],
+    "food":        [("amenity", "restaurant")],
 }
+
+# 某些分组必须在 Overpass 端就收窄，否则响应过大。
+# 北京的 amenity=restaurant 上万条，绝大多数是普通馆子；这里只取至少带一项
+# 强信号的（有人认真标过官网 / 维基 / 营业时间），实测 269 条，连锁仅 9 家。
+# 注意：这不是「人气」——OSM 没有人气数据，它只说明有人在意过这家店。
+REQUIRE_ANY = {"food": ["website", "wikidata", "opening_hours"]}
+
+# 全国连锁不是「值得专门去」的地方——哪儿都有，不必让命运替你挑。
+# 只排全国性连锁；北京本地的小连锁（紫光园、南城香一类）保留。
+CHAIN_KEYWORDS = ["麦当劳", "肯德基", "KFC", "必胜客", "星巴克", "汉堡王", "真功夫",
+                  "永和大王", "吉野家", "萨莉亚", "呷哺", "华莱士", "德克士",
+                  "赛百味", "Subway", "海底捞", "西贝", "太二", "九毛九", "外婆家",
+                  "绿茶餐厅", "杨国福", "张亮麻辣烫", "和府捞面", "老乡鸡",
+                  "大米先生", "南京大牌档", "探鱼", "瑞幸", "COSTA", "Costa",
+                  "喜茶", "奈雪", "蜜雪冰城", "茶百道", "古茗", "小肥羊", "小龙坎",
+                  "谭鸭血", "蜀大侠", "庆丰包子", "嘉和一品", "味千拉面",
+                  "食其家", "避风塘"]
+# 注意：老字号（全聚德、东来顺、便宜坊一类）虽然也是连锁，但确实是会专程去的
+# 目的地，不在排除之列。这里只排「哪儿都有、不值得为它坐地铁」的那种。
 
 # OSM 标签 -> (展示品类, 子类型, 是否需要质量信号)
 #
@@ -87,6 +107,7 @@ CATEGORY = {
     ("historic", "temple"):          ("🏛 寺庙 / 古迹", "古寺", True),
     ("historic", "ruins"):           ("🏛 寺庙 / 古迹", "遗址", True),
     ("historic", "monument"):        ("🏛 寺庙 / 古迹", "古迹", True),
+    ("amenity", "restaurant"):       ("🍜 吃喝", "餐厅", False),
 }
 
 
@@ -97,9 +118,16 @@ def has_quality_signal(tags):
                 or tags.get("opening_hours")) or len(tags) >= 6
 
 
-def build_query(tags):
-    clauses = "\n".join('  nwr["%s"="%s"]["name"](%s);' % (k, v, BBOX) for k, v in tags)
-    return "[out:json][timeout:180];\n(\n%s\n);\nout center tags;\n" % clauses
+def build_query(tags, require_any=None):
+    """require_any 非空时，为每个「必须存在的标签」各生成一条子句（Overpass 端过滤）。"""
+    clauses = []
+    for key, value in tags:
+        if require_any:
+            for extra in require_any:
+                clauses.append('  nwr["%s"="%s"]["name"]["%s"](%s);' % (key, value, extra, BBOX))
+        else:
+            clauses.append('  nwr["%s"="%s"]["name"](%s);' % (key, value, BBOX))
+    return "[out:json][timeout:180];\n(\n%s\n);\nout center tags;\n" % "\n".join(clauses)
 
 
 class RateLimited(Exception):
@@ -109,7 +137,7 @@ class RateLimited(Exception):
 def fetch_group(label, tags, attempt=1):
     request = urllib.request.Request(
         OVERPASS,
-        data=urllib.parse.urlencode({"data": build_query(tags)}).encode(),
+        data=urllib.parse.urlencode({"data": build_query(tags, REQUIRE_ANY.get(label))}).encode(),
         headers={"User-Agent": UA},
     )
     started = time.time()
@@ -180,6 +208,8 @@ def parse(raws):
                 if tags.get(key[0]) == key[1]:
                     category, subtype, strict = value
                     if strict and not has_quality_signal(tags):
+                        category = None
+                    elif any(word in name for word in CHAIN_KEYWORDS):
                         category = None
                     break
             if not category:

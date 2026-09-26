@@ -237,13 +237,19 @@ function renderDestinationOnly() {
   }
 
   document.querySelector(".result-lead").textContent = `📍 ${state.destination.station_name}附近`;
+  // 展示顺序：专程去的在前，吃喝是顺带的，放最后
+  const CATEGORY_ORDER = ["🎨 艺术 / 展览", "🎵 音乐 / 演出", "🏛 寺庙 / 古迹", "🌳 公园 / 自然", "🍸 夜生活", "🍜 吃喝"];
   // 按品类分组展示；组内按距离升序。同一个站每次结果一致，随机性只发生在抽站那一步。
   const groups = new Map();
   pois.forEach((poi) => {
     if (!groups.has(poi.category)) groups.set(poi.category, []);
     groups.get(poi.category).push(poi);
   });
-  groups.forEach((items, category) => {
+  const ordered = [...groups.entries()].sort((a, b) => {
+    const rank = (c) => { const i = CATEGORY_ORDER.indexOf(c); return i === -1 ? CATEGORY_ORDER.length : i; };
+    return rank(a[0]) - rank(b[0]);
+  });
+  ordered.forEach(([category, items]) => {
     const card = document.createElement("article"); card.className = "place-card";
     const rows = items.slice(0, 5).map((poi) =>
       `<p><strong>${poi.name}</strong> · ${poi.subtype}<br /><span class="place-freshness">步行约 ${Math.round(poi.distance_km * 1000)} 米 · <a href="${poi.source_url}" target="_blank" rel="noreferrer">地图 ↗</a></span></p>`).join("");
@@ -254,7 +260,8 @@ function renderDestinationOnly() {
 
   const note = document.createElement("p");
   note.className = "place-freshness";
-  note.innerHTML = `范围 ${radiusKm} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
+  const usedKm = Math.max(radiusKm, Math.ceil(Math.max(...pois.map((p) => p.distance_km)) * 10) / 10);
+  note.innerHTML = `范围 ${usedKm} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
   list.append(note);
 }
 function renderPlace(item) {
