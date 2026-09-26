@@ -57,19 +57,44 @@ GROUPS = {
     "culture":     [("tourism", "museum"), ("tourism", "gallery"), ("amenity", "arts_centre")],
     "performance": [("amenity", "theatre"), ("amenity", "cinema"), ("amenity", "nightclub")],
     "nightlife":   [("amenity", "bar"), ("amenity", "pub")],
+    "nature":      [("leisure", "park"), ("leisure", "garden"), ("tourism", "zoo"),
+                    ("leisure", "nature_reserve")],
+    "heritage":    [("amenity", "place_of_worship"), ("historic", "temple"),
+                    ("historic", "ruins"), ("historic", "monument")],
 }
 
-# OSM 标签 -> 展示品类
+# OSM 标签 -> (展示品类, 子类型, 是否需要质量信号)
+#
+# strict=True 的品类必须带质量信号才收录。原因：博物馆、剧场、酒吧本身就是
+# 目的地型场所，标了就基本可用；而公园和古迹不是——北京有 1197 个 leisure=park，
+# 里面大量是「东沙窝村头公园」「X10地块口袋公园」这种小区绿地，古迹里也混着
+# 「钱学森雕像」这类地图要素。实测质量筛把公园 1339 收到 169、古迹 1132 收到 134，
+# 而天坛/景山/颐和园/圆明园/雍和宫/法源寺这些该留的一个没漏。
 CATEGORY = {
-    ("tourism", "museum"):      ("🎨 艺术 / 展览", "博物馆"),
-    ("tourism", "gallery"):     ("🎨 艺术 / 展览", "美术馆 / 画廊"),
-    ("amenity", "arts_centre"): ("🎨 艺术 / 展览", "艺术中心"),
-    ("amenity", "theatre"):     ("🎵 音乐 / 演出", "剧场"),
-    ("amenity", "cinema"):      ("🎵 音乐 / 演出", "影院"),
-    ("amenity", "nightclub"):   ("🎵 音乐 / 演出", "Live House / 夜店"),
-    ("amenity", "bar"):         ("🍸 夜生活", "酒吧"),
-    ("amenity", "pub"):         ("🍸 夜生活", "酒馆"),
+    ("tourism", "museum"):           ("🎨 艺术 / 展览", "博物馆", False),
+    ("tourism", "gallery"):          ("🎨 艺术 / 展览", "美术馆 / 画廊", False),
+    ("amenity", "arts_centre"):      ("🎨 艺术 / 展览", "艺术中心", False),
+    ("amenity", "theatre"):          ("🎵 音乐 / 演出", "剧场", False),
+    ("amenity", "cinema"):           ("🎵 音乐 / 演出", "影院", False),
+    ("amenity", "nightclub"):        ("🎵 音乐 / 演出", "Live House / 夜店", False),
+    ("amenity", "bar"):              ("🍸 夜生活", "酒吧", False),
+    ("amenity", "pub"):              ("🍸 夜生活", "酒馆", False),
+    ("leisure", "park"):             ("🌳 公园 / 自然", "公园", True),
+    ("leisure", "garden"):           ("🌳 公园 / 自然", "园林", True),
+    ("tourism", "zoo"):              ("🌳 公园 / 自然", "动物园", True),
+    ("leisure", "nature_reserve"):   ("🌳 公园 / 自然", "自然保护区", True),
+    ("amenity", "place_of_worship"): ("🏛 寺庙 / 古迹", "寺庙 / 教堂", True),
+    ("historic", "temple"):          ("🏛 寺庙 / 古迹", "古寺", True),
+    ("historic", "ruins"):           ("🏛 寺庙 / 古迹", "遗址", True),
+    ("historic", "monument"):        ("🏛 寺庙 / 古迹", "古迹", True),
 }
+
+
+def has_quality_signal(tags):
+    """有人愿意为它填维基条目、官网、门票或营业时间，通常说明它值得专门去一趟。"""
+    return bool(tags.get("wikidata") or tags.get("wikipedia") or tags.get("website")
+                or tags.get("contact:website") or tags.get("fee")
+                or tags.get("opening_hours")) or len(tags) >= 6
 
 
 def build_query(tags):
@@ -153,7 +178,9 @@ def parse(raws):
             category = subtype = None
             for key, value in CATEGORY.items():
                 if tags.get(key[0]) == key[1]:
-                    category, subtype = value
+                    category, subtype, strict = value
+                    if strict and not has_quality_signal(tags):
+                        category = None
                     break
             if not category:
                 continue
@@ -197,6 +224,8 @@ def write_js(pois, missing):
         w(" *   （多因 Overpass 限流；重跑脚本会只补这些分组，已有缓存不会重复请求）")
     w(" *")
     w(" * 刻意不收餐厅、咖啡、泛化景点——理由见 tools/fetch_station_pois.py 的说明。")
+    w(" * 公园与寺庙古迹额外过了一道质量筛（须有维基/官网/门票/营业时间，或标签足够丰富），")
+    w(" * 否则会混入大量小区绿地与路边雕像。")
     w(" * 坐标为 WGS84，与 data/station_coordinates.js 同一坐标系。")
     w(" *")
     w(" * 本文件由 tools/fetch_station_pois.py 生成，不要手工编辑。")
