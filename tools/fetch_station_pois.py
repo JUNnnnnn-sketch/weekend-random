@@ -72,6 +72,18 @@ GROUPS = {
 # 注意：这不是「人气」——OSM 没有人气数据，它只说明有人在意过这家店。
 REQUIRE_ANY = {"food": ["website", "wikidata", "opening_hours"]}
 
+# 「气质」这件事 OSM 没有字段，但「有没有官网」是个可用的代用指标：
+# 肯花力气弄个官网的馆子，基本不会是食堂或平价快餐。
+# 实测 269 家按信号分三档——有官网/维基的 31 家是大董、胡大、鸿宾楼、铃木食堂、
+# TRB Hutong、老舍茶馆、便宜坊这类；只有营业时间的 119 家是永和豆浆、护国寺小吃、
+# 新乐群食堂、学子居这类。后两档不是「值得专门去」，一律不收。
+STRICT_SIGNAL = {("amenity", "restaurant")}
+
+
+def has_site_signal(tags):
+    return bool(tags.get("wikidata") or tags.get("wikipedia")
+                or tags.get("website") or tags.get("contact:website"))
+
 # 全国连锁不是「值得专门去」的地方——哪儿都有，不必让命运替你挑。
 # 只排全国性连锁；北京本地的小连锁（紫光园、南城香一类）保留。
 CHAIN_KEYWORDS = ["麦当劳", "肯德基", "KFC", "必胜客", "星巴克", "汉堡王", "真功夫",
@@ -81,7 +93,7 @@ CHAIN_KEYWORDS = ["麦当劳", "肯德基", "KFC", "必胜客", "星巴克", "�
                   "大米先生", "南京大牌档", "探鱼", "瑞幸", "COSTA", "Costa",
                   "喜茶", "奈雪", "蜜雪冰城", "茶百道", "古茗", "小肥羊", "小龙坎",
                   "谭鸭血", "蜀大侠", "庆丰包子", "嘉和一品", "味千拉面",
-                  "食其家", "避风塘"]
+                  "食其家", "避风塘", "李先生", "眉州东坡", "大鸭梨"]
 # 注意：老字号（全聚德、东来顺、便宜坊一类）虽然也是连锁，但确实是会专程去的
 # 目的地，不在排除之列。这里只排「哪儿都有、不值得为它坐地铁」的那种。
 
@@ -216,7 +228,9 @@ def parse(raws):
             for key, value in CATEGORY.items():
                 if tags.get(key[0]) == key[1]:
                     category, subtype, strict = value
-                    if strict and not has_quality_signal(tags):
+                    if key in STRICT_SIGNAL and not has_site_signal(tags):
+                        category = None
+                    elif strict and not has_quality_signal(tags):
                         category = None
                     elif any(word in name for word in CHAIN_KEYWORDS):
                         category = None
