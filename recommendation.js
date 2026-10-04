@@ -20,29 +20,23 @@ function coordinatesOf(station) {
 }
 
 /**
- * 命运模式的覆盖范围：距市中心（天安门）这个公里数以内的车站。
+ * 命运模式的覆盖范围由数据决定：附近有没有值得去的地方，而不是离天安门多远。
  *
- * 为什么要划范围：远郊站周边几乎没有可推荐的地方（12km 以外只有约 48% 的站
- * 能找到内容，20km 以外只有 29%），不设范围的话超过一半的抽签会落空。
- * 划定范围不是把骰子做手脚——范围公开写在界面上，范围之内仍是真随机。
+ * 曾经用「距天安门 8 km」划范围，是个错误的代理指标——北京的好地方并非以
+ * 天安门为圆心均匀分布。那条规则把整个海淀文化带切在了外面：清华东路西口
+ * （周边 35 个）、圆明园（22）、北京大学东门（22）、五道口（21）、中关村（18）、
+ * 奥林匹克公园（18）全部落选，而用户搜「五道口」搜不到正是因为这个。
  *
- * 8 km 覆盖 121 个站，其中 93% 能给出附近推荐，是覆盖面与命中率的平衡点。
+ * 现在只保留一条：周边 1.2 km 内至少有 MIN_NEARBY_COUNT 个可推荐的地方。
+ * 这既是「值得送人过去」的定义，也自然排除了什么都没有的远郊站。
  */
-const CITY_CENTER = { latitude: 39.9087, longitude: 116.3975 };
-export const FORTUNE_SCOPE_KM = 8;
 export const NEARBY_RADIUS_KM = 1.2;
 
-function inFortuneScope(station) {
-  const hit = stationCoordinates[station.physical_station_id];
-  return Boolean(hit) && distanceKm(CITY_CENTER, hit) <= FORTUNE_SCOPE_KM;
-}
-
 /**
- * 命运模式的候选站：在覆盖范围内、且该半径下附近确实有地方可去。
+ * 命运模式的候选站：有坐标，且该半径下附近确实有地方可去。
  *
  * 把「附近什么都没有」的站排除在抽签池外，而不是抽中了再告诉用户没有。
- * 这跟公开声明覆盖范围是同一件事——范围的定义就是「市区、且有地方可去」，
- * 范围之内仍然是真随机。
+ * 范围的定义就是「附近有地方可去」，范围之内仍然是真随机。
  *
  * 按物理站去重后再抽，而不是先抽线路再抽站：后者会让范围内只剩两三站的
  * 线路（如 17 号线南段）权重被放大好几倍。换乘站也只算一个，不因为停靠
@@ -56,8 +50,8 @@ export function fortuneCandidates(lines, { radiusKm = NEARBY_RADIUS_KM } = {}) {
   const byPhysical = new Map();
   lines.forEach((line) => {
     (line.stations || []).forEach((station) => {
-      if (!inFortuneScope(station)) return;
       const coords = coordinatesOf(station);
+      if (coords.latitude === null) return;
       if (findNearbyPois(coords, { radiusKm }).length < MIN_NEARBY_COUNT) return;
       const entry = byPhysical.get(station.physical_station_id) || { station, lines: [] };
       if (!entry.lines.includes(line)) entry.lines.push(line);

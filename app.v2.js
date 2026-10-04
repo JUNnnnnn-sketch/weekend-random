@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildWeekendPlan, pickExperience, FORTUNE_SCOPE_KM } from "./recommendation.js";
+import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildWeekendPlan, pickExperience } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
@@ -248,7 +248,8 @@ function renderDestinationOnly() {
   document.querySelector(".result-lead").textContent = `📍 ${state.destination.station_name}附近`;
   // 展示顺序：专程去的在前，吃喝是顺带的，放最后
   const CATEGORY_ORDER = ["🧭 特色去处", "🎨 艺术 / 展览", "🎵 音乐 / 演出", "🏛 寺庙 / 古迹",
-                         "🌳 公园 / 自然", "📚 书店 / 图书馆", "🏟 场馆 / 运动", "🍸 夜生活", "🍜 吃喝"];
+                         "🌳 公园 / 自然", "🛍 商场 / 商圈", "📚 书店 / 图书馆",
+                         "🏟 场馆 / 运动", "🍸 夜生活", "🍜 吃喝"];
   // 按品类分组展示；组内按距离升序。同一个站每次结果一致，随机性只发生在抽站那一步。
   const groups = new Map();
   pois.forEach((poi) => {
@@ -261,9 +262,10 @@ function renderDestinationOnly() {
   });
   ordered.forEach(([category, items]) => {
     const card = document.createElement("article"); card.className = "place-card";
-    const rows = items.slice(0, 5).map((poi) =>
+    const SHOWN = 8;   // 显示 5 条却提示「另有 1 个未列出」很奇怪，放宽到 8 条
+    const rows = items.slice(0, SHOWN).map((poi) =>
       `<p><strong>${poi.name}</strong> · ${poi.subtype}<br /><span class="place-freshness">步行约 ${Math.round(poi.distance_km * 1000)} 米 · <a href="${poi.source_url}" target="_blank" rel="noreferrer">地图 ↗</a></span></p>`).join("");
-    const more = items.length > 5 ? `<p class="place-freshness">另有 ${items.length - 5} 个未列出</p>` : "";
+    const more = items.length > SHOWN ? `<p class="place-freshness">另有 ${items.length - SHOWN} 个</p>` : "";
     card.innerHTML = `<div><p class="place-category">${category}</p><h3>${items.length} 个</h3></div>${rows}${more}`;
     list.append(card);
   });

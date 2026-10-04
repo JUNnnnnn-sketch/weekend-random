@@ -64,6 +64,7 @@ GROUPS = {
     "food":        [("amenity", "restaurant")],
     "reading":     [("shop", "books"), ("amenity", "library")],
     "venue":       [("leisure", "stadium"), ("tourism", "aquarium")],
+    "mall":        [("shop", "mall")],
     # attraction 放最后：它和公园/古迹/博物馆大量重叠，让那些先匹配，
     # 这一组只兜住前面没覆盖到的——比如潘家园旧货市场。
     "attraction":  [("tourism", "attraction")],
@@ -135,6 +136,12 @@ CATEGORY = {
     ("amenity", "restaurant"):       ("🍜 吃喝", "餐厅", False),
     ("shop", "books"):               ("📚 书店 / 图书馆", "书店", True),
     ("amenity", "library"):          ("📚 书店 / 图书馆", "图书馆", True),
+    # 商场不过质量筛：一个标了 shop=mall 又有名字的东西本来就是商场，
+    # 不需要维基条目来证明朝阳大悦城值得去。实测加筛会把 SKP（4 个标签）、
+    # 朝阳大悦城（4 个）、荟聚（5 个）、颐堤港（2 个）全部误杀。
+    # 不收 shop=department_store——那一类在北京是「无印良品」「九木杂物社」
+    # 这种单店，不是去处。
+    ("shop", "mall"):                ("🛍 商场 / 商圈", "商场", False),
     ("leisure", "stadium"):          ("🏟 场馆 / 运动", "体育场馆", True),
     ("tourism", "aquarium"):         ("🏟 场馆 / 运动", "水族馆", True),
     # 必须排在最后：同一个要素若既是公园又标了 attraction，应归到公园。
