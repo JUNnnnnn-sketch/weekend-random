@@ -34,7 +34,9 @@
 
 import argparse
 import json
+import math
 import os
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -65,6 +67,9 @@ GROUPS = {
     "reading":     [("shop", "books"), ("amenity", "library")],
     "venue":       [("leisure", "stadium"), ("tourism", "aquarium")],
     "mall":        [("shop", "mall")],
+    # 三里屯太古里、蓝色港湾、THE BOX、华贸这类在 OSM 里不是 shop=mall 而是
+    # landuse=retail（整块商业用地）。这一类整体抓会非常噪，故按品牌名直接点取。
+    "retail":      [("landuse", "retail")],
     # attraction 放最后：它和公园/古迹/博物馆大量重叠，让那些先匹配，
     # 这一组只兜住前面没覆盖到的——比如潘家园旧货市场。
     "attraction":  [("tourism", "attraction")],
@@ -74,6 +79,20 @@ GROUPS = {
 # 北京的 amenity=restaurant 上万条，绝大多数是普通馆子；这里只取至少带一项
 # 强信号的（有人认真标过官网 / 维基 / 营业时间），实测 269 条，连锁仅 9 家。
 # 注意：这不是「人气」——OSM 没有人气数据，它只说明有人在意过这家店。
+# 需要按名字正则匹配的分组，直接给出完整查询。
+RAW_QUERY = {
+    "retail": (
+        "[out:json][timeout:120];\n"
+        "(\n"
+        '  nwr["landuse"="retail"]["name"~"%(brands)s"](%(bbox)s);\n'
+        '  nwr["landuse"="commercial"]["name"~"%(brands)s"](%(bbox)s);\n'
+        ");\n"
+        "out center tags;\n"
+    ),
+}
+RETAIL_BRANDS = ("太古里|蓝色港湾|SOLANA|THE BOX|大悦城|SKP|颐堤港|三里屯|华贸|国贸商城|"
+                 "恒隆|侨福|王府中环|世贸天阶|合生汇|荟聚|万象城|来福士|新光天地|芳草地")
+
 REQUIRE_ANY = {
     "food": ["website", "wikidata", "opening_hours"],
     # attraction 原始 820 条、噪声极大（「簋街雕像」「帽儿胡同」），
@@ -137,6 +156,8 @@ CATEGORY = {
     ("shop", "books"):               ("📚 书店 / 图书馆", "书店", True),
     ("amenity", "library"):          ("📚 书店 / 图书馆", "图书馆", True),
     ("shop", "mall"):                ("🛍 商场 / 商圈", "商场", False),
+    ("landuse", "retail"):           ("🛍 商场 / 商圈", "商圈", False),
+    ("landuse", "commercial"):       ("🛍 商场 / 商圈", "商圈", False),
     ("leisure", "stadium"):          ("🏟 场馆 / 运动", "体育场馆", True),
     ("tourism", "aquarium"):         ("🏟 场馆 / 运动", "水族馆", True),
     # 必须排在最后：同一个要素若既是公园又标了 attraction，应归到公园。
@@ -178,8 +199,11 @@ def has_quality_signal(tags):
                 or tags.get("opening_hours")) or len(tags) >= 6
 
 
-def build_query(tags, require_any=None):
-    """require_any 非空时，为每个「必须存在的标签」各生成一条子句（Overpass 端过滤）。"""
+def build_query(tags, require_any=None, label=None):
+    """按分组拼查询。RAW_QUERY 里的分组用自带的完整查询（需要正则匹配名字）；
+    require_any 非空时，为每个「必须存在的标签」各生成一条子句（Overpass 端过滤）。"""
+    if label in RAW_QUERY:
+        return RAW_QUERY[label] % {"brands": RETAIL_BRANDS, "bbox": BBOX}
     clauses = []
     for key, value in tags:
         if require_any:
@@ -197,7 +221,8 @@ class RateLimited(Exception):
 def fetch_group(label, tags, attempt=1):
     request = urllib.request.Request(
         OVERPASS,
-        data=urllib.parse.urlencode({"data": build_query(tags, REQUIRE_ANY.get(label))}).encode(),
+        data=urllib.parse.urlencode(
+            {"data": build_query(tags, REQUIRE_ANY.get(label), label)}).encode(),
         headers={"User-Agent": UA},
     )
     started = time.time()
@@ -297,9 +322,65 @@ def parse(raws):
                 "source_url": "https://www.openstreetmap.org/%s/%s" % (element["type"], element["id"]),
                 "website": tags.get("website") or tags.get("contact:website") or None,
                 "opening_hours": tags.get("opening_hours") or None,
+                "tag_count": len(tags),
             })
     pois.sort(key=lambda p: (p["category"], p["name"]))
-    return pois
+    return dedupe_malls(pois)
+
+
+# 同一个商圈在 OSM 里常被切成好几块：三里屯太古里分南/北/西区，华贸有中心、
+# 购物中心、天地三条，THE BOX 还多一个 B 座；而颐堤港、SKP、侨福芳草地
+# 既有 shop=mall 的点也有 landuse=retail 的面。按名字归并，只留标签最全的那条，
+# 否则一个站的推荐里会出现三次太古里。
+MALL_SUFFIXES = ["南区", "北区", "西区", "东区", "中区", "B座", "A座", "一期", "二期", "三期",
+                 "步行街", "购物中心", "商场", "中心", "广场"]
+
+
+def haversine_m(lat1, lon1, lat2, lon2):
+    r = math.radians
+    d_lat, d_lon = r(lat2 - lat1), r(lon2 - lon1)
+    h = math.sin(d_lat / 2) ** 2 + math.cos(r(lat1)) * math.cos(r(lat2)) * math.sin(d_lon / 2) ** 2
+    return 6371000 * 2 * math.atan2(math.sqrt(h), math.sqrt(1 - h))
+
+
+# 这些品牌在北京只有一处，但 OSM 里被切成了好几条（「合生汇」「北京朝阳合生汇」
+# 「北京超极合生汇（东区）」是同一个地方）。按品牌直接归并。
+# 注意不能对「大悦城」「万达广场」这类做同样处理——它们在北京确实有多家。
+SINGLE_LOCATION_BRANDS = ["合生汇", "太古里", "THE BOX", "颐堤港", "蓝色港湾", "SOLANA",
+                          "芳草地", "王府中环", "世贸天阶", "来福士", "新光天地"]
+
+
+def mall_key(name):
+    for brand in SINGLE_LOCATION_BRANDS:
+        if brand in name:
+            return brand
+    key = re.sub(r"[（(].*?[)）]", "", name).strip()
+    changed = True
+    while changed:
+        changed = False
+        for suffix in MALL_SUFFIXES:
+            if key.endswith(suffix) and len(key) > len(suffix) + 1:
+                key = key[: -len(suffix)].strip()
+                changed = True
+    return key.replace("北京", "").strip() or name
+
+
+def dedupe_malls(pois):
+    best, others = {}, []
+    for poi in pois:
+        if poi["category"] != "🛍 商场 / 商圈":
+            others.append(poi)
+            continue
+        key = mall_key(poi["name"])
+        kept = best.get(key)
+        if kept is None or poi["tag_count"] > kept["tag_count"]:
+            best[key] = poi
+
+    merged = others + list(best.values())
+    merged.sort(key=lambda p: (p["category"], p["name"]))
+    for poi in merged:
+        poi.pop("tag_count", None)
+    return merged
 
 
 def write_js(pois, missing):

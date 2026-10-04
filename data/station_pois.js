@@ -3,17 +3,17 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-04T21:13:01+08:00
+ * 获取时间：2026-10-04T23:07:57+08:00
  *
- * 共 1217 条：
+ * 共 1227 条：
  *   🎨 艺术 / 展览  255
  *   🎵 音乐 / 演出  240
  *   🍸 夜生活  173
  *   🌳 公园 / 自然  168
  *   🏛 寺庙 / 古迹  139
  *   📚 书店 / 图书馆  82
- *   🛍 商场 / 商圈  65
- *   🧭 特色去处  48
+ *   🛍 商场 / 商圈  77
+ *   🧭 特色去处  46
  *   🍜 吃喝  26
  *   🏟 场馆 / 运动  21
  *
@@ -1130,27 +1130,38 @@ export const nearbyPois = [
   { id: "way/997857679", name: "首钢档案馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.919057, longitude: 116.144154, source_url: "https://www.openstreetmap.org/way/997857679" },
   { id: "way/543836357", name: "高等教育书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.991419, longitude: 116.347692, source_url: "https://www.openstreetmap.org/way/543836357" },
   { id: "node/12252520650", name: "1733", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.964961, longitude: 116.338217, source_url: "https://www.openstreetmap.org/node/12252520650" },
+  { id: "way/30663427", name: "798艺术区", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.98294, longitude: 116.489783, source_url: "https://www.openstreetmap.org/way/30663427" },
   { id: "way/336948957", name: "BHG Mall 华联同成街购物中心", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 40.070816, longitude: 116.331454, source_url: "https://www.openstreetmap.org/way/336948957" },
-  { id: "way/321301384", name: "万达广场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.905068, longitude: 116.219248, source_url: "https://www.openstreetmap.org/way/321301384" },
+  { id: "way/359741619", name: "SOLANA蓝色港湾", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.947923, longitude: 116.469684, source_url: "https://www.openstreetmap.org/way/359741619" },
+  { id: "way/1148415659", name: "THE BOX朝外年轻力中心", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.921453, longitude: 116.43884, source_url: "https://www.openstreetmap.org/way/1148415659" },
   { id: "way/764431903", name: "万达广场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.907964, longitude: 116.466425, source_url: "https://www.openstreetmap.org/way/764431903" },
-  { id: "way/799280235", name: "万达广场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.859357, longitude: 116.349686, source_url: "https://www.openstreetmap.org/way/799280235" },
-  { id: "way/411814396", name: "万达广场B座", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.519728, longitude: 116.698939, source_url: "https://www.openstreetmap.org/way/411814396" },
+  { id: "way/1007828566", name: "三里屯3·3", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.935481, longitude: 116.448593, source_url: "https://www.openstreetmap.org/way/1007828566" },
+  { id: "way/235064241", name: "三里屯SOHO", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.930858, longitude: 116.44744, source_url: "https://www.openstreetmap.org/way/235064241" },
+  { id: "way/127291184", name: "三里屯太古里南区", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.933559, longitude: 116.448191, source_url: "https://www.openstreetmap.org/way/127291184" },
   { id: "way/340233497", name: "世茂工三", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.933526, longitude: 116.443128, source_url: "https://www.openstreetmap.org/way/340233497" },
+  { id: "way/233513050", name: "世贸天阶步行街", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.9151, longitude: 116.445846, source_url: "https://www.openstreetmap.org/way/233513050" },
   { id: "way/33457835", name: "东升大厦", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.992396, longitude: 116.327693, source_url: "https://www.openstreetmap.org/way/33457835" },
   { id: "node/6633180185", name: "东方新天地", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.907904, longitude: 116.408301, source_url: "https://www.openstreetmap.org/node/6633180185" },
   { id: "node/2418894058", name: "中国世界商场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.911459, longitude: 116.452245, source_url: "https://www.openstreetmap.org/node/2418894058" },
+  { id: "way/965172276", name: "中粮海淀大悦城", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 40.089925, longitude: 116.223166, source_url: "https://www.openstreetmap.org/way/965172276" },
   { id: "way/370312510", name: "久隆生活广场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.960353, longitude: 116.488774, source_url: "https://www.openstreetmap.org/way/370312510" },
+  { id: "way/1059803749", name: "二拨子新村农贸市场", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 40.077613, longitude: 116.293166, source_url: "https://www.openstreetmap.org/way/1059803749" },
   { id: "way/171736971", name: "五棵松万达广场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.911592, longitude: 116.271943, source_url: "https://www.openstreetmap.org/way/171736971" },
   { id: "way/33457828", name: "五道口购物中心", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.990607, longitude: 116.333149, source_url: "https://www.openstreetmap.org/way/33457828" },
+  { id: "way/981630347", name: "京西大悦城", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.924435, longitude: 116.17745, source_url: "https://www.openstreetmap.org/way/981630347" },
   { id: "way/156297801", name: "侨福芳草地购物中心", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.918132, longitude: 116.442672, source_url: "https://www.openstreetmap.org/way/156297801" },
   { id: "way/109497827", name: "凯德MALL•西直门", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.940607, longitude: 116.346581, source_url: "https://www.openstreetmap.org/way/109497827" },
   { id: "way/508157319", name: "凯德Mall·天宫院", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.670875, longitude: 116.313105, source_url: "https://www.openstreetmap.org/way/508157319" },
   { id: "node/8831659724", name: "创时尚商场品牌超级折扣仓", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.939666, longitude: 116.366678, source_url: "https://www.openstreetmap.org/node/8831659724" },
   { id: "way/289331432", name: "北京SKP", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.908664, longitude: 116.473151, source_url: "https://www.openstreetmap.org/way/289331432" },
+  { id: "way/1271096273", name: "北京SKP-S", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.906132, longitude: 116.472881, source_url: "https://www.openstreetmap.org/way/1271096273" },
   { id: "way/216729654", name: "北京apm", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.912349, longitude: 116.405869, source_url: "https://www.openstreetmap.org/way/216729654" },
   { id: "way/1257712525", name: "北京北投爱琴海购物公园", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.90789, longitude: 116.653054, source_url: "https://www.openstreetmap.org/way/1257712525" },
   { id: "way/617902876", name: "北京华联顺义金街购物中心", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 40.127341, longitude: 116.646616, source_url: "https://www.openstreetmap.org/way/617902876" },
   { id: "way/343683108", name: "北京富力广场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.894074, longitude: 116.454418, source_url: "https://www.openstreetmap.org/way/343683108" },
+  { id: "way/975380051", name: "半壁店商业广场", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.879728, longitude: 116.631248, source_url: "https://www.openstreetmap.org/way/975380051" },
+  { id: "way/1259091238", name: "华贸中心", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.907862, longitude: 116.474726, source_url: "https://www.openstreetmap.org/way/1259091238" },
+  { id: "relation/19478859", name: "华贸天地", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 40.046245, longitude: 116.423991, source_url: "https://www.openstreetmap.org/relation/19478859" },
   { id: "way/1246255713", name: "合生汇", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.892735, longitude: 116.47391, source_url: "https://www.openstreetmap.org/way/1246255713" },
   { id: "node/13456445349", name: "地安门商场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.936622, longitude: 116.389315, source_url: "https://www.openstreetmap.org/node/13456445349" },
   { id: "node/5240428593", name: "天时市场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.932538, longitude: 116.496689, source_url: "https://www.openstreetmap.org/node/5240428593" },
@@ -1167,6 +1178,7 @@ export const nearbyPois = [
   { id: "way/705955724", name: "槐房万达广场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.812646, longitude: 116.36195, source_url: "https://www.openstreetmap.org/way/705955724" },
   { id: "way/478544049", name: "欧陆时尚购物中心", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 40.065734, longitude: 116.541563, source_url: "https://www.openstreetmap.org/way/478544049" },
   { id: "way/55884669", name: "清河万象汇", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 40.028718, longitude: 116.328184, source_url: "https://www.openstreetmap.org/way/55884669" },
+  { id: "way/25053110", name: "潘家园旧货市场", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.874031, longitude: 116.452181, source_url: "https://www.openstreetmap.org/way/25053110" },
   { id: "node/9119032201", name: "澳门中心商场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.913388, longitude: 116.407416, source_url: "https://www.openstreetmap.org/node/9119032201" },
   { id: "way/260266587", name: "燕莎友谊商城", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.94756, longitude: 116.457188, source_url: "https://www.openstreetmap.org/way/260266587" },
   { id: "way/476128760", name: "王府中环", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.911209, longitude: 116.403382, source_url: "https://www.openstreetmap.org/way/476128760" },
@@ -1178,7 +1190,6 @@ export const nearbyPois = [
   { id: "way/1040129961", name: "红星美凯龙", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.913325, longitude: 116.534031, source_url: "https://www.openstreetmap.org/way/1040129961" },
   { id: "way/371497131", name: "红桥市场", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.884874, longitude: 116.414279, source_url: "https://www.openstreetmap.org/way/371497131" },
   { id: "way/490488974", name: "绿竺中心", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 40.097758, longitude: 116.535839, source_url: "https://www.openstreetmap.org/way/490488974" },
-  { id: "node/9702068667", name: "能量城市", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.95151, longitude: 116.273933, source_url: "https://www.openstreetmap.org/node/9702068667" },
   { id: "way/1382987688", name: "能量城市", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.951394, longitude: 116.273764, source_url: "https://www.openstreetmap.org/way/1382987688" },
   { id: "way/396990805", name: "荟聚中心西红门店", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.786423, longitude: 116.320524, source_url: "https://www.openstreetmap.org/way/396990805" },
   { id: "way/156297791", name: "蓝岛大厦", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.920955, longitude: 116.443235, source_url: "https://www.openstreetmap.org/way/156297791" },
@@ -1193,8 +1204,8 @@ export const nearbyPois = [
   { id: "node/9671609773", name: "颐堤港", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.968688, longitude: 116.485474, source_url: "https://www.openstreetmap.org/node/9671609773" },
   { id: "relation/17137045", name: "首开通州万象汇", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.9033, longitude: 116.728446, source_url: "https://www.openstreetmap.org/relation/17137045" },
   { id: "way/1038124164", name: "马连道茶城", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.88223, longitude: 116.319446, source_url: "https://www.openstreetmap.org/way/1038124164" },
+  { id: "way/237964767", name: "鹿海园早市", category: "🛍 商场 / 商圈", subtype: "商圈", latitude: 39.760401, longitude: 116.497664, source_url: "https://www.openstreetmap.org/way/237964767" },
   { id: "way/958120883", name: "龙湖北京房山天街", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.744021, longitude: 116.134142, source_url: "https://www.openstreetmap.org/way/958120883" },
-  { id: "way/30663427", name: "798艺术区", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.98294, longitude: 116.489783, source_url: "https://www.openstreetmap.org/way/30663427" },
   { id: "node/14174619402", name: "Fayuansi hutong", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.884944, longitude: 116.366295, source_url: "https://www.openstreetmap.org/node/14174619402" },
   { id: "node/13479547121", name: "“佛”字石刻", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.868897, longitude: 116.081604, source_url: "https://www.openstreetmap.org/node/13479547121" },
   { id: "way/1072523526", name: "万佛堂村过街楼", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.898316, longitude: 116.072709, source_url: "https://www.openstreetmap.org/way/1072523526" },
@@ -1230,7 +1241,6 @@ export const nearbyPois = [
   { id: "way/228041535", name: "永定门", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.871062, longitude: 116.393113, source_url: "https://www.openstreetmap.org/way/228041535" },
   { id: "node/12402877187", name: "汤若望", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.932228, longitude: 116.347323, source_url: "https://www.openstreetmap.org/node/12402877187" },
   { id: "way/1456261874", name: "法国使馆旧址", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.902319, longitude: 116.404555, source_url: "https://www.openstreetmap.org/way/1456261874" },
-  { id: "way/25053110", name: "潘家园旧货市场", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.874031, longitude: 116.452181, source_url: "https://www.openstreetmap.org/way/25053110" },
   { id: "way/33612197", name: "王府井大街", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.913143, longitude: 116.404973, source_url: "https://www.openstreetmap.org/way/33612197" },
   { id: "node/549374047", name: "珍妃井", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.920528, longitude: 116.393798, source_url: "https://www.openstreetmap.org/node/549374047" },
   { id: "way/43921121", name: "皇穹宇", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.877144, longitude: 116.406922, source_url: "https://www.openstreetmap.org/way/43921121" },
@@ -1249,5 +1259,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-04T21:13:01+08:00",
+  fetched_at: "2026-10-04T23:07:57+08:00",
 };
