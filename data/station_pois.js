@@ -3,15 +3,16 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-04T20:34:24+08:00
+ * 获取时间：2026-10-04T20:38:10+08:00
  *
- * 共 1104 条：
+ * 共 1152 条：
  *   🎨 艺术 / 展览  255
  *   🎵 音乐 / 演出  240
  *   🍸 夜生活  173
  *   🌳 公园 / 自然  168
  *   🏛 寺庙 / 古迹  139
  *   📚 书店 / 图书馆  82
+ *   🧭 特色去处  48
  *   🍜 吃喝  26
  *   🏟 场馆 / 运动  21
  *
@@ -1127,6 +1128,54 @@ export const nearbyPois = [
   { id: "node/12019945646", name: "首开书院城市记忆书房", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.989263, longitude: 116.417425, source_url: "https://www.openstreetmap.org/node/12019945646" },
   { id: "way/997857679", name: "首钢档案馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.919057, longitude: 116.144154, source_url: "https://www.openstreetmap.org/way/997857679" },
   { id: "way/543836357", name: "高等教育书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.991419, longitude: 116.347692, source_url: "https://www.openstreetmap.org/way/543836357" },
+  { id: "way/30663427", name: "798艺术区", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.98294, longitude: 116.489783, source_url: "https://www.openstreetmap.org/way/30663427" },
+  { id: "node/14174619402", name: "Fayuansi hutong", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.884944, longitude: 116.366295, source_url: "https://www.openstreetmap.org/node/14174619402" },
+  { id: "node/13479547121", name: "“佛”字石刻", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.868897, longitude: 116.081604, source_url: "https://www.openstreetmap.org/node/13479547121" },
+  { id: "way/1072523526", name: "万佛堂村过街楼", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.898316, longitude: 116.072709, source_url: "https://www.openstreetmap.org/way/1072523526" },
+  { id: "node/13165548723", name: "三里屯酒吧街", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.933993, longitude: 116.449358, source_url: "https://www.openstreetmap.org/node/13165548723" },
+  { id: "way/403383764", name: "中央电视塔", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.918177, longitude: 116.300299, source_url: "https://www.openstreetmap.org/way/403383764" },
+  { id: "node/6896751343", name: "五龙亭", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.928448, longitude: 116.379806, source_url: "https://www.openstreetmap.org/node/6896751343" },
+  { id: "way/1033422265", name: "克勤郡王府", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.903217, longitude: 116.363017, source_url: "https://www.openstreetmap.org/way/1033422265" },
+  { id: "relation/20121960", name: "刘鸿瑞宅院", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.888475, longitude: 116.099511, source_url: "https://www.openstreetmap.org/relation/20121960" },
+  { id: "node/12402812275", name: "利玛窦", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.932165, longitude: 116.347328, source_url: "https://www.openstreetmap.org/node/12402812275" },
+  { id: "node/5150889521", name: "前门历史大街", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.893383, longitude: 116.391926, source_url: "https://www.openstreetmap.org/node/5150889521" },
+  { id: "node/269693885", name: "北京古观象台", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.90618, longitude: 116.428353, source_url: "https://www.openstreetmap.org/node/269693885" },
+  { id: "way/1412981313", name: "北安河烈士纪念堂", category: "🧭 特色去处", subtype: "特色地点", latitude: 40.062022, longitude: 116.115382, source_url: "https://www.openstreetmap.org/way/1412981313" },
+  { id: "node/12402877327", name: "南怀仁", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.932104, longitude: 116.347325, source_url: "https://www.openstreetmap.org/node/12402877327" },
+  { id: "way/4922662", name: "南锣鼓巷", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.935772, longitude: 116.396873, source_url: "https://www.openstreetmap.org/way/4922662" },
+  { id: "way/605472716", name: "双清别墅", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.985245, longitude: 116.188029, source_url: "https://www.openstreetmap.org/way/605472716" },
+  { id: "way/30784273", name: "国子监", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.945668, longitude: 116.406977, source_url: "https://www.openstreetmap.org/way/30784273" },
+  { id: "way/1072486326", name: "圈门戏楼", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.9282, longitude: 116.053956, source_url: "https://www.openstreetmap.org/way/1072486326" },
+  { id: "way/1072486317", name: "圈门过街楼", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.927945, longitude: 116.052411, source_url: "https://www.openstreetmap.org/way/1072486317" },
+  { id: "way/237696580", name: "圜丘", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.875585, longitude: 116.406954, source_url: "https://www.openstreetmap.org/way/237696580" },
+  { id: "way/155427406", name: "地质调查所鹫峰地震研究室原址（鹫峰地震台）", category: "🧭 特色去处", subtype: "特色地点", latitude: 40.062813, longitude: 116.094586, source_url: "https://www.openstreetmap.org/way/155427406" },
+  { id: "node/269720154", name: "大水法", category: "🧭 特色去处", subtype: "特色地点", latitude: 40.012115, longitude: 116.306635, source_url: "https://www.openstreetmap.org/node/269720154" },
+  { id: "relation/941596", name: "天安门广场", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.90236, longitude: 116.391465, source_url: "https://www.openstreetmap.org/relation/941596" },
+  { id: "node/700356064", name: "宛平城", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.849839, longitude: 116.22013, source_url: "https://www.openstreetmap.org/node/700356064" },
+  { id: "node/13247296732", name: "巩华城", category: "🧭 特色去处", subtype: "特色地点", latitude: 40.128328, longitude: 116.271805, source_url: "https://www.openstreetmap.org/node/13247296732" },
+  { id: "node/1938345234", name: "抗日烈士赵登禹将军之墓", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.853935, longitude: 116.231614, source_url: "https://www.openstreetmap.org/node/1938345234" },
+  { id: "node/3390469184", name: "摩崖造像群", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.870655, longitude: 116.090609, source_url: "https://www.openstreetmap.org/node/3390469184" },
+  { id: "relation/9511883", name: "故宫", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.916406, longitude: 116.390796, source_url: "https://www.openstreetmap.org/relation/9511883" },
+  { id: "way/1300905085", name: "斋宫", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.878336, longitude: 116.400665, source_url: "https://www.openstreetmap.org/way/1300905085" },
+  { id: "node/9518387616", name: "旸台山清水院藏经记碑", category: "🧭 特色去处", subtype: "特色地点", latitude: 40.051496, longitude: 116.098791, source_url: "https://www.openstreetmap.org/node/9518387616" },
+  { id: "node/13032226863", name: "显龙山石刻", category: "🧭 特色去处", subtype: "特色地点", latitude: 40.049474, longitude: 116.157214, source_url: "https://www.openstreetmap.org/node/13032226863" },
+  { id: "way/605472718", name: "欢喜园", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.985242, longitude: 116.187036, source_url: "https://www.openstreetmap.org/way/605472718" },
+  { id: "node/2354348604", name: "水木清华", category: "🧭 特色去处", subtype: "特色地点", latitude: 40.001926, longitude: 116.316868, source_url: "https://www.openstreetmap.org/node/2354348604" },
+  { id: "way/228041535", name: "永定门", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.871062, longitude: 116.393113, source_url: "https://www.openstreetmap.org/way/228041535" },
+  { id: "node/12402877187", name: "汤若望", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.932228, longitude: 116.347323, source_url: "https://www.openstreetmap.org/node/12402877187" },
+  { id: "way/1456261874", name: "法国使馆旧址", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.902319, longitude: 116.404555, source_url: "https://www.openstreetmap.org/way/1456261874" },
+  { id: "way/25053110", name: "潘家园旧货市场", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.874031, longitude: 116.452181, source_url: "https://www.openstreetmap.org/way/25053110" },
+  { id: "way/33612197", name: "王府井大街", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.913143, longitude: 116.404973, source_url: "https://www.openstreetmap.org/way/33612197" },
+  { id: "node/549374047", name: "珍妃井", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.920528, longitude: 116.393798, source_url: "https://www.openstreetmap.org/node/549374047" },
+  { id: "way/43921121", name: "皇穹宇", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.877144, longitude: 116.406922, source_url: "https://www.openstreetmap.org/way/43921121" },
+  { id: "node/13472833383", name: "石佛村修路摩崖石刻", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.871802, longitude: 116.089738, source_url: "https://www.openstreetmap.org/node/13472833383" },
+  { id: "way/43921139", name: "祈年殿", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.88225, longitude: 116.406624, source_url: "https://www.openstreetmap.org/way/43921139" },
+  { id: "way/703612796", name: "神乐署", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.877397, longitude: 116.398031, source_url: "https://www.openstreetmap.org/way/703612796" },
+  { id: "node/4454306990", name: "荣宝斋", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.894107, longitude: 116.376884, source_url: "https://www.openstreetmap.org/node/4454306990" },
+  { id: "way/602802468", name: "见心斋", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.992852, longitude: 116.185502, source_url: "https://www.openstreetmap.org/way/602802468" },
+  { id: "way/856189717", name: "辛亥滦州起义纪念园", category: "🧭 特色去处", subtype: "特色地点", latitude: 40.049425, longitude: 116.158919, source_url: "https://www.openstreetmap.org/way/856189717" },
+  { id: "relation/318110", name: "长城", category: "🧭 特色去处", subtype: "特色地点", latitude: 35.72224, longitude: 107.925279, source_url: "https://www.openstreetmap.org/relation/318110" },
+  { id: "node/6313986642", name: "齐白石故居", category: "🧭 特色去处", subtype: "特色地点", latitude: 39.934321, longitude: 116.395264, source_url: "https://www.openstreetmap.org/node/6313986642" },
 ];
 
 /** POI 来源署名，展示这些内容时应当带上。 */
@@ -1134,5 +1183,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-04T20:34:24+08:00",
+  fetched_at: "2026-10-04T20:38:10+08:00",
 };

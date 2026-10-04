@@ -64,13 +64,21 @@ GROUPS = {
     "food":        [("amenity", "restaurant")],
     "reading":     [("shop", "books"), ("amenity", "library")],
     "venue":       [("leisure", "stadium"), ("tourism", "aquarium")],
+    # attraction 放最后：它和公园/古迹/博物馆大量重叠，让那些先匹配，
+    # 这一组只兜住前面没覆盖到的——比如潘家园旧货市场。
+    "attraction":  [("tourism", "attraction")],
 }
 
 # 某些分组必须在 Overpass 端就收窄，否则响应过大。
 # 北京的 amenity=restaurant 上万条，绝大多数是普通馆子；这里只取至少带一项
 # 强信号的（有人认真标过官网 / 维基 / 营业时间），实测 269 条，连锁仅 9 家。
 # 注意：这不是「人气」——OSM 没有人气数据，它只说明有人在意过这家店。
-REQUIRE_ANY = {"food": ["website", "wikidata", "opening_hours"]}
+REQUIRE_ANY = {
+    "food": ["website", "wikidata", "opening_hours"],
+    # attraction 原始 820 条、噪声极大（「簋街雕像」「帽儿胡同」），
+    # 直接在 Overpass 端要求带强信号，既降响应体积也省掉大部分噪声。
+    "attraction": ["wikidata", "wikipedia", "website", "fee", "opening_hours"],
+}
 
 # 「气质」这件事 OSM 没有字段，但「有没有官网」是个可用的代用指标：
 # 肯花力气弄个官网的馆子，基本不会是食堂或平价快餐。
@@ -78,6 +86,9 @@ REQUIRE_ANY = {"food": ["website", "wikidata", "opening_hours"]}
 # TRB Hutong、老舍茶馆、便宜坊这类；只有营业时间的 119 家是永和豆浆、护国寺小吃、
 # 新乐群食堂、学子居这类。后两档不是「值得专门去」，一律不收。
 STRICT_SIGNAL = {("amenity", "restaurant")}
+# 咖啡馆试过同样的「有官网」判据，不成立：全北京只有 32 家咖啡馆填了官网，
+# 其中绝大多数是星巴克——连锁才有人维护这些字段，独立咖啡馆没有。
+# 排掉连锁后只剩 3 家，收了没有意义，故不收咖啡。
 
 
 def has_site_signal(tags):
@@ -126,6 +137,8 @@ CATEGORY = {
     ("amenity", "library"):          ("📚 书店 / 图书馆", "图书馆", True),
     ("leisure", "stadium"):          ("🏟 场馆 / 运动", "体育场馆", True),
     ("tourism", "aquarium"):         ("🏟 场馆 / 运动", "水族馆", True),
+    # 必须排在最后：同一个要素若既是公园又标了 attraction，应归到公园。
+    ("tourism", "attraction"):       ("🧭 特色去处", "特色地点", True),
 }
 
 # 按名字排除的噪声：街边自助借书机、无人值守阅读空间不是「去处」。

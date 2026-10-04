@@ -247,8 +247,8 @@ function renderDestinationOnly() {
 
   document.querySelector(".result-lead").textContent = `📍 ${state.destination.station_name}附近`;
   // 展示顺序：专程去的在前，吃喝是顺带的，放最后
-  const CATEGORY_ORDER = ["🎨 艺术 / 展览", "🎵 音乐 / 演出", "🏛 寺庙 / 古迹", "🌳 公园 / 自然",
-                         "📚 书店 / 图书馆", "🏟 场馆 / 运动", "🍸 夜生活", "🍜 吃喝"];
+  const CATEGORY_ORDER = ["🧭 特色去处", "🎨 艺术 / 展览", "🎵 音乐 / 演出", "🏛 寺庙 / 古迹",
+                         "🌳 公园 / 自然", "📚 书店 / 图书馆", "🏟 场馆 / 运动", "🍸 夜生活", "🍜 吃喝"];
   // 按品类分组展示；组内按距离升序。同一个站每次结果一致，随机性只发生在抽站那一步。
   const groups = new Map();
   pois.forEach((poi) => {
