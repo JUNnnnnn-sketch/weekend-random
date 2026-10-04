@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, findNearbyPois, radiusForDuration, freshness, buildWeekendPlan, pickExperience, FORTUNE_SCOPE_KM } from "./recommendation.js";
+import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildWeekendPlan, pickExperience, FORTUNE_SCOPE_KM } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
@@ -52,15 +52,24 @@ function goBack() { rollRunId += 1; showScreen(navigationStack.pop() || "home", 
 function goHome() { rollRunId += 1; navigationStack = []; showScreen("home", { remember: false }); }
 function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 function addLog(text, done = false) { const item = document.createElement("li"); item.textContent = text; item.classList.toggle("is-done", done); rollLog.append(item); }
-/** 命运模式只用时长（决定愿意走多远）；人数对「附近有什么」没有真实作用，故不问。 */
-function needsParty(mode) { return mode !== "fortune"; }
-function updateContinue() { continueBtn.disabled = !(state.duration && (!needsParty(state.mode) || state.party)); }
-function syncSetupFields() { document.getElementById("block-party").hidden = !needsParty(state.mode); }
-function restoreSelectionUI() { document.querySelectorAll(".chip").forEach((chip) => chip.classList.toggle("is-selected", state[chip.dataset.group] === chip.dataset.value)); syncSetupFields(); updateContinue(); }
+/**
+ * 命运模式不问任何问题——它的全部意思就是「不用想，让命运决定」，
+ * 还要先填两道题是自相矛盾的。人数对「附近有什么」没有真实影响；时长也没有：
+ * 有半天还是有一整天，并不改变你愿不愿意多走十分钟。两个都去掉。
+ * 周末方案继续问人数和时长，那里 buildWeekendPlan 真的在用。
+ */
+function needsSetup(mode) { return mode !== "fortune"; }
+function updateContinue() { continueBtn.disabled = !(state.party && state.duration); }
+function restoreSelectionUI() { document.querySelectorAll(".chip").forEach((chip) => chip.classList.toggle("is-selected", state[chip.dataset.group] === chip.dataset.value)); updateContinue(); }
 
 function setupTitleFor(mode) { return mode === "fortune" ? "先告诉命运一点情报" : mode === "plan" ? "先告诉它会怎么过" : "先告诉这次怎么探索"; }
-function setupMode(mode) { state.mode = mode; document.getElementById("setup-title").textContent = setupTitleFor(mode); syncSetupFields(); updateContinue(); showScreen("setup"); }
-document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => { if (button.dataset.mode === "recent") { state.mode = "recent"; showScreen("recent"); renderRecent(); return; } setupMode(button.dataset.mode); }));
+function setupMode(mode) { state.mode = mode; document.getElementById("setup-title").textContent = setupTitleFor(mode); updateContinue(); showScreen("setup"); }
+document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => {
+  const mode = button.dataset.mode;
+  if (mode === "recent") { state.mode = "recent"; showScreen("recent"); renderRecent(); return; }
+  if (!needsSetup(mode)) { state.mode = mode; startRoll(); return; }   // 命运模式直接开抽
+  setupMode(mode);
+}));
 document.querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => { state[chip.dataset.group] = chip.dataset.value; restoreSelectionUI(); saveSession(); }));
 document.querySelectorAll("[data-back]").forEach((button) => button.addEventListener("click", goBack));
 document.querySelectorAll("[data-home]").forEach((button) => button.addEventListener("click", goHome));
@@ -198,7 +207,7 @@ async function startRoll() {
   document.getElementById("roll-kicker").textContent = "命运正在抽签";
   showScreen("roll");
   // 命运模式只做一件事：在覆盖范围内随机线路 -> 随机站点。“附近有什么”是下一阶段。
-  const radiusKm = radiusForDuration(state.duration);
+  const radiusKm = NEARBY_RADIUS_KM;
   const picked = pickDestination(subwayLines, { radiusKm });
   if (!picked) { addLog("暂时没有可用的地铁线路数据", true); return; }
   const { line, station, destination, lineNames, stationNames } = picked;
@@ -223,8 +232,8 @@ function renderResult() {
 /** 命运模式的结果页：只公布目的地（线路 + 站点），并为下一阶段留出入口。缺坐标不影响展示。 */
 function renderDestinationOnly() {
   const { line_name, station_order } = state.destination;
-  const radiusKm = radiusForDuration(state.duration);
-  document.getElementById("result-meta").textContent = `${state.duration} · ${line_name} 第 ${station_order} 站 · 步行 ${radiusKm} km 内`;
+  const radiusKm = NEARBY_RADIUS_KM;
+  document.getElementById("result-meta").textContent = `${line_name} 第 ${station_order} 站 · 步行 ${radiusKm} km 内`;
   document.getElementById("explore-task").hidden = true;
 
   const pois = findNearbyPois(state.destination, { radiusKm });
@@ -238,7 +247,8 @@ function renderDestinationOnly() {
 
   document.querySelector(".result-lead").textContent = `📍 ${state.destination.station_name}附近`;
   // 展示顺序：专程去的在前，吃喝是顺带的，放最后
-  const CATEGORY_ORDER = ["🎨 艺术 / 展览", "🎵 音乐 / 演出", "🏛 寺庙 / 古迹", "🌳 公园 / 自然", "🍸 夜生活", "🍜 吃喝"];
+  const CATEGORY_ORDER = ["🎨 艺术 / 展览", "🎵 音乐 / 演出", "🏛 寺庙 / 古迹", "🌳 公园 / 自然",
+                         "📚 书店 / 图书馆", "🏟 场馆 / 运动", "🍸 夜生活", "🍜 吃喝"];
   // 按品类分组展示；组内按距离升序。同一个站每次结果一致，随机性只发生在抽站那一步。
   const groups = new Map();
   pois.forEach((poi) => {
@@ -260,8 +270,7 @@ function renderDestinationOnly() {
 
   const note = document.createElement("p");
   note.className = "place-freshness";
-  const usedKm = Math.max(radiusKm, Math.ceil(Math.max(...pois.map((p) => p.distance_km)) * 10) / 10);
-  note.innerHTML = `范围 ${usedKm} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
+  note.innerHTML = `范围 ${radiusKm} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
   list.append(note);
 }
 function renderPlace(item) {

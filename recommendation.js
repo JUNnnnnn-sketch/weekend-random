@@ -32,15 +32,6 @@ const CITY_CENTER = { latitude: 39.9087, longitude: 116.3975 };
 export const FORTUNE_SCOPE_KM = 8;
 export const NEARBY_RADIUS_KM = 1.2;
 
-/**
- * 时长决定愿意走多远。这是「有多少时间」对命运模式的真实作用——
- * 时间多就愿意多走几步，而不是印在页面上当装饰。
- */
-const DURATION_RADIUS_KM = { "2-3小时": 0.8, "半天": 1.2, "一整天": 2 };
-export function radiusForDuration(duration) {
-  return DURATION_RADIUS_KM[duration] ?? NEARBY_RADIUS_KM;
-}
-
 function inFortuneScope(station) {
   const hit = stationCoordinates[station.physical_station_id];
   return Boolean(hit) && distanceKm(CITY_CENTER, hit) <= FORTUNE_SCOPE_KM;
@@ -126,21 +117,21 @@ export function pickDestination(lines, { radiusKm = NEARBY_RADIUS_KM } = {}) {
  * 没有坐标、或周边确实没有收录的场所时，返回空数组。不扩大半径去凑数。
  */
 export const MIN_NEARBY_COUNT = 3;
-const RADIUS_LADDER_KM = [1.2, 1.5, 2, 2.5, 3];
 
-export function findNearbyPois(destination, { radiusKm = NEARBY_RADIUS_KM, minCount = MIN_NEARBY_COUNT } = {}) {
+/**
+ * 半径固定 1.2 km（约 15 分钟步行），不为了凑数放宽。
+ *
+ * 曾经试过「凑不够就逐级放宽到 3 km」，结果是没内容的站去蹭邻站：宋家庄推出
+ * 2.4 km 外的方庄体育公园，而那儿根本不算方庄；27 个放宽过的站里有 23 个
+ * 跟邻站的推荐重合，丽泽商务区和菜户营的清单完全一样。
+ * 这个产品不是地图大合集——附近没有值得去的地方，就不该把这一站放进抽签池。
+ */
+export function findNearbyPois(destination, { radiusKm = NEARBY_RADIUS_KM } = {}) {
   if (!destination || destination.latitude === null || destination.longitude === null) return [];
-  const scored = nearbyPois
+  return nearbyPois
     .map((poi) => ({ ...poi, distance_km: distanceKm(destination, poi) }))
+    .filter((poi) => poi.distance_km <= radiusKm)
     .sort((a, b) => a.distance_km - b.distance_km);
-  // 从起始半径开始，凑不够 minCount 就逐级放宽。
-  // 放宽不是糊弄：每条都会显示真实步行距离，1.9 km 值不值得走由用户自己判断。
-  // 实测 121 个市区站里，92 个在 1.2 km 内就够，其余最多放到 3 km，无一落空。
-  for (const limit of [radiusKm, ...RADIUS_LADDER_KM.filter((r) => r > radiusKm)]) {
-    const hit = scored.filter((poi) => poi.distance_km <= limit);
-    if (hit.length >= minCount) return hit;
-  }
-  return scored.filter((poi) => poi.distance_km <= RADIUS_LADDER_KM[RADIUS_LADDER_KM.length - 1]);
 }
 
 export function distanceKm(a, b) {

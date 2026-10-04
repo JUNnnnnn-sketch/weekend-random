@@ -62,6 +62,8 @@ GROUPS = {
     "heritage":    [("amenity", "place_of_worship"), ("historic", "temple"),
                     ("historic", "ruins"), ("historic", "monument")],
     "food":        [("amenity", "restaurant")],
+    "reading":     [("shop", "books"), ("amenity", "library")],
+    "venue":       [("leisure", "stadium"), ("tourism", "aquarium")],
 }
 
 # 某些分组必须在 Overpass 端就收窄，否则响应过大。
@@ -108,7 +110,14 @@ CATEGORY = {
     ("historic", "ruins"):           ("🏛 寺庙 / 古迹", "遗址", True),
     ("historic", "monument"):        ("🏛 寺庙 / 古迹", "古迹", True),
     ("amenity", "restaurant"):       ("🍜 吃喝", "餐厅", False),
+    ("shop", "books"):               ("📚 书店 / 图书馆", "书店", True),
+    ("amenity", "library"):          ("📚 书店 / 图书馆", "图书馆", True),
+    ("leisure", "stadium"):          ("🏟 场馆 / 运动", "体育场馆", True),
+    ("tourism", "aquarium"):         ("🏟 场馆 / 运动", "水族馆", True),
 }
+
+# 按名字排除的噪声：街边自助借书机、无人值守阅读空间不是「去处」。
+NAME_NOISE = ["自助图书馆", "智能文化空间", "自助借阅", "图书借阅机", "新华书店"]
 
 
 def has_quality_signal(tags):
@@ -210,6 +219,8 @@ def parse(raws):
                     if strict and not has_quality_signal(tags):
                         category = None
                     elif any(word in name for word in CHAIN_KEYWORDS):
+                        category = None
+                    elif any(word in name for word in NAME_NOISE):
                         category = None
                     break
             if not category:
