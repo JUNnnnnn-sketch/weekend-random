@@ -136,11 +136,6 @@ CATEGORY = {
     ("amenity", "restaurant"):       ("🍜 吃喝", "餐厅", False),
     ("shop", "books"):               ("📚 书店 / 图书馆", "书店", True),
     ("amenity", "library"):          ("📚 书店 / 图书馆", "图书馆", True),
-    # 商场不过质量筛：一个标了 shop=mall 又有名字的东西本来就是商场，
-    # 不需要维基条目来证明朝阳大悦城值得去。实测加筛会把 SKP（4 个标签）、
-    # 朝阳大悦城（4 个）、荟聚（5 个）、颐堤港（2 个）全部误杀。
-    # 不收 shop=department_store——那一类在北京是「无印良品」「九木杂物社」
-    # 这种单店，不是去处。
     ("shop", "mall"):                ("🛍 商场 / 商圈", "商场", False),
     ("leisure", "stadium"):          ("🏟 场馆 / 运动", "体育场馆", True),
     ("tourism", "aquarium"):         ("🏟 场馆 / 运动", "水族馆", True),
@@ -150,6 +145,30 @@ CATEGORY = {
 
 # 按名字排除的噪声：街边自助借书机、无人值守阅读空间不是「去处」。
 NAME_NOISE = ["自助图书馆", "智能文化空间", "自助借阅", "图书借阅机", "新华书店"]
+
+# ---- 商场的筛选 ----
+# 北京标了 shop=mall 的有 199 家，绝大多数是方庄购物中心、NTP新城广场、时代Life
+# 这类社区商场，没人会为它专程坐地铁。用户给的判据是「商铺多、评价过万」或
+# 「在华外国人中有名气」——OSM 两样数据都没有，但 name:en 是后者的好代用品：
+# 实测该留的 7/11 有英文名，该砍的 8/8 一个都没有。有人愿意给它填英文名的商场，
+# 恰恰就是外国人会去的那种。
+#
+# 只靠 name:en 会漏掉标签极稀疏的大商场（颐堤港只有 2 个标签），故再加一张
+# 品牌白名单兜底；另排除批发市场与建材家居城——它们是 shop=mall 但不是去处。
+MALL_BRANDS = ["大悦城", "万象", "合生汇", "SKP", "颐堤港", "银泰", "爱琴海", "太古",
+               "恒隆", "国贸", "侨福", "华贸", "蓝色港湾", "天街", "荟聚", "apm",
+               "来福士", "新光天地", "王府中环", "东方新天地", "世贸天阶", "富力广场",
+               "悠唐", "三里屯", "凯德", "万达广场", "新中关", "蓝港", "朝阳", "西单",
+               "五道口"]
+MALL_EXCLUDE = ["批发", "折扣仓", "红星美凯龙", "建材", "家居", "茶城", "工艺品",
+                "五金", "机电", "汽配", "果蔬", "粮油", "水产", "宠物", "图书大厦",
+                "超市", "便利"]
+
+
+def mall_is_destination(name):
+    if any(word in name for word in MALL_EXCLUDE):
+        return False
+    return any(brand in name for brand in MALL_BRANDS)
 
 
 def has_quality_signal(tags):
@@ -255,6 +274,11 @@ def parse(raws):
                     elif any(word in name for word in CHAIN_KEYWORDS):
                         category = None
                     elif any(word in name for word in NAME_NOISE):
+                        category = None
+                    elif key == ("shop", "mall") and not (
+                            mall_is_destination(name) or tags.get("name:en")
+                            or tags.get("wikidata") or tags.get("wikipedia")
+                            or tags.get("brand") or tags.get("operator")):
                         category = None
                     break
             if not category:
