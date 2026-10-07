@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, placeableExperiencesAt, matchPlaceFor } from "./recommendation.js";
+import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, placeableExperiencesAt, matchPlaceFor, pickWorthATrip } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
@@ -270,10 +270,46 @@ function renderDestinationOnly() {
     list.append(card);
   });
 
+  list.append(renderWorthATrip());
+
   const note = document.createElement("p");
   note.className = "place-freshness";
   note.innerHTML = `范围 ${radiusKm} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
   list.append(note);
+}
+
+// 已经摇出来过的，换一个时不重复
+let tripSeen = [];
+
+/**
+ * 「或者，专程去一趟」。
+ *
+ * 收录的地方里有一批命运模式永远给不出来：周边凑不够 3 个可推荐的地方，
+ * 或者离最近的站太远。它们不是不好，是不在「出地铁走一刻钟」这个模式里。
+ * 与其让三分之一的数据看不见，不如在站点清单末尾单开一块，
+ * 老实写明从哪站出来还有多远。
+ */
+function renderWorthATrip(place) {
+  const pick = place || pickWorthATrip(subwayLines, { exclude: tripSeen });
+  const card = document.createElement("article");
+  card.className = "place-card trip-card";
+  if (!pick) {
+    card.innerHTML = '<div><p class="place-category">🧳 或者，专程去一趟</p></div>'
+      + '<p class="empty">这一类暂时没有收录到地方。</p>';
+    return card;
+  }
+  if (!tripSeen.includes(pick.id)) tripSeen.push(pick.id);
+  const km = pick.nearest.distance_km;
+  card.innerHTML = `
+    <div><p class="place-category">🧳 或者，专程去一趟</p><h3>${esc(pick.name)}</h3></div>
+    <p class="activity-meta">${esc(pick.category)} · ${esc(pick.subtype)}</p>
+    <p class="place-freshness">地铁到不了——最近的是 ${esc(pick.nearest.station_name)}站，出来还有 ${km.toFixed(1)} 公里，
+      得换公交或打车 · <a href="${pick.source_url}" target="_blank" rel="noreferrer">地图 ↗</a></p>
+    <button class="btn btn-ghost btn-trip" type="button">换一个</button>`;
+  card.querySelector(".btn-trip").addEventListener("click", () => {
+    card.replaceWith(renderWorthATrip());
+  });
+  return card;
 }
 function renderPlace(item) {
   const card = document.createElement("article"); card.className = "place-card";

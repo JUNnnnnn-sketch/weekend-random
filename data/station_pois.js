@@ -3,20 +3,20 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-07T20:30:21+08:00
+ * 获取时间：2026-10-07T20:39:22+08:00
  *
- * 共 1011 条：
- *   🎨 艺术 / 展览  216
- *   🎵 音乐 / 演出  216
+ * 共 986 条：
+ *   🎨 艺术 / 展览  214
+ *   🎵 音乐 / 演出  195
  *   🍸 夜生活  172
  *   🏛 寺庙 / 古迹  124
  *   🌳 公园 / 自然  64
  *   🎯 玩乐场地  56
  *   🛍 商场 / 商圈  46
- *   🧭 特色去处  45
+ *   🧭 特色去处  44
  *   📚 书店 / 图书馆  29
  *   🍜 吃喝  24
- *   🏟 场馆 / 运动  19
+ *   🏟 场馆 / 运动  18
  *
  * 刻意不收餐厅、咖啡、泛化景点——理由见 tools/fetch_station_pois.py 的说明。
  * 公园与寺庙古迹额外过了一道质量筛（须有维基/官网/门票/营业时间，或标签足够丰富），
@@ -424,7 +424,6 @@ export const nearbyPois = [
   { id: "way/523569206", name: "广告博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.913614, longitude: 116.553532, source_url: "https://www.openstreetmap.org/way/523569206" },
   { id: "node/12871058706", name: "康有为故居", category: "🎨 艺术 / 展览", subtype: "故居 / 纪念馆", latitude: 39.886592, longitude: 116.369359, source_url: "https://www.openstreetmap.org/node/12871058706" },
   { id: "way/235761636", name: "廉洁奥运主题文化展馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 40.018908, longitude: 116.380499, source_url: "https://www.openstreetmap.org/way/235761636" },
-  { id: "way/464844572", name: "廊坊市博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.552225, longitude: 116.716483, source_url: "https://www.openstreetmap.org/way/464844572" },
   { id: "way/1494544850", name: "张家湾博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.85309, longitude: 116.692094, source_url: "https://www.openstreetmap.org/way/1494544850" },
   { id: "way/545400819", name: "张家湾文化艺术博览苑", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.855304, longitude: 116.729135, source_url: "https://www.openstreetmap.org/way/545400819" },
   { id: "way/738094476", name: "徐悲鸿纪念馆", category: "🎨 艺术 / 展览", subtype: "故居 / 纪念馆", latitude: 39.943693, longitude: 116.365329, source_url: "https://www.openstreetmap.org/way/738094476" },
@@ -455,7 +454,6 @@ export const nearbyPois = [
   { id: "node/11521261683", name: "波斯文化艺术中心", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.984579, longitude: 116.490465, source_url: "https://www.openstreetmap.org/node/11521261683" },
   { id: "node/11521228003", name: "活的3D博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.982746, longitude: 116.495219, source_url: "https://www.openstreetmap.org/node/11521228003" },
   { id: "way/571143708", name: "海淀区少年宫", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.963814, longitude: 116.289892, source_url: "https://www.openstreetmap.org/way/571143708" },
-  { id: "way/1334653328", name: "涿州市博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.492931, longitude: 115.967355, source_url: "https://www.openstreetmap.org/way/1334653328" },
   { id: "way/122100032", name: "清华园车站旧址", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.990219, longitude: 116.325613, source_url: "https://www.openstreetmap.org/way/122100032" },
   { id: "way/451335313", name: "清华大学艺术博物馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 40.000582, longitude: 116.329475, source_url: "https://www.openstreetmap.org/way/451335313" },
   { id: "way/447845992", name: "炎黄艺术馆", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.994335, longitude: 116.402589, source_url: "https://www.openstreetmap.org/way/447845992" },
@@ -599,14 +597,12 @@ export const nearbyPois = [
   { id: "node/2997106103", name: "万达影城CBD店", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.907811, longitude: 116.464388, source_url: "https://www.openstreetmap.org/node/2997106103" },
   { id: "node/2123273796", name: "万达影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 40.059084, longitude: 116.409465, source_url: "https://www.openstreetmap.org/node/2123273796" },
   { id: "node/6302602516", name: "三庆园", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.894485, longitude: 116.3905, source_url: "https://www.openstreetmap.org/node/6302602516" },
-  { id: "way/1354577575", name: "上海路甲36号", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.560519, longitude: 116.713268, source_url: "https://www.openstreetmap.org/way/1354577575" },
   { id: "node/9690934261", name: "不可驯服", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.854732, longitude: 116.674604, source_url: "https://www.openstreetmap.org/node/9690934261" },
   { id: "node/2408401338", name: "世纪剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.950424, longitude: 116.466251, source_url: "https://www.openstreetmap.org/node/2408401338" },
   { id: "way/727614584", name: "东宫影剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.924231, longitude: 116.40937, source_url: "https://www.openstreetmap.org/way/727614584" },
   { id: "way/1315110492", name: "东方艺空间", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.89367, longitude: 116.339352, source_url: "https://www.openstreetmap.org/way/1315110492" },
   { id: "node/2974995671", name: "东环影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.935111, longitude: 116.429933, source_url: "https://www.openstreetmap.org/node/2974995671" },
   { id: "node/7535488178", name: "东融国际影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 40.042181, longitude: 116.343925, source_url: "https://www.openstreetmap.org/node/7535488178" },
-  { id: "node/12535657051", name: "丝绸之路国际艺术交流中心戏剧厅", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.565332, longitude: 116.713865, source_url: "https://www.openstreetmap.org/node/12535657051" },
   { id: "way/477916190", name: "中华电影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.882955, longitude: 116.391861, source_url: "https://www.openstreetmap.org/way/477916190" },
   { id: "way/1280550099", name: "中国剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.947148, longitude: 116.304804, source_url: "https://www.openstreetmap.org/way/1280550099" },
   { id: "way/631914113", name: "中国木偶艺术剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.966673, longitude: 116.394875, source_url: "https://www.openstreetmap.org/way/631914113" },
@@ -621,17 +617,13 @@ export const nearbyPois = [
   { id: "node/10963664661", name: "中间剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.952652, longitude: 116.226155, source_url: "https://www.openstreetmap.org/node/10963664661" },
   { id: "way/943130580", name: "中间电影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.952374, longitude: 116.224739, source_url: "https://www.openstreetmap.org/way/943130580" },
   { id: "node/9579771903", name: "丰台影剧院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.850656, longitude: 116.278203, source_url: "https://www.openstreetmap.org/node/9579771903" },
-  { id: "way/1354577576", name: "书不尽", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.560512, longitude: 116.714058, source_url: "https://www.openstreetmap.org/way/1354577576" },
   { id: "node/8593675432", name: "二七剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.908038, longitude: 116.339641, source_url: "https://www.openstreetmap.org/node/8593675432" },
-  { id: "way/1354577571", name: "二商店", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.561846, longitude: 116.713834, source_url: "https://www.openstreetmap.org/way/1354577571" },
   { id: "node/3318033564", name: "云岗影剧院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.80658, longitude: 116.154432, source_url: "https://www.openstreetmap.org/node/3318033564" },
   { id: "node/14007684457", name: "五一剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.916662, longitude: 116.147242, source_url: "https://www.openstreetmap.org/node/14007684457" },
   { id: "node/910429280", name: "五道口工人俱乐部", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.992137, longitude: 116.333416, source_url: "https://www.openstreetmap.org/node/910429280" },
   { id: "node/8892591901", name: "京剧票友", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.926281, longitude: 116.327503, source_url: "https://www.openstreetmap.org/node/8892591901" },
   { id: "node/4801360221", name: "人民剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.93328, longitude: 116.368464, source_url: "https://www.openstreetmap.org/node/4801360221" },
   { id: "node/9311586225", name: "人艺小剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.920218, longitude: 116.406818, source_url: "https://www.openstreetmap.org/node/9311586225" },
-  { id: "way/1354577578", name: "他乡", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.559693, longitude: 116.714868, source_url: "https://www.openstreetmap.org/way/1354577578" },
-  { id: "node/12535657139", name: "你试试看", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.560175, longitude: 116.714807, source_url: "https://www.openstreetmap.org/node/12535657139" },
   { id: "node/6302636408", name: "保利国际影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.896878, longitude: 116.391165, source_url: "https://www.openstreetmap.org/node/6302636408" },
   { id: "node/7780921229", name: "保利影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 40.222153, longitude: 116.228535, source_url: "https://www.openstreetmap.org/node/7780921229" },
   { id: "node/1485625573", name: "保利影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.853273, longitude: 116.360427, source_url: "https://www.openstreetmap.org/node/1485625573" },
@@ -663,9 +655,7 @@ export const nearbyPois = [
   { id: "node/11217716984", name: "博纳国际影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 40.041457, longitude: 116.431648, source_url: "https://www.openstreetmap.org/node/11217716984" },
   { id: "node/3506893983", name: "友唱·全民K歌", category: "🎵 音乐 / 演出", subtype: "Live House / 夜店", latitude: 39.931896, longitude: 116.438484, source_url: "https://www.openstreetmap.org/node/3506893983" },
   { id: "node/8575679038", name: "变形金刚：传奇现场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.856605, longitude: 116.675265, source_url: "https://www.openstreetmap.org/node/8575679038" },
-  { id: "way/1354577579", name: "只有红楼梦", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.559997, longitude: 116.714253, source_url: "https://www.openstreetmap.org/way/1354577579" },
   { id: "node/1787497648", name: "嘉华影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 40.007553, longitude: 116.347186, source_url: "https://www.openstreetmap.org/node/1787497648" },
-  { id: "way/1354577577", name: "四合院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.559798, longitude: 116.712375, source_url: "https://www.openstreetmap.org/way/1354577577" },
   { id: "way/377569800", name: "国安剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.980114, longitude: 116.364398, source_url: "https://www.openstreetmap.org/way/377569800" },
   { id: "way/4974233", name: "国家大剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.903342, longitude: 116.383547, source_url: "https://www.openstreetmap.org/way/4974233" },
   { id: "way/1058100253", name: "国家大剧院台湖舞美艺术中心", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.837421, longitude: 116.625874, source_url: "https://www.openstreetmap.org/way/1058100253" },
@@ -687,22 +677,16 @@ export const nearbyPois = [
   { id: "way/1264009406", name: "幸运星野", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.888644, longitude: 116.733406, source_url: "https://www.openstreetmap.org/way/1264009406" },
   { id: "way/1318861938", name: "广安门电影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.88269, longitude: 116.353336, source_url: "https://www.openstreetmap.org/way/1318861938" },
   { id: "node/6302602908", name: "广德楼德云社", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.894465, longitude: 116.388752, source_url: "https://www.openstreetmap.org/node/6302602908" },
-  { id: "way/1354577569", name: "床剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.561849, longitude: 116.713063, source_url: "https://www.openstreetmap.org/way/1354577569" },
   { id: "node/4827184437", name: "开心麻花磁力剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.921305, longitude: 116.365238, source_url: "https://www.openstreetmap.org/node/4827184437" },
-  { id: "node/12535657133", name: "张迎春", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.559436, longitude: 116.712431, source_url: "https://www.openstreetmap.org/node/12535657133" },
   { id: "way/251434123", name: "当代MOMA百老汇电影中心", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.949179, longitude: 116.432012, source_url: "https://www.openstreetmap.org/way/251434123" },
   { id: "way/1259304558", name: "德云社", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.882507, longitude: 116.391563, source_url: "https://www.openstreetmap.org/way/1259304558" },
-  { id: "way/1354577574", name: "我就不喜欢红楼梦", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.561173, longitude: 116.713558, source_url: "https://www.openstreetmap.org/way/1354577574" },
   { id: "node/5660650521", name: "新国戏艺术中心", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.871831, longitude: 116.351111, source_url: "https://www.openstreetmap.org/node/5660650521" },
   { id: "way/158112141", name: "新清华学堂", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 40.000341, longitude: 116.323397, source_url: "https://www.openstreetmap.org/way/158112141" },
-  { id: "node/12535657119", name: "无常", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.562703, longitude: 116.713773, source_url: "https://www.openstreetmap.org/node/12535657119" },
-  { id: "way/981123328", name: "明珠影剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.519101, longitude: 116.703381, source_url: "https://www.openstreetmap.org/way/981123328" },
   { id: "node/7861665829", name: "星典影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.948951, longitude: 116.461151, source_url: "https://www.openstreetmap.org/node/7861665829" },
   { id: "node/8732675951", name: "星梦影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.920138, longitude: 116.432918, source_url: "https://www.openstreetmap.org/node/8732675951" },
   { id: "node/1297039794", name: "星美国际影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 40.074877, longitude: 116.312873, source_url: "https://www.openstreetmap.org/node/1297039794" },
   { id: "node/8575679037", name: "智慧仙桃树", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.857714, longitude: 116.67796, source_url: "https://www.openstreetmap.org/node/8575679037" },
   { id: "node/9311586224", name: "曹禺剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.919857, longitude: 116.406862, source_url: "https://www.openstreetmap.org/node/9311586224" },
-  { id: "way/1354577567", name: "有还无剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.561512, longitude: 116.712352, source_url: "https://www.openstreetmap.org/way/1354577567" },
   { id: "way/162586536", name: "朝阳剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.921071, longitude: 116.456463, source_url: "https://www.openstreetmap.org/way/162586536" },
   { id: "way/235270898", name: "梅兰芳大剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.930317, longitude: 116.350764, source_url: "https://www.openstreetmap.org/way/235270898" },
   { id: "node/6418587636", name: "橙天嘉禾影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.971719, longitude: 116.289439, source_url: "https://www.openstreetmap.org/node/6418587636" },
@@ -723,13 +707,9 @@ export const nearbyPois = [
   { id: "node/13248079250", name: "电影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.709324, longitude: 116.055864, source_url: "https://www.openstreetmap.org/node/13248079250" },
   { id: "node/12837264169", name: "疯狂理发店", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.921084, longitude: 116.441944, source_url: "https://www.openstreetmap.org/node/12837264169" },
   { id: "node/6354047421", name: "百老汇影城(东方广场店)", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.908558, longitude: 116.410689, source_url: "https://www.openstreetmap.org/node/6354047421" },
-  { id: "way/1354577566", name: "真亦假剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.560924, longitude: 116.712486, source_url: "https://www.openstreetmap.org/way/1354577566" },
   { id: "way/250712057", name: "福浪", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.97772, longitude: 116.390322, source_url: "https://www.openstreetmap.org/way/250712057" },
   { id: "way/924472174", name: "科技馆影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 40.004085, longitude: 116.391133, source_url: "https://www.openstreetmap.org/way/924472174" },
-  { id: "way/1354577568", name: "第三十五中学", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.562668, longitude: 116.712354, source_url: "https://www.openstreetmap.org/way/1354577568" },
-  { id: "way/1354577573", name: "筒子楼剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.561548, longitude: 116.713891, source_url: "https://www.openstreetmap.org/way/1354577573" },
   { id: "node/3809859868", name: "红剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.884327, longitude: 116.426002, source_url: "https://www.openstreetmap.org/node/3809859868" },
-  { id: "way/1354577570", name: "红楼梦第三十三回", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.562434, longitude: 116.712955, source_url: "https://www.openstreetmap.org/way/1354577570" },
   { id: "node/12141642652", name: "纳美国际影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.936317, longitude: 116.697397, source_url: "https://www.openstreetmap.org/node/12141642652" },
   { id: "way/1253826817", name: "绿心露天剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.886191, longitude: 116.714336, source_url: "https://www.openstreetmap.org/way/1253826817" },
   { id: "node/820093838", name: "美嘉欢乐影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.933004, longitude: 116.448028, source_url: "https://www.openstreetmap.org/node/820093838" },
@@ -743,11 +723,8 @@ export const nearbyPois = [
   { id: "node/4176504084", name: "蜂巢剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.938918, longitude: 116.432577, source_url: "https://www.openstreetmap.org/node/4176504084" },
   { id: "node/12162032861", name: "观华国际影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.914067, longitude: 116.499902, source_url: "https://www.openstreetmap.org/node/12162032861" },
   { id: "way/162983004", name: "解放军歌剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.946604, longitude: 116.366854, source_url: "https://www.openstreetmap.org/way/162983004" },
-  { id: "way/1354577565", name: "读者剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.559712, longitude: 116.713733, source_url: "https://www.openstreetmap.org/way/1354577565" },
-  { id: "node/12535657134", name: "谁还不是个贾宝玉", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.559078, longitude: 116.713858, source_url: "https://www.openstreetmap.org/node/12535657134" },
   { id: "way/1051171639", name: "贝家花园沉浸式剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 40.060217, longitude: 116.098393, source_url: "https://www.openstreetmap.org/way/1051171639" },
   { id: "node/6918448086", name: "赵岱", category: "🎵 音乐 / 演出", subtype: "Live House / 夜店", latitude: 39.947818, longitude: 116.443953, source_url: "https://www.openstreetmap.org/node/6918448086" },
-  { id: "node/12535657120", name: "轮转", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.562952, longitude: 116.713337, source_url: "https://www.openstreetmap.org/node/12535657120" },
   { id: "node/4858657861", name: "迈阿密酒", category: "🎵 音乐 / 演出", subtype: "Live House / 夜店", latitude: 39.928241, longitude: 116.438002, source_url: "https://www.openstreetmap.org/node/4858657861" },
   { id: "way/1557304759", name: "运河剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.927074, longitude: 116.63392, source_url: "https://www.openstreetmap.org/way/1557304759" },
   { id: "node/13860479413", name: "这家厂牌(东单)剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.903883, longitude: 116.408508, source_url: "https://www.openstreetmap.org/node/13860479413" },
@@ -912,7 +889,6 @@ export const nearbyPois = [
   { id: "way/518469023", name: "大操场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.973062, longitude: 116.307143, source_url: "https://www.openstreetmap.org/way/518469023" },
   { id: "way/4974227", name: "奥体中心体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.982175, longitude: 116.393046, source_url: "https://www.openstreetmap.org/way/4974227" },
   { id: "way/958624302", name: "富国海底世界", category: "🏟 场馆 / 运动", subtype: "水族馆", latitude: 39.926807, longitude: 116.440793, source_url: "https://www.openstreetmap.org/way/958624302" },
-  { id: "way/658187074", name: "廊坊体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.553968, longitude: 116.72111, source_url: "https://www.openstreetmap.org/way/658187074" },
   { id: "way/29131580", name: "石景山体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.904722, longitude: 116.195446, source_url: "https://www.openstreetmap.org/way/29131580" },
   { id: "way/83799756", name: "综合体育馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 40.003098, longitude: 116.326276, source_url: "https://www.openstreetmap.org/way/83799756" },
   { id: "way/77083638", name: "首都体育馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.938844, longitude: 116.321156, source_url: "https://www.openstreetmap.org/way/77083638" },
@@ -1035,7 +1011,6 @@ export const nearbyPois = [
   { id: "way/703612796", name: "神乐署", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.877397, longitude: 116.398031, source_url: "https://www.openstreetmap.org/way/703612796" },
   { id: "way/602802468", name: "见心斋", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.992852, longitude: 116.185502, source_url: "https://www.openstreetmap.org/way/602802468" },
   { id: "way/856189717", name: "辛亥滦州起义纪念园", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 40.049425, longitude: 116.158919, source_url: "https://www.openstreetmap.org/way/856189717" },
-  { id: "relation/318110", name: "长城", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 35.72224, longitude: 107.925279, source_url: "https://www.openstreetmap.org/relation/318110" },
   { id: "node/6313986642", name: "齐白石故居", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.934321, longitude: 116.395264, source_url: "https://www.openstreetmap.org/node/6313986642" },
 ];
 
@@ -1044,5 +1019,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-07T20:30:21+08:00",
+  fetched_at: "2026-10-07T20:39:22+08:00",
 };

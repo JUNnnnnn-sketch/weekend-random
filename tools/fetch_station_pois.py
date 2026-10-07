@@ -345,6 +345,37 @@ def library_is_open_to_public(name):
     return not re.search("%s|%s|%s" % (LIBRARY_CAMPUS, LIBRARY_INSTITUTE, LIBRARY_GRASS), name)
 
 
+# 地理上的兜底筛查。两件事：
+#
+# 一、out center 对巨型 relation 会给出整体的几何中心。OSM 的「长城」
+#    （relation/318110）是整条长城，中心点落在甘肃，离北京 800 多公里，
+#    却因为外接矩形与查询框相交而被返回。中心点落在查询框外的，一律不要。
+#
+# 二、BBOX 是矩形，北京边界不是。框里混进了河北的廊坊和涿州——廊坊「只有
+#    红楼梦」戏剧幻城把每个房间（「床剧场」「轮转」「谁还不是个贾宝玉」）
+#    都标成独立剧场，一口气 20 多条。这个产品是按地铁站组织的，离最近的站
+#    20 公里以上就不是它能服务的范围，不管行政上属于哪儿。
+#    （实测北京境内最远的一条是房山古积庵舍利塔 14.5 km，留足了余量。）
+MAX_STATION_KM = 20
+
+
+def load_station_points():
+    path = os.path.join(ROOT, "data", "station_coordinates.js")
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+    return [(float(a), float(b)) for a, b in
+            re.findall(r'latitude: ([-\d.]+), longitude: ([-\d.]+)', text)]
+
+
+def in_bbox(lat, lon):
+    south, west, north, east = (float(v) for v in BBOX.split(","))
+    return south <= lat <= north and west <= lon <= east
+
+
+def within_reach(lat, lon, stations):
+    return any(haversine_m(lat, lon, sa, sb) <= MAX_STATION_KM * 1000 for sa, sb in stations)
+
+
 def has_quality_signal(tags):
     """有人愿意为它填维基条目、官网、门票或营业时间，通常说明它值得专门去一趟。"""
     return bool(tags.get("wikidata") or tags.get("wikipedia") or tags.get("website")
@@ -432,6 +463,8 @@ def collect(force=False, offline=False):
 
 def parse(raws):
     pois, seen = [], set()
+    stations = load_station_points()
+    dropped_far = []
     for raw in raws.values():
         for element in json.loads(raw.decode("utf-8"))["elements"]:
             tags = element.get("tags") or {}
@@ -445,6 +478,9 @@ def parse(raws):
             if lat is None and element.get("center"):
                 lat, lon = element["center"]["lat"], element["center"]["lon"]
             if not name or lat is None:
+                continue
+            if not in_bbox(lat, lon) or not within_reach(lat, lon, stations):
+                dropped_far.append(name)
                 continue
             category = subtype = None
             for key, value in CATEGORY.items():
@@ -502,6 +538,9 @@ def parse(raws):
                 "opening_hours": tags.get("opening_hours") or None,
                 "tag_count": len(tags),
             })
+    if dropped_far:
+        print("   地理筛查丢弃 %d 条（查询框外或离最近地铁站 %d km 以上）"
+              % (len(dropped_far), MAX_STATION_KM))
     pois.sort(key=lambda p: (p["category"], p["name"]))
     return dedupe_malls(dedupe_split_venues(dedupe_same_name(pois)))
 

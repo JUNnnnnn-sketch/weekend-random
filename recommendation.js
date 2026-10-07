@@ -136,6 +136,57 @@ export function distanceKm(a, b) {
   return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 
+/**
+ * 「值得专程去」：命运模式抽不到、又确实得专门跑一趟的地方。
+ *
+ * 1011 个收录的地方里有 333 个命运模式永远给不出来——要么周边没有够 3 个
+ * 可推荐的地方（那一站进不了抽签池），要么离最近的站超过 1.2 km。
+ * 三分之一的数据看不见，太浪费。
+ *
+ * 但这 333 个性质不一样：有 152 个其实就在站旁边两公里内，走走就到，
+ * 说成「专程去」名不副实。所以只收离最近的地铁站 2 km 以上的那 181 个。
+ *
+ * 判定在运行时算，不写进数据文件：数据一变就自动跟着变，不会留下过期的标记。
+ */
+export const TRIP_MIN_KM = 2;
+
+let tripCache = null;
+export function worthATripPlaces(lines) {
+  if (tripCache) return tripCache;
+  const reachable = fortuneCandidates(lines).map((entry) => coordinatesOf(entry.station));
+  // 算「最近的站有多远」要用全部有坐标的站，不只是抽签池里那些
+  const seen = new Set();
+  const allStations = [];
+  lines.forEach((line) => (line.stations || []).forEach((station) => {
+    if (seen.has(station.physical_station_id)) return;
+    const coords = coordinatesOf(station);
+    if (coords.latitude === null) return;
+    seen.add(station.physical_station_id);
+    allStations.push({ station_name: station.station_name, ...coords });
+  }));
+
+  tripCache = [];
+  for (const poi of nearbyPois) {
+    if (reachable.some((c) => distanceKm(c, poi) <= NEARBY_RADIUS_KM)) continue;
+    let nearest = null;
+    for (const station of allStations) {
+      const km = distanceKm(station, poi);
+      if (!nearest || km < nearest.distance_km) nearest = { station_name: station.station_name, distance_km: km };
+    }
+    if (!nearest || nearest.distance_km < TRIP_MIN_KM) continue;
+    tripCache.push({ ...poi, nearest });
+  }
+  return tripCache;
+}
+
+/** 随机挑一个「值得专程去」的地方；exclude 传已经看过的 id。 */
+export function pickWorthATrip(lines, { exclude = [] } = {}) {
+  const pool = worthATripPlaces(lines).filter((poi) => !exclude.includes(poi.id));
+  if (pool.length) return randomItem(pool);
+  const all = worthATripPlaces(lines);
+  return all.length ? randomItem(all) : null;
+}
+
 export function activityStatus(activity, now = new Date()) {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   if (new Date(activity.end_date) < today) return "已结束";
