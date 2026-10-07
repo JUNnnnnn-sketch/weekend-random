@@ -314,6 +314,25 @@ def is_area_place(name, category):
     return any(brand in name for brand in AREA_BRANDS)
 
 
+# ---- 书店 / 图书馆的筛选 -------------------------------------------------
+# 79 条里有三十多条是高校和中小学的馆：清华大学图书馆、北航图书馆、矿大图书馆、
+# 逸夫图书馆、「图书馆及计算机机房」、「北京市私立汇佳学校中学部图书馆」。
+# 和「中心花园」是同一类——校园设施，外人进不去，不该出现在推荐里。
+# 科研院所的馆（社科院、地质、农业）同理，挂着「图书馆」的名但不对外。
+LIBRARY_CAMPUS = (r"大学|学院|学校|附中|附小|校本部|校园|教二|机房|^老馆$|^中法馆$"
+                  r"|^医学图书馆$|^法律图书馆$|^逸夫图书馆$|^逸夫馆$|^李文正馆$"
+                  r"|^学校图书馆$|^北一区图书馆$|^图书馆-|^熹阅堂图书馆$"
+                  r"|^徐特立图书馆$|^人文社科图书馆|北航|北工大|矿大|^邺架轩")
+LIBRARY_INSTITUTE = r"社会科学院|地质图书馆|农业图书馆|出版社|档案馆"
+# 街道/社区的借阅点，以及名字根本不成名字的
+LIBRARY_GRASS = (r"街道图书馆|地区图书馆|阅读空间|^二手书店$|^校园书店$|教育书店$"
+                 r"|^宏途书店$|^康文书店$|^米莱知识宇宙$")
+
+
+def library_is_open_to_public(name):
+    return not re.search("%s|%s|%s" % (LIBRARY_CAMPUS, LIBRARY_INSTITUTE, LIBRARY_GRASS), name)
+
+
 def has_quality_signal(tags):
     """有人愿意为它填维基条目、官网、门票或营业时间，通常说明它值得专门去一趟。"""
     return bool(tags.get("wikidata") or tags.get("wikipedia") or tags.get("website")
@@ -441,6 +460,8 @@ def parse(raws):
                 subtype = museum_subtype(name)
                 if not subtype:
                     continue
+            elif category == "📚 书店 / 图书馆" and not library_is_open_to_public(name):
+                continue
             elif category in ("🧭 特色去处", "🛍 商场 / 商圈"):
                 if is_area_place(name, category):
                     subtype = "街区 / 商圈"
@@ -507,11 +528,23 @@ def mall_key(name):
 # 国家版本馆、铁道博物馆东郊展馆都有两条；元大都城垣遗址公园被切成了好几段）。
 # 不能按名字一刀切——万达影城、保利影院的分店同名但确实是不同的地方。
 # 只合并 800 米以内的，保留标签多的那条。
+def same_place_key(name):
+    """归一掉「总馆南区」「北区」这类分区后缀，以及可有可无的「中国」前缀。
+
+    国家图书馆在 OSM 里是三条：中国国家图书馆、国家图书馆总馆北区、
+    国家图书馆总馆南区，相距 130-290 米。合并只在 800 米内发生，
+    所以去掉「中国」前缀不会误伤真的不同的地方。
+    """
+    name = re.sub(r"(总馆)?[东南西北]区$", "", name).strip()
+    return re.sub(r"^中国", "", name).strip()
+
+
 def dedupe_same_name(pois, radius_m=800):
     kept = []
     for poi in sorted(pois, key=lambda p: -p["tag_count"]):
+        key = same_place_key(poi["name"])
         twin = next((k for k in kept
-                     if k["name"] == poi["name"] and k["subtype"] == poi["subtype"]
+                     if same_place_key(k["name"]) == key
                      and haversine_m(k["latitude"], k["longitude"],
                                      poi["latitude"], poi["longitude"]) <= radius_m), None)
         if twin is None:

@@ -3,18 +3,18 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-07T19:59:47+08:00
+ * 获取时间：2026-10-07T20:03:58+08:00
  *
- * 共 1137 条：
+ * 共 1085 条：
  *   🎵 音乐 / 演出  239
- *   🎨 艺术 / 展览  222
+ *   🎨 艺术 / 展览  221
  *   🍸 夜生活  173
- *   🏛 寺庙 / 古迹  135
- *   📚 书店 / 图书馆  78
+ *   🏛 寺庙 / 古迹  134
  *   🛍 商场 / 商圈  77
  *   🌳 公园 / 自然  64
  *   🎯 玩乐场地  57
- *   🧭 特色去处  46
+ *   🧭 特色去处  45
+ *   📚 书店 / 图书馆  29
  *   🍜 吃喝  25
  *   🏟 场馆 / 运动  21
  *
@@ -333,7 +333,6 @@ export const nearbyPois = [
   { id: "way/970518652", name: "中国核工业科技馆", category: "🎨 艺术 / 展览", subtype: "工业博物馆", latitude: 39.733353, longitude: 116.05444, source_url: "https://www.openstreetmap.org/way/970518652" },
   { id: "way/1058100190", name: "中国民兵武器装备陈列馆", category: "🎨 艺术 / 展览", subtype: "军事博物馆", latitude: 39.936586, longitude: 116.664459, source_url: "https://www.openstreetmap.org/way/1058100190" },
   { id: "node/13296153143", name: "中国民族博物馆", category: "🎨 艺术 / 展览", subtype: "民俗博物馆", latitude: 39.972166, longitude: 116.303192, source_url: "https://www.openstreetmap.org/node/13296153143" },
-  { id: "way/1209624777", name: "中国民航博物馆", category: "🎨 艺术 / 展览", subtype: "科技博物馆", latitude: 40.016847, longitude: 116.532617, source_url: "https://www.openstreetmap.org/way/1209624777" },
   { id: "way/637237606", name: "中国海关博物馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.905834, longitude: 116.426867, source_url: "https://www.openstreetmap.org/way/637237606" },
   { id: "way/635574817", name: "中国消防博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.869998, longitude: 116.346182, source_url: "https://www.openstreetmap.org/way/635574817" },
   { id: "way/395220422", name: "中国现代文学馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.983338, longitude: 116.423782, source_url: "https://www.openstreetmap.org/way/395220422" },
@@ -885,7 +884,6 @@ export const nearbyPois = [
   { id: "node/9768674688", name: "极乐洞", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.995766, longitude: 116.013813, source_url: "https://www.openstreetmap.org/node/9768674688" },
   { id: "way/656351646", name: "柏林寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.944659, longitude: 116.413634, source_url: "https://www.openstreetmap.org/way/656351646" },
   { id: "way/795172455", name: "正福寺天主堂", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.948605, longitude: 116.276067, source_url: "https://www.openstreetmap.org/way/795172455" },
-  { id: "relation/8848144", name: "毛主席纪念堂", category: "🏛 寺庙 / 古迹", subtype: "古迹", latitude: 39.901099, longitude: 116.391553, source_url: "https://www.openstreetmap.org/relation/8848144" },
   { id: "way/984073425", name: "水思殿", category: "🏛 寺庙 / 古迹", subtype: "古寺", latitude: 39.926256, longitude: 116.391558, source_url: "https://www.openstreetmap.org/way/984073425" },
   { id: "way/124007370", name: "永安寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.923594, longitude: 116.382757, source_url: "https://www.openstreetmap.org/way/124007370" },
   { id: "node/13267247608", name: "永安观", category: "🏛 寺庙 / 古迹", subtype: "遗址", latitude: 40.001447, longitude: 116.32313, source_url: "https://www.openstreetmap.org/node/13267247608" },
@@ -968,78 +966,29 @@ export const nearbyPois = [
   { id: "way/270270679", name: "东城区第一图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.940034, longitude: 116.406571, source_url: "https://www.openstreetmap.org/way/270270679" },
   { id: "node/2180702595", name: "中关村图书大厦", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.983017, longitude: 116.298829, source_url: "https://www.openstreetmap.org/node/2180702595" },
   { id: "way/240832213", name: "中国书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.983386, longitude: 116.300102, source_url: "https://www.openstreetmap.org/way/240832213" },
-  { id: "way/608650150", name: "中国农业大学新图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.004731, longitude: 116.352674, source_url: "https://www.openstreetmap.org/way/608650150" },
   { id: "way/625701993", name: "中国国家图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.942741, longitude: 116.317105, source_url: "https://www.openstreetmap.org/way/625701993" },
   { id: "way/262853096", name: "中国国家图书馆古籍馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.922079, longitude: 116.379034, source_url: "https://www.openstreetmap.org/way/262853096" },
-  { id: "way/244249227", name: "中国地质图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.99038, longitude: 116.343619, source_url: "https://www.openstreetmap.org/way/244249227" },
-  { id: "way/677387759", name: "中国社会科学院图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.737937, longitude: 116.174148, source_url: "https://www.openstreetmap.org/way/677387759" },
-  { id: "way/1519447218", name: "中法馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.063897, longitude: 116.106752, source_url: "https://www.openstreetmap.org/way/1519447218" },
-  { id: "node/3511264388", name: "二手书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.957967, longitude: 116.351045, source_url: "https://www.openstreetmap.org/node/3511264388" },
-  { id: "way/226671429", name: "人文社科图书馆（凯风楼）", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.002954, longitude: 116.322483, source_url: "https://www.openstreetmap.org/way/226671429" },
   { id: "node/10557002788", name: "人文考古书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.935203, longitude: 116.30809, source_url: "https://www.openstreetmap.org/node/10557002788" },
-  { id: "node/9296358846", name: "人民教育出版社图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.9528, longitude: 116.316709, source_url: "https://www.openstreetmap.org/node/9296358846" },
   { id: "node/4054121834", name: "传习堂地下书城", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.982832, longitude: 116.300707, source_url: "https://www.openstreetmap.org/node/4054121834" },
-  { id: "way/383266188", name: "北一区图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.936417, longitude: 116.301916, source_url: "https://www.openstreetmap.org/way/383266188" },
   { id: "node/5907569342", name: "北京三联韬奋24小时书店海淀分店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.997071, longitude: 116.332764, source_url: "https://www.openstreetmap.org/node/5907569342" },
   { id: "way/1151193750", name: "北京城市图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.882926, longitude: 116.708539, source_url: "https://www.openstreetmap.org/way/1151193750" },
   { id: "node/1592319245", name: "北京外文书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.913531, longitude: 116.404625, source_url: "https://www.openstreetmap.org/node/1592319245" },
-  { id: "relation/3249649", name: "北京大学图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.99055, longitude: 116.303892, source_url: "https://www.openstreetmap.org/relation/3249649" },
-  { id: "way/1013065606", name: "北京大学新燕园校区图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.177308, longitude: 116.15826, source_url: "https://www.openstreetmap.org/way/1013065606" },
-  { id: "way/639489088", name: "北京市私立汇佳学校中学部图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.191433, longitude: 116.244469, source_url: "https://www.openstreetmap.org/way/639489088" },
-  { id: "way/546473921", name: "北京建筑大学大兴校区图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.744723, longitude: 116.281424, source_url: "https://www.openstreetmap.org/way/546473921" },
-  { id: "way/564596665", name: "北京石油化工学院新图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.746769, longitude: 116.321842, source_url: "https://www.openstreetmap.org/way/564596665" },
-  { id: "way/564596668", name: "北京石油化工学院旧图书馆（15号楼）", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.746212, longitude: 116.321494, source_url: "https://www.openstreetmap.org/way/564596668" },
-  { id: "way/543815679", name: "北工大北图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.876595, longitude: 116.474447, source_url: "https://www.openstreetmap.org/way/543815679" },
-  { id: "way/88777864", name: "北航图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.982539, longitude: 116.342548, source_url: "https://www.openstreetmap.org/way/88777864" },
-  { id: "way/543824383", name: "医学图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.982935, longitude: 116.351373, source_url: "https://www.openstreetmap.org/way/543824383" },
   { id: "node/8114025097", name: "博学书屋", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 40.248394, longitude: 116.145364, source_url: "https://www.openstreetmap.org/node/8114025097" },
   { id: "node/13036589701", name: "国图书店(亚洲金融大厦店)", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.006184, longitude: 116.38348, source_url: "https://www.openstreetmap.org/node/13036589701" },
-  { id: "way/305570856", name: "国家农业图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.958565, longitude: 116.320186, source_url: "https://www.openstreetmap.org/way/305570856" },
-  { id: "way/78051436", name: "国家图书馆总馆北区", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.944146, longitude: 116.317204, source_url: "https://www.openstreetmap.org/way/78051436" },
-  { id: "relation/6907054", name: "国家图书馆总馆南区", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.941566, longitude: 116.316991, source_url: "https://www.openstreetmap.org/relation/6907054" },
-  { id: "way/1294957976", name: "图书馆-人文馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.989243, longitude: 116.419996, source_url: "https://www.openstreetmap.org/way/1294957976" },
-  { id: "way/1294957987", name: "图书馆-理工馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.989007, longitude: 116.420781, source_url: "https://www.openstreetmap.org/way/1294957987" },
-  { id: "way/518469017", name: "图书馆及计算机机房", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.973905, longitude: 116.309409, source_url: "https://www.openstreetmap.org/way/518469017" },
-  { id: "way/1445662428", name: "学校图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.990772, longitude: 116.22077, source_url: "https://www.openstreetmap.org/way/1445662428" },
-  { id: "way/344376258", name: "宏途书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.958241, longitude: 116.350592, source_url: "https://www.openstreetmap.org/way/344376258" },
-  { id: "node/12984953306", name: "小关街道图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.983897, longitude: 116.411605, source_url: "https://www.openstreetmap.org/node/12984953306" },
-  { id: "node/5257186661", name: "康文书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.862452, longitude: 116.346845, source_url: "https://www.openstreetmap.org/node/5257186661" },
-  { id: "relation/12568946", name: "徐特立图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.730552, longitude: 116.165202, source_url: "https://www.openstreetmap.org/relation/12568946" },
-  { id: "way/439439985", name: "教二（图书馆）", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.150626, longitude: 116.265664, source_url: "https://www.openstreetmap.org/way/439439985" },
   { id: "node/11099763204", name: "旁观书社", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.98317, longitude: 116.49024, source_url: "https://www.openstreetmap.org/node/11099763204" },
-  { id: "way/852646108", name: "李文正馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.004223, longitude: 116.317616, source_url: "https://www.openstreetmap.org/way/852646108" },
-  { id: "node/12984951367", name: "来广营地区图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.05037, longitude: 116.426805, source_url: "https://www.openstreetmap.org/node/12984951367" },
-  { id: "way/142604101", name: "林业大学图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.002284, longitude: 116.340795, source_url: "https://www.openstreetmap.org/way/142604101" },
-  { id: "node/8484384357", name: "校园书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.926871, longitude: 116.203282, source_url: "https://www.openstreetmap.org/node/8484384357" },
-  { id: "way/283743430", name: "校本部图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.929105, longitude: 116.301797, source_url: "https://www.openstreetmap.org/way/283743430" },
   { id: "node/12804054463", name: "樊登书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.951434, longitude: 116.273648, source_url: "https://www.openstreetmap.org/node/12804054463" },
-  { id: "way/817157928", name: "法律图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.997974, longitude: 116.322778, source_url: "https://www.openstreetmap.org/way/817157928" },
   { id: "way/943077615", name: "法渊阁", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.221817, longitude: 116.240777, source_url: "https://www.openstreetmap.org/way/943077615" },
   { id: "node/13036572502", name: "泰舍书局(西府书局)", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.871468, longitude: 116.301556, source_url: "https://www.openstreetmap.org/node/13036572502" },
-  { id: "node/7072425636", name: "清华大学图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.003125, longitude: 116.318386, source_url: "https://www.openstreetmap.org/node/7072425636" },
-  { id: "node/12463325319", name: "潞澄教育书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.911418, longitude: 116.727849, source_url: "https://www.openstreetmap.org/node/12463325319" },
-  { id: "node/13033248601", name: "熹阅堂图书馆", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.885064, longitude: 116.479346, source_url: "https://www.openstreetmap.org/node/13033248601" },
   { id: "node/937625058", name: "独峰书院", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 40.005876, longitude: 116.317461, source_url: "https://www.openstreetmap.org/node/937625058" },
   { id: "way/146633673", name: "王府井书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.908887, longitude: 116.406378, source_url: "https://www.openstreetmap.org/way/146633673" },
-  { id: "way/247351547", name: "矿大图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.997257, longitude: 116.343279, source_url: "https://www.openstreetmap.org/way/247351547" },
-  { id: "node/12270469152", name: "米莱知识宇宙", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.903166, longitude: 116.728721, source_url: "https://www.openstreetmap.org/node/12270469152" },
-  { id: "relation/20779765", name: "老馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.003486, longitude: 116.318668, source_url: "https://www.openstreetmap.org/relation/20779765" },
   { id: "node/4454310289", name: "荣宝斋", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.894048, longitude: 116.376064, source_url: "https://www.openstreetmap.org/node/4454310289" },
   { id: "node/14002526851", name: "融书阁书社", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.929828, longitude: 116.706835, source_url: "https://www.openstreetmap.org/node/14002526851" },
   { id: "node/12197343127", name: "西西弗书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.903756, longitude: 116.727882, source_url: "https://www.openstreetmap.org/node/12197343127" },
   { id: "node/11340822290", name: "西西弗书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.967928, longitude: 116.485376, source_url: "https://www.openstreetmap.org/node/11340822290" },
   { id: "node/8420295109", name: "西西弗书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.961878, longitude: 116.450774, source_url: "https://www.openstreetmap.org/node/8420295109" },
   { id: "node/12997250589", name: "观澜书院", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 40.041358, longitude: 116.415327, source_url: "https://www.openstreetmap.org/node/12997250589" },
-  { id: "way/1537183857", name: "通州区新型文化阅读空间含章园站", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.935406, longitude: 116.704514, source_url: "https://www.openstreetmap.org/way/1537183857" },
-  { id: "way/673288085", name: "逸夫图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.970051, longitude: 116.415169, source_url: "https://www.openstreetmap.org/way/673288085" },
-  { id: "way/839812059", name: "逸夫图书馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.873649, longitude: 116.473619, source_url: "https://www.openstreetmap.org/way/839812059" },
-  { id: "relation/20779764", name: "逸夫馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 40.003616, longitude: 116.31749, source_url: "https://www.openstreetmap.org/relation/20779764" },
-  { id: "node/10188911944", name: "邺架轩（阅读体验书店）", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 40.004214, longitude: 116.317467, source_url: "https://www.openstreetmap.org/node/10188911944" },
   { id: "node/13025964901", name: "钟书阁(老佛爷百货店)", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.912885, longitude: 116.369186, source_url: "https://www.openstreetmap.org/node/13025964901" },
-  { id: "way/628032101", name: "阿卜杜勒·阿齐兹国王公共图书馆北京大学分馆（古籍图书馆）", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.991525, longitude: 116.30338, source_url: "https://www.openstreetmap.org/way/628032101" },
   { id: "node/12019945646", name: "首开书院城市记忆书房", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.989263, longitude: 116.417425, source_url: "https://www.openstreetmap.org/node/12019945646" },
-  { id: "way/997857679", name: "首钢档案馆", category: "📚 书店 / 图书馆", subtype: "图书馆", latitude: 39.919057, longitude: 116.144154, source_url: "https://www.openstreetmap.org/way/997857679" },
-  { id: "way/543836357", name: "高等教育书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.991419, longitude: 116.347692, source_url: "https://www.openstreetmap.org/way/543836357" },
   { id: "node/12252520650", name: "1733", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 39.964961, longitude: 116.338217, source_url: "https://www.openstreetmap.org/node/12252520650" },
   { id: "way/30663427", name: "798艺术区", category: "🛍 商场 / 商圈", subtype: "街区 / 商圈", latitude: 39.98294, longitude: 116.489783, source_url: "https://www.openstreetmap.org/way/30663427" },
   { id: "way/336948957", name: "BHG Mall 华联同成街购物中心", category: "🛍 商场 / 商圈", subtype: "商场", latitude: 40.070816, longitude: 116.331454, source_url: "https://www.openstreetmap.org/way/336948957" },
@@ -1158,7 +1107,6 @@ export const nearbyPois = [
   { id: "node/13472833383", name: "石佛村修路摩崖石刻", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.871802, longitude: 116.089738, source_url: "https://www.openstreetmap.org/node/13472833383" },
   { id: "way/43921139", name: "祈年殿", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.88225, longitude: 116.406624, source_url: "https://www.openstreetmap.org/way/43921139" },
   { id: "way/703612796", name: "神乐署", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.877397, longitude: 116.398031, source_url: "https://www.openstreetmap.org/way/703612796" },
-  { id: "node/4454306990", name: "荣宝斋", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.894107, longitude: 116.376884, source_url: "https://www.openstreetmap.org/node/4454306990" },
   { id: "way/602802468", name: "见心斋", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.992852, longitude: 116.185502, source_url: "https://www.openstreetmap.org/way/602802468" },
   { id: "way/856189717", name: "辛亥滦州起义纪念园", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 40.049425, longitude: 116.158919, source_url: "https://www.openstreetmap.org/way/856189717" },
   { id: "relation/318110", name: "长城", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 35.72224, longitude: 107.925279, source_url: "https://www.openstreetmap.org/relation/318110" },
@@ -1170,5 +1118,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-07T19:59:47+08:00",
+  fetched_at: "2026-10-07T20:03:58+08:00",
 };
