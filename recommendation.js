@@ -1,6 +1,7 @@
 import { experiences } from "./data/experiences.js";
 import { stationCoordinates } from "./data/station_coordinates.js";
 import { nearbyPois } from "./data/station_pois.js";
+import { placeRuleFor, AREA_CATEGORIES } from "./experience_places.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -291,9 +292,16 @@ export function buildWeekendPlan({ people, duration, locationScope, exclude = []
 
   // 2-3小时：一个 short core 即成立，不强行加 support。
   if (duration === "2-3小时") return finalize(plan, ctx, "single_core");
-  // full_day core 或不可组合的 core：单独成方案（情况A）。
-  if (plan[0].duration_type === "full_day" || plan[0].combinable === false) {
-    return finalize(plan, ctx, plan[0].duration_type === "full_day" ? "full_day_core" : "non_combinable_core");
+  // 不可组合的 core：单独成方案。
+  if (plan[0].combinable === false) {
+    return finalize(plan, ctx, "non_combinable_core");
+  }
+  // full_day 的 core 占满了白天，但晚上还能接一段轻的——爬了一天山，晚上吃个饭
+  // 喝一杯是成立的。原先直接单条返回，是「一整天反而最空」的主因之一。
+  if (plan[0].duration_type === "full_day") {
+    const tail = supportPool.filter((e) => !used.has(e.id) && compatibleScope(e, plan[0]));
+    if (tail.length) plan.push(randomItem(tail));
+    return finalize(plan, ctx, plan.length > 1 ? "full_day_core_support" : "full_day_core");
   }
 
   // 半天 / 一整天：在剩余预算内尝试补充（不强制），至多 2 个 core + 1 个 support。
@@ -331,4 +339,88 @@ export function buildWeekendPlan({ people, duration, locationScope, exclude = []
 
 function finalize(plan, ctx, type) {
   return { ...ctx, structure: { type, moduleCount: plan.length }, experiences: plan, empty: plan.length === 0 };
+}
+
+/* ========================= 给方案挂真实地点 ========================= */
+
+/** 每种时长的起始时刻，用来排出先后顺序。 */
+const PLAN_START_HOUR = { "2-3小时": 14, "半天": 14, "一整天": 10 };
+
+function formatClock(minutesFromMidnight) {
+  const h = Math.floor(minutesFromMidnight / 60) % 24;
+  const m = Math.round(minutesFromMidnight % 60);
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+/** 在一批已按距离排好的 POI 里，挑出符合该玩法的那个。 */
+function matchPlace(experience, pois, taken) {
+  const rule = placeRuleFor(experience.name);
+  if (!rule) return { mode: "none" };
+  if (rule.mode === "area") {
+    // 按品类优先级挑，而不是单纯就近：798、国子监、南锣鼓巷这类「特色去处」
+    // 比一个商场更像「做陶艺、拍汉服该去的那一片」。
+    for (const category of AREA_CATEGORIES) {
+      const area = pois.find((p) => p.category === category && !taken.has(p.id));
+      if (area) return { mode: "area", place: area, hint: rule.hint };
+    }
+    return { mode: "none", hint: rule.hint };
+  }
+  const hit = pois.find((p) => rule.subtypes.includes(p.subtype) && !taken.has(p.id));
+  return hit ? { mode: "anchor", place: hit } : { mode: "none" };
+}
+
+/** 换玩法之后重新给这一环挂地点。暴露给界面用的小封装。 */
+export function matchPlaceFor(experience, station, taken = new Set()) {
+  const pois = findNearbyPois(coordinatesOf(station));
+  const matched = matchPlace(experience, pois, taken);
+  return { placeMode: matched.mode, place: matched.place || null, hint: matched.hint || null };
+}
+
+/**
+ * 周末方案：玩法组合 + 真实地点 + 时间顺序。
+ *
+ * 做法是「先定一片地方，再在那一带排环节」——而不是先排环节再满世界找地点，
+ * 否则一个半天方案可能把人从石景山支到通州。地点来自与命运模式同一份
+ * station_pois 数据，所以每条都是真实存在的场所。
+ *
+ * 和命运模式的分工：命运给一个点和周边清单，让你自己挑；方案给一条有先后
+ * 顺序的线。少了时间编排，方案就只是换了排版的命运模式。
+ */
+export function buildAnchoredPlan({ people, duration, locationScope, lines, exclude = [], attempts = 25 } = {}) {
+  const base = () => buildWeekendPlan({ people, duration, locationScope, exclude });
+  if (!lines || !lines.length) return { ...base(), station: null };
+
+  const candidates = fortuneCandidates(lines);
+  if (!candidates.length) return { ...base(), station: null };
+
+  let best = null;
+  for (let i = 0; i < attempts; i += 1) {
+    const entry = randomItem(candidates);
+    const coords = coordinatesOf(entry.station);
+    const pois = findNearbyPois(coords);
+    const plan = base();
+    if (plan.empty) continue;
+
+    const taken = new Set();
+    let clock = (PLAN_START_HOUR[duration] ?? 14) * 60;
+    const steps = plan.experiences.map((experience) => {
+      const matched = matchPlace(experience, pois, taken);
+      if (matched.place) taken.add(matched.place.id);
+      const step = {
+        experience,
+        startTime: formatClock(clock),
+        placeMode: matched.mode,
+        place: matched.place || null,
+        hint: matched.hint || null,
+      };
+      clock += experience.duration_max;
+      return step;
+    });
+    const anchored = steps.filter((s) => s.place).length;
+    const scored = { ...plan, station: entry.station, line: randomItem(entry.lines), steps, anchored };
+    // 优先选「落地环节最多」的那一次尝试；全部落地就直接采用。
+    if (!best || anchored > best.anchored) best = scored;
+    if (anchored === steps.length) break;
+  }
+  return best || { ...base(), station: null, steps: [] };
 }

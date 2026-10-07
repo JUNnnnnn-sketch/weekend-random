@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildWeekendPlan, pickExperience } from "./recommendation.js";
+import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, pickExperience, matchPlaceFor } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
@@ -285,11 +285,15 @@ function renderPlace(item) {
 let planExperiences = [];
 let planSwapCounts = [];
 let planModuleHistory = [];
+let planSteps = [];      // 与 planExperiences 一一对应：时刻、地点
+let planStation = null;  // 这次方案锚定的那一站
 
 function startPlan() {
-  const plan = buildWeekendPlan({ people: state.party, duration: state.duration });
+  const plan = buildAnchoredPlan({ people: state.party, duration: state.duration, lines: subwayLines });
   if (!plan || plan.empty || !plan.experiences.length) { showScreen("setup"); return; }
   planExperiences = plan.experiences.slice();
+  planSteps = (plan.steps || []).slice();
+  planStation = plan.station ? { station: plan.station, line: plan.line } : null;
   planSwapCounts = planExperiences.map(() => 0);
   planModuleHistory = planExperiences.map(() => []);
   renderPlan();
@@ -301,17 +305,31 @@ function scopeLabel(scope) { return scope === "suburban" ? "京郊" : scope === 
 function renderPlan() {
   const container = document.getElementById("plan-list");
   container.replaceChildren();
-  document.getElementById("plan-subtitle").textContent = `${state.party} · ${state.duration} · 共 ${planExperiences.length} 个玩法`;
+  const where = planStation ? ` · ${planStation.line.line_name} ${planStation.station.station_name}一带` : "";
+  document.getElementById("plan-subtitle").textContent =
+    `${state.party} · ${state.duration}${where} · 共 ${planExperiences.length} 个环节`;
   planExperiences.forEach((exp, i) => {
     const card = document.createElement("article");
     card.className = "place-card plan-card " + (exp.role === "support" ? "is-support" : "is-core");
-    const isSupport = exp.role === "support";
     const swapped = planSwapCounts[i] >= 3;
     const tags = (exp.vibe || []).map((v) => `<span class="tag">${esc(v)}</span>`).join("");
+    const step = planSteps[i];
+    const clock = step && step.startTime ? `<span class="plan-clock num">${esc(step.startTime)}</span>` : "";
+    // 有具体地点就报地点；没有就老实说「地点你定」，不编一个出来。
+    let place = '<p class="activity-meta">地点你定</p>';
+    if (step && step.place) {
+      const metres = Math.round(step.place.distance_km * 1000);
+      const lead = step.placeMode === "area" ? "在这一带 " : "";
+      place = `<p class="activity-meta">${lead}<strong>${esc(step.place.name)}</strong>`
+        + ` · ${esc(step.place.subtype)}<br /><span class="place-freshness">步行约 ${metres} 米 · `
+        + `<a href="${step.place.source_url}" target="_blank" rel="noreferrer">地图 ↗</a></span></p>`;
+    } else if (step && step.hint) {
+      place = `<p class="activity-meta">地点你定 · <span class="place-freshness">${esc(step.hint)}</span></p>`;
+    }
     card.innerHTML = `
-      <div><p class="place-category">${isSupport ? "辅助活动" : "核心活动"}</p><h3>${esc(exp.name)}</h3></div>
-      <p class="activity-meta">${esc(exp.main_type)} · ${esc(exp.sub_type || "")}</p>
-      <p class="activity-date">⏱ ${exp.duration_min}–${exp.duration_max} 分钟 · ${scopeLabel(exp.location_scope)}</p>
+      <div><p class="place-category">${clock}${exp.role === "support" ? " 顺带" : ""}</p><h3>${esc(exp.name)}</h3></div>
+      ${place}
+      <p class="activity-date">⏱ ${exp.duration_min}–${exp.duration_max} 分钟 · ${esc(exp.sub_type || exp.main_type)}</p>
       ${tags ? `<p class="plan-vibe">${tags}</p>` : ""}
       <button class="btn btn-ghost btn-swap" type="button" data-index="${i}" ${swapped ? "disabled" : ""}>${swapped ? "命运已定 ✦" : "换一个"}</button>`;
     container.append(card);
@@ -331,6 +349,12 @@ function swapModule(i) {
   planModuleHistory[i].push(planExperiences[i].id);
   planExperiences[i] = next;
   planSwapCounts[i] += 1;
+  // 换了玩法，这一环的地点也要跟着换——否则会挂着上一个玩法的地点
+  if (planSteps[i] && planStation) {
+    const taken = new Set(planSteps.filter((s, j) => j !== i && s && s.place).map((s) => s.place.id));
+    const rematched = matchPlaceFor(next, planStation.station, taken);
+    planSteps[i] = { ...planSteps[i], ...rematched };
+  }
   renderPlan();
 }
 

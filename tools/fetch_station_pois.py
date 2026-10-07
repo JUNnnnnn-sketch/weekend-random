@@ -67,6 +67,12 @@ GROUPS = {
     "reading":     [("shop", "books"), ("amenity", "library")],
     "venue":       [("leisure", "stadium"), ("tourism", "aquarium")],
     "mall":        [("shop", "mall")],
+    # 「玩乐场地」：这些玩法场地稀缺，去哪一家是有区别的，必须给具体地点。
+    # 实测 OSM 覆盖很不均匀——攀岩 28 家可用，而滑冰只有 2 条（其中一条还是
+    # 轮滑场）、射箭和保龄球各 1 家，这三项只能不给地点。
+    "playvenue":   [("sport", "climbing"), ("sport", "karting"), ("sport", "billiards"),
+                    ("sport", "equestrian"), ("leisure", "horse_riding"),
+                    ("amenity", "karaoke_box")],
     # 三里屯太古里、蓝色港湾、THE BOX、华贸这类在 OSM 里不是 shop=mall 而是
     # landuse=retail（整块商业用地）。这一类整体抓会非常噪，故按品牌名直接点取。
     "retail":      [("landuse", "retail")],
@@ -158,6 +164,12 @@ CATEGORY = {
     ("shop", "mall"):                ("🛍 商场 / 商圈", "商场", False),
     ("landuse", "retail"):           ("🛍 商场 / 商圈", "商圈", False),
     ("landuse", "commercial"):       ("🛍 商场 / 商圈", "商圈", False),
+    ("sport", "climbing"):           ("🎯 玩乐场地", "攀岩", False),
+    ("sport", "karting"):            ("🎯 玩乐场地", "卡丁车", False),
+    ("sport", "billiards"):          ("🎯 玩乐场地", "台球", False),
+    ("sport", "equestrian"):         ("🎯 玩乐场地", "马术", False),
+    ("leisure", "horse_riding"):     ("🎯 玩乐场地", "马术", False),
+    ("amenity", "karaoke_box"):      ("🎯 玩乐场地", "KTV", False),
     ("leisure", "stadium"):          ("🏟 场馆 / 运动", "体育场馆", True),
     ("tourism", "aquarium"):         ("🏟 场馆 / 运动", "水族馆", True),
     # 必须排在最后：同一个要素若既是公园又标了 attraction，应归到公园。

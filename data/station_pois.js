@@ -3,9 +3,9 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-04T23:07:57+08:00
+ * 获取时间：2026-10-07T16:44:54+08:00
  *
- * 共 1227 条：
+ * 共 1286 条：
  *   🎨 艺术 / 展览  255
  *   🎵 音乐 / 演出  240
  *   🍸 夜生活  173
@@ -13,6 +13,7 @@
  *   🏛 寺庙 / 古迹  139
  *   📚 书店 / 图书馆  82
  *   🛍 商场 / 商圈  77
+ *   🎯 玩乐场地  59
  *   🧭 特色去处  46
  *   🍜 吃喝  26
  *   🏟 场馆 / 运动  21
@@ -647,6 +648,65 @@ export const nearbyPois = [
   { id: "way/724834333", name: "香山革命纪念馆", category: "🎨 艺术 / 展览", subtype: "博物馆", latitude: 39.991517, longitude: 116.198503, source_url: "https://www.openstreetmap.org/way/724834333" },
   { id: "way/447939893", name: "鲁迅博物馆", category: "🎨 艺术 / 展览", subtype: "博物馆", latitude: 39.92431, longitude: 116.352342, source_url: "https://www.openstreetmap.org/way/447939893" },
   { id: "way/679644063", name: "龙徽葡萄酒博物馆", category: "🎨 艺术 / 展览", subtype: "博物馆", latitude: 39.925171, longitude: 116.247728, source_url: "https://www.openstreetmap.org/way/679644063" },
+  { id: "node/12964721867", name: "Climb On Gym攀岩馆", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.015292, longitude: 116.459806, source_url: "https://www.openstreetmap.org/node/12964721867" },
+  { id: "node/625655040", name: "ET攀岩俱乐部", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.039665, longitude: 116.503492, source_url: "https://www.openstreetmap.org/node/625655040" },
+  { id: "node/6784060606", name: "Grand Rock", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.980313, longitude: 116.487426, source_url: "https://www.openstreetmap.org/node/6784060606" },
+  { id: "node/8940464539", name: "MINI麦颂量贩式KTV", category: "🎯 玩乐场地", subtype: "KTV", latitude: 39.963157, longitude: 116.31822, source_url: "https://www.openstreetmap.org/node/8940464539" },
+  { id: "node/6781842595", name: "O’le 798 Climbing Gym", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.991172, longitude: 116.498278, source_url: "https://www.openstreetmap.org/node/6781842595" },
+  { id: "node/3498403447", name: "Party World Karaoke", category: "🎯 玩乐场地", subtype: "KTV", latitude: 39.921296, longitude: 116.433767, source_url: "https://www.openstreetmap.org/node/3498403447" },
+  { id: "node/6784065056", name: "Rock Hour", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.885842, longitude: 116.475935, source_url: "https://www.openstreetmap.org/node/6784065056" },
+  { id: "way/320679832", name: "一体岩壁", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.994574, longitude: 116.305249, source_url: "https://www.openstreetmap.org/way/320679832" },
+  { id: "way/743595618", name: "东操小岩壁", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.005245, longitude: 116.32523, source_url: "https://www.openstreetmap.org/way/743595618" },
+  { id: "node/12979639146", name: "中联骑士联盟马术俱乐部朝阳公园店", category: "🎯 玩乐场地", subtype: "马术", latitude: 39.941197, longitude: 116.47072, source_url: "https://www.openstreetmap.org/node/12979639146" },
+  { id: "node/14234707152", name: "云川台球", category: "🎯 玩乐场地", subtype: "台球", latitude: 39.974451, longitude: 116.484423, source_url: "https://www.openstreetmap.org/node/14234707152" },
+  { id: "node/6784095879", name: "人人攀岩", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.857161, longitude: 116.516474, source_url: "https://www.openstreetmap.org/node/6784095879" },
+  { id: "node/9612377712", name: "仙水宫KTV(东王庄店)", category: "🎯 玩乐场地", subtype: "KTV", latitude: 39.998157, longitude: 116.334353, source_url: "https://www.openstreetmap.org/node/9612377712" },
+  { id: "way/1133630387", name: "任天堂岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.105552, longitude: 116.076786, source_url: "https://www.openstreetmap.org/way/1133630387" },
+  { id: "way/1133365925", name: "元宇宙岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.102869, longitude: 116.079304, source_url: "https://www.openstreetmap.org/way/1133365925" },
+  { id: "way/452149082", name: "北京体育大学中国现代五项协会马术基地", category: "🎯 玩乐场地", subtype: "马术", latitude: 40.02702, longitude: 116.311033, source_url: "https://www.openstreetmap.org/way/452149082" },
+  { id: "way/1387434371", name: "北京龙头牧场", category: "🎯 玩乐场地", subtype: "马术", latitude: 39.705238, longitude: 116.646674, source_url: "https://www.openstreetmap.org/way/1387434371" },
+  { id: "way/849487519", name: "卡丁车", category: "🎯 玩乐场地", subtype: "卡丁车", latitude: 40.024236, longitude: 116.370251, source_url: "https://www.openstreetmap.org/way/849487519" },
+  { id: "way/1062272201", name: "卧牛岭岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.129137, longitude: 116.092499, source_url: "https://www.openstreetmap.org/way/1062272201" },
+  { id: "way/1133630386", name: "变形金刚岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.104816, longitude: 116.077448, source_url: "https://www.openstreetmap.org/way/1133630386" },
+  { id: "node/9602720210", name: "唱吧麦颂", category: "🎯 玩乐场地", subtype: "KTV", latitude: 39.986355, longitude: 116.41838, source_url: "https://www.openstreetmap.org/node/9602720210" },
+  { id: "node/9602738044", name: "唱吧麦颂", category: "🎯 玩乐场地", subtype: "KTV", latitude: 40.026469, longitude: 116.305558, source_url: "https://www.openstreetmap.org/node/9602738044" },
+  { id: "node/12765994868", name: "唱吧麦颂 KTV", category: "🎯 玩乐场地", subtype: "KTV", latitude: 40.041327, longitude: 116.415213, source_url: "https://www.openstreetmap.org/node/12765994868" },
+  { id: "node/12162899416", name: "唱吧麦颂KTV", category: "🎯 玩乐场地", subtype: "KTV", latitude: 39.914044, longitude: 116.49653, source_url: "https://www.openstreetmap.org/node/12162899416" },
+  { id: "way/1133365872", name: "外星人基地岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.129174, longitude: 116.095771, source_url: "https://www.openstreetmap.org/way/1133365872" },
+  { id: "node/13278864498", name: "夜猫台球", category: "🎯 玩乐场地", subtype: "台球", latitude: 39.904297, longitude: 116.632697, source_url: "https://www.openstreetmap.org/node/13278864498" },
+  { id: "way/814051052", name: "天星调良国际马术俱乐部", category: "🎯 玩乐场地", subtype: "马术", latitude: 40.04242, longitude: 116.504955, source_url: "https://www.openstreetmap.org/way/814051052" },
+  { id: "node/12979842810", name: "奥攀攀岩(角门店)", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.842492, longitude: 116.380846, source_url: "https://www.openstreetmap.org/node/12979842810" },
+  { id: "node/12161357780", name: "娱小乐24h自助台球", category: "🎯 玩乐场地", subtype: "台球", latitude: 39.916333, longitude: 116.525602, source_url: "https://www.openstreetmap.org/node/12161357780" },
+  { id: "way/784384677", name: "室内马术馆", category: "🎯 玩乐场地", subtype: "马术", latitude: 40.02689, longitude: 116.309867, source_url: "https://www.openstreetmap.org/way/784384677" },
+  { id: "way/1133365874", name: "小北壁岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.127182, longitude: 116.081682, source_url: "https://www.openstreetmap.org/way/1133365874" },
+  { id: "node/12161357776", name: "小铁24h自助台球", category: "🎯 玩乐场地", subtype: "台球", latitude: 39.916369, longitude: 116.525822, source_url: "https://www.openstreetmap.org/node/12161357776" },
+  { id: "node/8671853925", name: "思雨林KTV", category: "🎯 玩乐场地", subtype: "KTV", latitude: 39.931392, longitude: 116.30904, source_url: "https://www.openstreetmap.org/node/8671853925" },
+  { id: "node/7030903682", name: "攀岩墙", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.899479, longitude: 116.249445, source_url: "https://www.openstreetmap.org/node/7030903682" },
+  { id: "way/607421941", name: "攀岩训练设施", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.15048, longitude: 116.270706, source_url: "https://www.openstreetmap.org/way/607421941" },
+  { id: "way/1466252360", name: "星云卡丁车", category: "🎯 玩乐场地", subtype: "卡丁车", latitude: 39.924097, longitude: 116.075209, source_url: "https://www.openstreetmap.org/way/1466252360" },
+  { id: "node/14251860508", name: "星空里桌球", category: "🎯 玩乐场地", subtype: "台球", latitude: 39.888753, longitude: 116.65066, source_url: "https://www.openstreetmap.org/node/14251860508" },
+  { id: "node/6124301724", name: "火焰山", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.129835, longitude: 116.08263, source_url: "https://www.openstreetmap.org/node/6124301724" },
+  { id: "way/1133365876", name: "火焰山岩场（一层）", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.128179, longitude: 116.081107, source_url: "https://www.openstreetmap.org/way/1133365876" },
+  { id: "way/1062874317", name: "火焰山岩场（二层）", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.12826, longitude: 116.08149, source_url: "https://www.openstreetmap.org/way/1062874317" },
+  { id: "node/12389289877", name: "瑞得万国际卡丁车场", category: "🎯 玩乐场地", subtype: "卡丁车", latitude: 40.029287, longitude: 116.471493, source_url: "https://www.openstreetmap.org/node/12389289877" },
+  { id: "way/1133630388", name: "百鸟朝凤岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.105292, longitude: 116.076954, source_url: "https://www.openstreetmap.org/way/1133630388" },
+  { id: "way/1133365882", name: "绳者基地", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.132532, longitude: 116.103876, source_url: "https://www.openstreetmap.org/way/1133365882" },
+  { id: "node/13726985776", name: "聚洪台球俱乐部", category: "🎯 玩乐场地", subtype: "台球", latitude: 39.910974, longitude: 116.725319, source_url: "https://www.openstreetmap.org/node/13726985776" },
+  { id: "way/1133365926", name: "道德峰岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.102619, longitude: 116.080095, source_url: "https://www.openstreetmap.org/way/1133365926" },
+  { id: "way/1072891454", name: "酷跑卡丁", category: "🎯 玩乐场地", subtype: "卡丁车", latitude: 39.91401, longitude: 116.202198, source_url: "https://www.openstreetmap.org/way/1072891454" },
+  { id: "way/1549547072", name: "金果儿马术", category: "🎯 玩乐场地", subtype: "马术", latitude: 39.92163, longitude: 116.229748, source_url: "https://www.openstreetmap.org/way/1549547072" },
+  { id: "node/13577424906", name: "鑫星台球", category: "🎯 玩乐场地", subtype: "台球", latitude: 39.90603, longitude: 116.639076, source_url: "https://www.openstreetmap.org/node/13577424906" },
+  { id: "node/11968741418", name: "钱柜", category: "🎯 玩乐场地", subtype: "KTV", latitude: 40.00412, longitude: 116.39749, source_url: "https://www.openstreetmap.org/node/11968741418" },
+  { id: "way/1062285878", name: "雄狮峰岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.104973, longitude: 116.082753, source_url: "https://www.openstreetmap.org/way/1062285878" },
+  { id: "node/4915768599", name: "风雨雪日坛公园攀岩墙", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.914735, longitude: 116.439419, source_url: "https://www.openstreetmap.org/node/4915768599" },
+  { id: "node/9757757639", name: "飞拉达", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 40.103749, longitude: 116.077545, source_url: "https://www.openstreetmap.org/node/9757757639" },
+  { id: "node/4915834033", name: "首体首攀壁虎王攀岩俱乐部", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.93874, longitude: 116.320511, source_url: "https://www.openstreetmap.org/node/4915834033" },
+  { id: "way/478550720", name: "马场", category: "🎯 玩乐场地", subtype: "马术", latitude: 40.069048, longitude: 116.517497, source_url: "https://www.openstreetmap.org/way/478550720" },
+  { id: "way/1291518911", name: "马术场", category: "🎯 玩乐场地", subtype: "马术", latitude: 40.242513, longitude: 116.160594, source_url: "https://www.openstreetmap.org/way/1291518911" },
+  { id: "way/1291518912", name: "马术场", category: "🎯 玩乐场地", subtype: "马术", latitude: 40.242485, longitude: 116.160264, source_url: "https://www.openstreetmap.org/way/1291518912" },
+  { id: "way/1291518913", name: "马术场", category: "🎯 玩乐场地", subtype: "马术", latitude: 40.241863, longitude: 116.161046, source_url: "https://www.openstreetmap.org/way/1291518913" },
+  { id: "node/8245177868", name: "魅KTV", category: "🎯 玩乐场地", subtype: "KTV", latitude: 39.97419, longitude: 116.484361, source_url: "https://www.openstreetmap.org/node/8245177868" },
+  { id: "node/4915830859", name: "龙潭湖公园攀岩场", category: "🎯 玩乐场地", subtype: "攀岩", latitude: 39.878414, longitude: 116.434105, source_url: "https://www.openstreetmap.org/node/4915830859" },
   { id: "node/4717973796", name: "17.5四道口店", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.958223, longitude: 116.339802, source_url: "https://www.openstreetmap.org/node/4717973796" },
   { id: "node/4277750194", name: "17.5电影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.952095, longitude: 116.354921, source_url: "https://www.openstreetmap.org/node/4277750194" },
   { id: "node/2408653854", name: "4D动感影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.938001, longitude: 116.475809, source_url: "https://www.openstreetmap.org/node/2408653854" },
@@ -1259,5 +1319,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-04T23:07:57+08:00",
+  fetched_at: "2026-10-07T16:44:54+08:00",
 };
