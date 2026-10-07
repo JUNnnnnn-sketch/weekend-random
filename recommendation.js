@@ -284,12 +284,33 @@ function durationOverlap(min, max, win) { return min <= win[1] && max >= win[0];
  * 返回真实存在于 data/experiences.js 的 Experience 对象，不自行生成任何名称。
  */
 /**
+ * 当前季节。玩法词典里的 season 字段一直存在，但代码从没用过——
+ * 在只有抽象玩法的阶段这不要紧，有了真实地点就要紧了：
+ * 一月份推「去钓鱼台撒起一把落叶」，或者七月推滑雪，都很荒唐。
+ *
+ * 只认 summer / autumn / winter / all_year，因为词典里就只有这四种
+ * （没有只属于春天的玩法）。
+ */
+export function currentSeason(now = new Date()) {
+  const month = now.getMonth() + 1;
+  if (month >= 6 && month <= 8) return "summer";
+  if (month >= 9 && month <= 11) return "autumn";
+  if (month === 12 || month <= 2) return "winter";
+  return "spring";
+}
+
+function inSeason(experience, season) {
+  return !experience.season || experience.season === "all_year" || experience.season === season;
+}
+
+/**
  * combining：这批玩法会被拼成一个多环节行程，所以不要求单条玩法自己撑满档位。
  * 不开这个开关时，「一整天」只会留下 duration_max >= 300 的玩法——实测每站
  * 只剩植物园和动物园两条，排不出行程。
  */
-export function filterExperiences({ people, duration, locationScope, combining = false } = {}) {
+export function filterExperiences({ people, duration, locationScope, combining = false, now = new Date() } = {}) {
   const code = peopleCodeOf(people);
+  const season = currentSeason(now);
   const win = DURATION_WINDOW[duration] || [0, Number.MAX_SAFE_INTEGER];
   const allowType = ALLOW_TYPE[duration] || ["short"];
   const suburbanAllowed = duration === "一整天";
@@ -298,6 +319,7 @@ export function filterExperiences({ people, duration, locationScope, combining =
   const support = [];
   for (const exp of experiences) {
     if (!exp.suitable_people.includes(code)) continue;
+    if (!inSeason(exp, season)) continue;                 // 不当季的玩法不出现
     if (!scopeMatch(exp, locationScope)) continue;
     if (exp.role === "support") {
       if (!allowType.includes(exp.duration_type)) continue;
