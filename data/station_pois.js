@@ -3,11 +3,11 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-07T19:38:37+08:00
+ * 获取时间：2026-10-07T19:45:07+08:00
  *
- * 共 1141 条：
+ * 共 1138 条：
  *   🎵 音乐 / 演出  239
- *   🎨 艺术 / 展览  225
+ *   🎨 艺术 / 展览  222
  *   🍸 夜生活  173
  *   🏛 寺庙 / 古迹  135
  *   📚 书店 / 图书馆  79
@@ -292,7 +292,7 @@ export const nearbyPois = [
   { id: "way/970877169", name: "77文创园", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.926186, longitude: 116.401956, source_url: "https://www.openstreetmap.org/way/970877169" },
   { id: "way/322694460", name: "79罐", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.985916, longitude: 116.493474, source_url: "https://www.openstreetmap.org/way/322694460" },
   { id: "way/1071503958", name: "81美术馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.969503, longitude: 116.272566, source_url: "https://www.openstreetmap.org/way/1071503958" },
-  { id: "node/6990090483", name: "93号院博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.891311, longitude: 116.381294, source_url: "https://www.openstreetmap.org/node/6990090483" },
+  { id: "node/6990090483", name: "93号院博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.891311, longitude: 116.381294, source_url: "https://www.openstreetmap.org/node/6990090483" },
   { id: "node/7509700003", name: "Aotu Space - 凹凸空间", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.940434, longitude: 116.410981, source_url: "https://www.openstreetmap.org/node/7509700003" },
   { id: "node/8867998867", name: "Art·Des艺术空间", category: "🎨 艺术 / 展览", subtype: "美术馆 / 画廊", latitude: 39.92717, longitude: 116.436896, source_url: "https://www.openstreetmap.org/node/8867998867" },
   { id: "node/3523113802", name: "Elephant Studio", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.933312, longitude: 116.446219, source_url: "https://www.openstreetmap.org/node/3523113802" },
@@ -317,7 +317,6 @@ export const nearbyPois = [
   { id: "relation/14180537", name: "中国人民抗日战争纪念馆", category: "🎨 艺术 / 展览", subtype: "军事博物馆", latitude: 39.851026, longitude: 116.219815, source_url: "https://www.openstreetmap.org/relation/14180537" },
   { id: "relation/963097", name: "中国人民革命军事博物馆", category: "🎨 艺术 / 展览", subtype: "军事博物馆", latitude: 39.908254, longitude: 116.31786, source_url: "https://www.openstreetmap.org/relation/963097" },
   { id: "way/955695642", name: "中国共产党历史展览馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 40.002394, longitude: 116.393077, source_url: "https://www.openstreetmap.org/way/955695642" },
-  { id: "way/1145919343", name: "中国农业大学饲料博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 40.029212, longitude: 116.278896, source_url: "https://www.openstreetmap.org/way/1145919343" },
   { id: "node/271818150", name: "中国冰川博物馆", category: "🎨 艺术 / 展览", subtype: "自然博物馆", latitude: 39.936288, longitude: 116.155674, source_url: "https://www.openstreetmap.org/node/271818150" },
   { id: "node/8744474533", name: "中国化工博物馆", category: "🎨 艺术 / 展览", subtype: "工业博物馆", latitude: 39.983308, longitude: 116.30276, source_url: "https://www.openstreetmap.org/node/8744474533" },
   { id: "way/656349764", name: "中国华侨历史博物馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.941532, longitude: 116.418876, source_url: "https://www.openstreetmap.org/way/656349764" },
@@ -336,7 +335,7 @@ export const nearbyPois = [
   { id: "node/13296153143", name: "中国民族博物馆", category: "🎨 艺术 / 展览", subtype: "民俗博物馆", latitude: 39.972166, longitude: 116.303192, source_url: "https://www.openstreetmap.org/node/13296153143" },
   { id: "way/1209624777", name: "中国民航博物馆", category: "🎨 艺术 / 展览", subtype: "科技博物馆", latitude: 40.016847, longitude: 116.532617, source_url: "https://www.openstreetmap.org/way/1209624777" },
   { id: "way/637237606", name: "中国海关博物馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.905834, longitude: 116.426867, source_url: "https://www.openstreetmap.org/way/637237606" },
-  { id: "way/635574817", name: "中国消防博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.869998, longitude: 116.346182, source_url: "https://www.openstreetmap.org/way/635574817" },
+  { id: "way/635574817", name: "中国消防博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.869998, longitude: 116.346182, source_url: "https://www.openstreetmap.org/way/635574817" },
   { id: "way/395220422", name: "中国现代文学馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.983338, longitude: 116.423782, source_url: "https://www.openstreetmap.org/way/395220422" },
   { id: "way/1125741563", name: "中国电信博物馆", category: "🎨 艺术 / 展览", subtype: "科技博物馆", latitude: 39.977161, longitude: 116.348747, source_url: "https://www.openstreetmap.org/way/1125741563" },
   { id: "way/48915008", name: "中国电影博物馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.995013, longitude: 116.514917, source_url: "https://www.openstreetmap.org/way/48915008" },
@@ -355,7 +354,7 @@ export const nearbyPois = [
   { id: "way/25199712", name: "中国铁道博物馆（东郊展馆）机车车辆展厅", category: "🎨 艺术 / 展览", subtype: "科技博物馆", latitude: 39.996605, longitude: 116.509666, source_url: "https://www.openstreetmap.org/way/25199712" },
   { id: "way/925188503", name: "中国铁道博物馆（正阳门展馆）", category: "🎨 艺术 / 展览", subtype: "科技博物馆", latitude: 39.898466, longitude: 116.394153, source_url: "https://www.openstreetmap.org/way/925188503" },
   { id: "way/1073323825", name: "中国高速铁路展厅", category: "🎨 艺术 / 展览", subtype: "科技博物馆", latitude: 39.997117, longitude: 116.510722, source_url: "https://www.openstreetmap.org/way/1073323825" },
-  { id: "relation/13937475", name: "中央礼品文物管理中心", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.896582, longitude: 116.404846, source_url: "https://www.openstreetmap.org/relation/13937475" },
+  { id: "relation/13937475", name: "中央礼品文物管理中心", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.896582, longitude: 116.404846, source_url: "https://www.openstreetmap.org/relation/13937475" },
   { id: "way/353135637", name: "中央美术学院美术馆", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.982842, longitude: 116.459176, source_url: "https://www.openstreetmap.org/way/353135637" },
   { id: "way/1136212653", name: "中法大学旧址", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.926687, longitude: 116.400795, source_url: "https://www.openstreetmap.org/way/1136212653" },
   { id: "way/943130578", name: "中间美术馆", category: "🎨 艺术 / 展览", subtype: "美术馆 / 画廊", latitude: 39.952886, longitude: 116.224986, source_url: "https://www.openstreetmap.org/way/943130578" },
@@ -395,7 +394,7 @@ export const nearbyPois = [
   { id: "node/10316470946", name: "北京民生现代美术馆", category: "🎨 艺术 / 展览", subtype: "美术馆 / 画廊", latitude: 39.987265, longitude: 116.487731, source_url: "https://www.openstreetmap.org/node/10316470946" },
   { id: "way/176441270", name: "北京汽车博物馆", category: "🎨 艺术 / 展览", subtype: "汽车博物馆", latitude: 39.827531, longitude: 116.296176, source_url: "https://www.openstreetmap.org/way/176441270" },
   { id: "node/4893022365", name: "北京石刻艺术博物馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.943096, longitude: 116.324227, source_url: "https://www.openstreetmap.org/node/4893022365" },
-  { id: "way/966214641", name: "北京税务博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.981209, longitude: 116.440141, source_url: "https://www.openstreetmap.org/way/966214641" },
+  { id: "way/966214641", name: "北京税务博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.981209, longitude: 116.440141, source_url: "https://www.openstreetmap.org/way/966214641" },
   { id: "way/190444425", name: "北京航空航天博物馆", category: "🎨 艺术 / 展览", subtype: "科技博物馆", latitude: 39.980846, longitude: 116.344507, source_url: "https://www.openstreetmap.org/way/190444425" },
   { id: "way/1151193751", name: "北京艺术中心", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.885481, longitude: 116.712478, source_url: "https://www.openstreetmap.org/way/1151193751" },
   { id: "node/1977218858", name: "北京艺术博物馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.945738, longitude: 116.305494, source_url: "https://www.openstreetmap.org/node/1977218858" },
@@ -411,7 +410,7 @@ export const nearbyPois = [
   { id: "way/161296938", name: "国家动物博物馆", category: "🎨 艺术 / 展览", subtype: "自然博物馆", latitude: 40.001185, longitude: 116.375188, source_url: "https://www.openstreetmap.org/way/161296938" },
   { id: "way/1318077962", name: "国家方志馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.87706, longitude: 116.446124, source_url: "https://www.openstreetmap.org/way/1318077962" },
   { id: "way/474337112", name: "国家自然博物馆", category: "🎨 艺术 / 展览", subtype: "自然博物馆", latitude: 39.881874, longitude: 116.393712, source_url: "https://www.openstreetmap.org/way/474337112" },
-  { id: "node/2400277115", name: "国际金融博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.944831, longitude: 116.478794, source_url: "https://www.openstreetmap.org/node/2400277115" },
+  { id: "node/2400277115", name: "国际金融博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.944831, longitude: 116.478794, source_url: "https://www.openstreetmap.org/node/2400277115" },
   { id: "way/1283482120", name: "地铁摇篮陈列馆", category: "🎨 艺术 / 展览", subtype: "科技博物馆", latitude: 39.91988, longitude: 116.189278, source_url: "https://www.openstreetmap.org/way/1283482120" },
   { id: "way/655154655", name: "坦克博物馆", category: "🎨 艺术 / 展览", subtype: "军事博物馆", latitude: 40.16161, longitude: 116.123525, source_url: "https://www.openstreetmap.org/way/655154655" },
   { id: "way/1013746472", name: "垡头地区文化中心", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.860268, longitude: 116.50741, source_url: "https://www.openstreetmap.org/way/1013746472" },
@@ -428,7 +427,7 @@ export const nearbyPois = [
   { id: "way/1149769963", name: "巧夺天工红木文化馆", category: "🎨 艺术 / 展览", subtype: "民俗博物馆", latitude: 39.936018, longitude: 116.269352, source_url: "https://www.openstreetmap.org/way/1149769963" },
   { id: "node/11530187640", name: "巴林文化中心", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.985791, longitude: 116.490385, source_url: "https://www.openstreetmap.org/node/11530187640" },
   { id: "way/1050963777", name: "平西地下交通线主题展览馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 40.066517, longitude: 116.09892, source_url: "https://www.openstreetmap.org/way/1050963777" },
-  { id: "way/523569206", name: "广告博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.913614, longitude: 116.553532, source_url: "https://www.openstreetmap.org/way/523569206" },
+  { id: "way/523569206", name: "广告博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.913614, longitude: 116.553532, source_url: "https://www.openstreetmap.org/way/523569206" },
   { id: "node/12871058706", name: "康有为故居", category: "🎨 艺术 / 展览", subtype: "故居 / 纪念馆", latitude: 39.886592, longitude: 116.369359, source_url: "https://www.openstreetmap.org/node/12871058706" },
   { id: "way/235761636", name: "廉洁奥运主题文化展馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 40.018908, longitude: 116.380499, source_url: "https://www.openstreetmap.org/way/235761636" },
   { id: "way/464844572", name: "廊坊市博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.552225, longitude: 116.716483, source_url: "https://www.openstreetmap.org/way/464844572" },
@@ -464,7 +463,6 @@ export const nearbyPois = [
   { id: "way/571143708", name: "海淀区少年宫", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.963814, longitude: 116.289892, source_url: "https://www.openstreetmap.org/way/571143708" },
   { id: "way/1334653328", name: "涿州市博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.492931, longitude: 115.967355, source_url: "https://www.openstreetmap.org/way/1334653328" },
   { id: "way/122100032", name: "清华园车站旧址", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.990219, longitude: 116.325613, source_url: "https://www.openstreetmap.org/way/122100032" },
-  { id: "node/10198891212", name: "清华大学科学博物馆（筹）", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 40.002298, longitude: 116.322108, source_url: "https://www.openstreetmap.org/node/10198891212" },
   { id: "way/451335313", name: "清华大学艺术博物馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 40.000582, longitude: 116.329475, source_url: "https://www.openstreetmap.org/way/451335313" },
   { id: "way/447845992", name: "炎黄艺术馆", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.994335, longitude: 116.402589, source_url: "https://www.openstreetmap.org/way/447845992" },
   { id: "node/3031420265", name: "热气球博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.878212, longitude: 116.198498, source_url: "https://www.openstreetmap.org/node/3031420265" },
@@ -473,7 +471,6 @@ export const nearbyPois = [
   { id: "node/6039590930", name: "王府井古人类文化遗址博物馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.90758, longitude: 116.406584, source_url: "https://www.openstreetmap.org/node/6039590930" },
   { id: "node/11521261704", name: "现代汽车文化中心", category: "🎨 艺术 / 展览", subtype: "美术馆 / 画廊", latitude: 39.982839, longitude: 116.487724, source_url: "https://www.openstreetmap.org/node/11521261704" },
   { id: "node/11521261702", name: "白盒子艺术馆", category: "🎨 艺术 / 展览", subtype: "美术馆 / 画廊", latitude: 39.985132, longitude: 116.490426, source_url: "https://www.openstreetmap.org/node/11521261702" },
-  { id: "way/1321484896", name: "白纸坊街道纸文化博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.878864, longitude: 116.354285, source_url: "https://www.openstreetmap.org/way/1321484896" },
   { id: "node/3809864708", name: "百工博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.882236, longitude: 116.428244, source_url: "https://www.openstreetmap.org/node/3809864708" },
   { id: "node/12079943046", name: "瞭仓艺术馆", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.920079, longitude: 116.150347, source_url: "https://www.openstreetmap.org/node/12079943046" },
   { id: "node/283642585", name: "石景山区石刻博物馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.933574, longitude: 116.151855, source_url: "https://www.openstreetmap.org/node/283642585" },
@@ -1174,5 +1171,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-07T19:38:37+08:00",
+  fetched_at: "2026-10-07T19:45:07+08:00",
 };
