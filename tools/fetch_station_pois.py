@@ -194,11 +194,21 @@ CATEGORY = {
 # 按名字排除的噪声：街边自助借书机、无人值守阅读空间不是「去处」。
 NAME_NOISE = ["自助图书馆", "智能文化空间", "自助借阅", "图书借阅机", "新华书店",
               # 同一类东西的英文名，照样是街边的借书机
-              "Self-service Library", "self-service library"]
+              "Self-service Library", "self-service library",
+              # 单位内部的礼堂，不对外
+              "礼堂"]
 
 # 名字就是个品类词，等于没名字——推荐里出现一条「美术馆」毫无用处。
 GENERIC_NAMES = {"美术馆", "博物馆", "图书馆", "画廊", "艺术中心", "剧场",
-                 "展览馆", "纪念馆", "体育馆", "公园", "校史馆", "正殿"}
+                 "展览馆", "纪念馆", "体育馆", "公园", "校史馆", "正殿",
+                 # 建筑的一个房间，不是一个去处
+                 "书法室", "绘画室", "舞蹈教室", "演播厅", "二楼多功能厅",
+                 "理学院报告厅", "阁楼",
+                 # 校内礼堂与食堂，外人进不去
+                 "大礼堂", "北工大礼堂", "新华社礼堂", "甲所餐厅",
+                 "蒙民伟音乐厅", "郭影秋音乐厅",
+                 # 每座庙都有的通用殿名，单列出来等于没说
+                 "大雄宝殿", "天王殿", "娘娘殿", "龙王堂"}
 
 # ---- 商场的筛选 ----
 # 北京标了 shop=mall 的有 199 家，绝大多数是方庄购物中心、NTP新城广场、时代Life
@@ -448,10 +458,17 @@ def parse(raws):
                         category = None
                     elif any(word in name for word in NAME_NOISE):
                         category = None
+                    elif key == ("landuse", "retail") and not is_area_place(name, value[0]):
+                        # 商圈这组本该由查询里的品牌正则限定，但 parse() 是按标签
+                        # 分类的，别的查询顺带带回来的 landuse=retail 也会落到这儿，
+                        # 于是混进了农贸市场和早市。这里再过一道同样的标准。
+                        category = None
                     elif key == ("shop", "mall") and not (
-                            mall_is_destination(name) or tags.get("name:en")
-                            or tags.get("wikidata") or tags.get("wikipedia")
-                            or tags.get("brand") or tags.get("operator")):
+                            mall_is_destination(name)
+                            or tags.get("wikidata") or tags.get("wikipedia")):
+                        # 原先还认 name:en / brand / operator，但这三条旁路放进来的
+                        # 全是久隆生活广场、百分百商城、能量城市、东升大厦这类社区商场。
+                        # 有人给填英文名或运营方，不说明它值得专门坐地铁去。
                         category = None
                     break
             if not category:
@@ -484,7 +501,7 @@ def parse(raws):
                 "tag_count": len(tags),
             })
     pois.sort(key=lambda p: (p["category"], p["name"]))
-    return dedupe_malls(dedupe_same_name(pois))
+    return dedupe_malls(dedupe_split_venues(dedupe_same_name(pois)))
 
 
 # 同一个商圈在 OSM 里常被切成好几块：三里屯太古里分南/北/西区，华贸有中心、
@@ -528,6 +545,56 @@ def mall_key(name):
 # 国家版本馆、铁道博物馆东郊展馆都有两条；元大都城垣遗址公园被切成了好几段）。
 # 不能按名字一刀切——万达影城、保利影院的分店同名但确实是不同的地方。
 # 只合并 800 米以内的，保留标签多的那条。
+# 一个场所在 OSM 里常被按分场地拆开标：北京天桥艺术中心有大/中/小三个剧场
+# 四条记录，丝绸之路国际艺术交流中心有五条，丰台体育中心的垒球场连「主球场」
+# 「备用球场」都单独一条。同一站附近并排列出三条「丰台体育中心」没有意义。
+#
+# 规则写得很窄，因为宽了就会误伤：
+#   - 公共前缀至少 5 个字、且含 3 个以上汉字 —— 否则 "The Bar" / "The Corner"
+#     这四家不同的酒吧会被当成一家
+#   - 两边的剩余部分都得像「分场地」（剧场、展厅、球场、一层、二店这类），
+#     且不能两边都只剩一个字 —— 否则「国家体育场」和「国家体育馆」会被合并，
+#     那是鸟巢和国家体育馆，两回事
+#   - 仍然限制在 800 米内
+# 合并时保留名字最短的那条，也就是场所本身而不是它的某个厅。
+SUBVENUE = re.compile(r"^.{0,10}$")
+SUBVENUE_WORDS = ("剧场", "剧院", "展厅", "展馆", "分馆", "副馆", "球场", "体育场",
+                  "音乐厅", "歌剧厅", "戏剧厅", "厅", "馆", "层", "店", "期", "号楼",
+                  "台", "站")   # 房山高线遗址被拆成了「万佛堂站」「基台」「大基台」
+
+
+def cjk_count(text):
+    return sum(1 for ch in text if "一" <= ch <= "鿿")
+
+
+def is_subvenue_tail(tail):
+    if tail == "":
+        return True
+    return bool(SUBVENUE.match(tail)) and any(w in tail for w in SUBVENUE_WORDS)
+
+
+def same_facility(a, b):
+    prefix = os.path.commonprefix([a, b])
+    if len(prefix) < 5 or cjk_count(prefix) < 3:
+        return False
+    ta, tb = a[len(prefix):], b[len(prefix):]
+    if len(ta) < 2 and len(tb) < 2:
+        return False
+    return is_subvenue_tail(ta) and is_subvenue_tail(tb)
+
+
+def dedupe_split_venues(pois, radius_m=800):
+    kept = []
+    for poi in sorted(pois, key=lambda p: len(p["name"])):
+        twin = next((k for k in kept
+                     if same_facility(k["name"], poi["name"])
+                     and haversine_m(k["latitude"], k["longitude"],
+                                     poi["latitude"], poi["longitude"]) <= radius_m), None)
+        if twin is None:
+            kept.append(poi)
+    return kept
+
+
 def same_place_key(name):
     """归一掉「总馆南区」「北区」这类分区后缀，以及可有可无的「中国」前缀。
 
