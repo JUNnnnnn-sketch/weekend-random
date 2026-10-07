@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, pickExperience, matchPlaceFor } from "./recommendation.js";
+import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, placeableExperiencesAt, matchPlaceFor } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
@@ -249,7 +249,7 @@ function renderDestinationOnly() {
   // 展示顺序：专程去的在前，吃喝是顺带的，放最后
   const CATEGORY_ORDER = ["🧭 特色去处", "🎨 艺术 / 展览", "🎵 音乐 / 演出", "🏛 寺庙 / 古迹",
                          "🌳 公园 / 自然", "🛍 商场 / 商圈", "📚 书店 / 图书馆",
-                         "🏟 场馆 / 运动", "🍸 夜生活", "🍜 吃喝"];
+                         "🏟 场馆 / 运动", "🎯 玩乐场地", "🍸 夜生活", "🍜 吃喝"];
   // 按品类分组展示；组内按距离升序。同一个站每次结果一致，随机性只发生在抽站那一步。
   const groups = new Map();
   pois.forEach((poi) => {
@@ -314,7 +314,6 @@ function renderPlan() {
     const swapped = planSwapCounts[i] >= 3;
     const tags = (exp.vibe || []).map((v) => `<span class="tag">${esc(v)}</span>`).join("");
     const step = planSteps[i];
-    const clock = step && step.startTime ? `<span class="plan-clock num">${esc(step.startTime)}</span>` : "";
     // 有具体地点就报地点；没有就老实说「地点你定」，不编一个出来。
     let place = '<p class="activity-meta">地点你定</p>';
     if (step && step.place) {
@@ -327,7 +326,7 @@ function renderPlan() {
       place = `<p class="activity-meta">地点你定 · <span class="place-freshness">${esc(step.hint)}</span></p>`;
     }
     card.innerHTML = `
-      <div><p class="place-category">${clock}${exp.role === "support" ? " 顺带" : ""}</p><h3>${esc(exp.name)}</h3></div>
+      <div><p class="place-category">${exp.role === "support" ? "顺带" : "主玩"}</p><h3>${esc(exp.name)}</h3></div>
       ${place}
       <p class="activity-date">⏱ ${exp.duration_min}–${exp.duration_max} 分钟 · ${esc(exp.sub_type || exp.main_type)}</p>
       ${tags ? `<p class="plan-vibe">${tags}</p>` : ""}
@@ -339,20 +338,22 @@ function renderPlan() {
 
 function swapModule(i) {
   if (i < 0 || i >= planExperiences.length || planSwapCounts[i] >= 3) return;
+  if (!planStation) return;
   const role = planExperiences[i].role;
-  const displayedIds = planExperiences.map((e) => e.id);
-  const exclude = [...new Set([...displayedIds, ...planModuleHistory[i]])];
-  let next = pickExperience({ people: state.party, duration: state.duration, role, exclude });
-  if (!next) next = pickExperience({ people: state.party, duration: state.duration, role, exclude: [planExperiences[i].id] });
-  if (!next) next = pickExperience({ people: state.party, duration: state.duration, role });
-  if (!next) return;
+  // 只在「这一站附近能落地」的玩法里换，否则换完就退回「地点你定」
+  const takenPlaces = planSteps.filter((s, j) => j !== i && s && s.place).map((s) => s.place.id);
+  const pool = placeableExperiencesAt(planStation.station, { people: state.party, duration: state.duration, role, taken: takenPlaces });
+  const exclude = new Set([...planExperiences.map((e) => e.id), ...planModuleHistory[i]]);
+  let options = pool.filter((e) => !exclude.has(e.id));
+  if (!options.length) options = pool.filter((e) => e.id !== planExperiences[i].id);
+  if (!options.length) return;
+  const next = options[Math.floor(Math.random() * options.length)];
   planModuleHistory[i].push(planExperiences[i].id);
   planExperiences[i] = next;
   planSwapCounts[i] += 1;
   // 换了玩法，这一环的地点也要跟着换——否则会挂着上一个玩法的地点
   if (planSteps[i] && planStation) {
-    const taken = new Set(planSteps.filter((s, j) => j !== i && s && s.place).map((s) => s.place.id));
-    const rematched = matchPlaceFor(next, planStation.station, taken);
+    const rematched = matchPlaceFor(next, planStation.station, new Set(takenPlaces));
     planSteps[i] = { ...planSteps[i], ...rematched };
   }
   renderPlan();

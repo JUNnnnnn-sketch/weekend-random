@@ -121,6 +121,21 @@ def has_site_signal(tags):
     return bool(tags.get("wikidata") or tags.get("wikipedia")
                 or tags.get("website") or tags.get("contact:website"))
 
+
+# 公园要比「标签够多」更硬的证据。原先沿用通用质量筛（含「标签数 >= 6」这条
+# 兜底），结果放进来一批校园绿地与街心花坛——用户抽到「中心花园」，一搜是
+# 北京理工大学里的一块地。街心花坛也能有六七个标签，标签数证明不了它值得去。
+# 改成必须有维基条目、官网或门票信息：168 条收到 67 条，而天坛、景山、北海、
+# 颐和园、圆明园、玉渊潭、奥森、紫竹院、陶然亭、香山、八大处等 19 个点名
+# 核对的地方一个没漏。
+PARK_TAGS = {("leisure", "park"), ("leisure", "garden"),
+             ("tourism", "zoo"), ("leisure", "nature_reserve")}
+
+
+def has_landmark_signal(tags):
+    return bool(tags.get("wikidata") or tags.get("wikipedia") or tags.get("website")
+                or tags.get("contact:website") or tags.get("fee"))
+
 # 全国连锁不是「值得专门去」的地方——哪儿都有，不必让命运替你挑。
 # 只排全国性连锁；北京本地的小连锁（紫光园、南城香一类）保留。
 CHAIN_KEYWORDS = ["麦当劳", "肯德基", "KFC", "必胜客", "星巴克", "汉堡王", "真功夫",
@@ -305,6 +320,8 @@ def parse(raws):
                 if tags.get(key[0]) == key[1]:
                     category, subtype, strict = value
                     if key in STRICT_SIGNAL and not has_site_signal(tags):
+                        category = None
+                    elif key in PARK_TAGS and not has_landmark_signal(tags):
                         category = None
                     elif strict and not has_quality_signal(tags):
                         category = None
