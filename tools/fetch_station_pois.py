@@ -194,6 +194,10 @@ CATEGORY = {
 # 按名字排除的噪声：街边自助借书机、无人值守阅读空间不是「去处」。
 NAME_NOISE = ["自助图书馆", "智能文化空间", "自助借阅", "图书借阅机", "新华书店"]
 
+# 名字就是个品类词，等于没名字——推荐里出现一条「美术馆」毫无用处。
+GENERIC_NAMES = {"美术馆", "博物馆", "图书馆", "画廊", "艺术中心", "剧场",
+                 "展览馆", "纪念馆", "体育馆", "公园", "校史馆", "正殿"}
+
 # ---- 商场的筛选 ----
 # 北京标了 shop=mall 的有 199 家，绝大多数是方庄购物中心、NTP新城广场、时代Life
 # 这类社区商场，没人会为它专程坐地铁。用户给的判据是「商铺多、评价过万」或
@@ -217,6 +221,60 @@ def mall_is_destination(name):
     if any(word in name for word in MALL_EXCLUDE):
         return False
     return any(brand in name for brand in MALL_BRANDS)
+
+
+# ---- 博物馆细分 ----------------------------------------------------------
+# OSM 的 tourism=museum 只到「博物馆」这一层，不区分军事/民俗/科技。周末方案
+# 里有 12 条细分博物馆玩法，全挂同一个 subtype 的后果是：抽到「军事博物馆」
+# 挂上来的是北京人艺戏剧博物馆。馆名本身带着类别信息，按名字分最省事。
+#
+# 顺序即优先级，先匹配到的先算。
+
+MUSEUM_NOISE = [
+    r"校史馆$", r"^校友之家$", r"^图书馆$", r"^钟表馆$", r"茗茶", r"茶社",
+    r"^书画频道$", r"^排云殿$", r"^石道碑$", r"^大慧寺$", r"^植物标本馆$",
+    r"乡史", r"场史馆", r"院史馆", r"展陈室", r"^南苑乡文化娱乐中心$",
+    r"^秀池水下展厅$", r"^中国当代艺术档案$",
+]
+
+MUSEUM_RULES = [
+    ("汽车博物馆",    r"汽车"),
+    ("军事博物馆",    r"军事|抗日战争|坦克|民兵|武器装备|国防|中国航空博物馆"),
+    ("自然博物馆",    r"自然|古动物|古植物|地质|冰川|动物博物馆|蜜蜂"),
+    ("食物博物馆",    r"农业|粮食|西瓜|饲料|葡萄酒"),
+    ("工业博物馆",    r"石化|高炉|化工|印刷|燕山|工业"),
+    ("科技博物馆",    r"科技|科学技术|航空|航天|民航|铁道|铁路|电信|核工业|公交|地铁|热气球|冬奥|奥运工程"),
+    ("规划展览馆",    r"规划|城市副中心|新区"),
+    ("艺术博物馆",    r"美术|艺术|石刻|电影"),
+    ("民俗博物馆",    r"民俗|民族|非遗|胡同|戏曲|香会|紫檀|红木|木作|老窑瓷|百工|人偶|蜡像"),
+    ("历史博物馆",    r"革命|二七|党|地下交通线"),          # 革命纪念馆归历史，不归故居
+    ("故居 / 纪念馆", r"故居|祠$|纪念馆|纪念堂|^鲁迅博物馆$|学社"),
+    ("历史博物馆",    r"历史|考古|遗址|古代|钱币|档案|故城|城墙|大运河|海关|华侨|旧址"
+                      r"|文学馆|典籍|版本馆|方志|故宫|Palace Museum|国家博物馆|首都博物馆|王府|博物院"),
+    ("规划展览馆",    r"展览馆|展示中心|展厅|展览$"),
+]
+
+# 「奇趣」是判断，不是关键词算得出来的，单列名单。它会盖掉上面的分类——
+# 中国西瓜博物馆归「冷门 / 奇趣」比归「食物」更贴近用户抽到它时的预期。
+MUSEUM_QUIRKY = {
+    "中国西瓜博物馆", "中国蜜蜂博物馆", "中国人偶博物馆", "热气球博物馆",
+    "北京松堂博物馆", "活的3D博物馆", "英杰硬石博物馆", "老窑瓷博物馆",
+    "文旺阁木作博物馆", "百工博物馆", "北京十三陵明皇蜡像宫", "中国古植物馆",
+    "中国农业大学饲料博物馆", "白纸坊街道纸文化博物馆", "崇德堂博物馆",
+}
+
+
+def museum_subtype(name):
+    """返回细分 subtype；返回 None 表示这条根本不是博物馆，丢掉。"""
+    for pattern in MUSEUM_NOISE:
+        if re.search(pattern, name):
+            return None
+    if name in MUSEUM_QUIRKY:
+        return "冷门 / 奇趣博物馆"
+    for label, pattern in MUSEUM_RULES:
+        if re.search(pattern, name):
+            return label
+    return "综合博物馆"
 
 
 def has_quality_signal(tags):
@@ -310,6 +368,11 @@ def parse(raws):
         for element in json.loads(raw.decode("utf-8"))["elements"]:
             tags = element.get("tags") or {}
             name = (tags.get("name") or "").strip()
+            # OSM 里一个地方有两个名字时会用分号拼起来，取第一个就够了。
+            if ";" in name:
+                name = name.split(";")[0].strip()
+            if name in GENERIC_NAMES:
+                continue
             lat, lon = element.get("lat"), element.get("lon")
             if lat is None and element.get("center"):
                 lat, lon = element["center"]["lat"], element["center"]["lon"]
@@ -337,6 +400,10 @@ def parse(raws):
                     break
             if not category:
                 continue
+            if subtype == "博物馆":
+                subtype = museum_subtype(name)
+                if not subtype:
+                    continue
             osm_id = "%s/%s" % (element["type"], element["id"])
             if osm_id in seen:
                 continue
@@ -354,7 +421,7 @@ def parse(raws):
                 "tag_count": len(tags),
             })
     pois.sort(key=lambda p: (p["category"], p["name"]))
-    return dedupe_malls(pois)
+    return dedupe_malls(dedupe_same_name(pois))
 
 
 # 同一个商圈在 OSM 里常被切成好几块：三里屯太古里分南/北/西区，华贸有中心、
@@ -392,6 +459,22 @@ def mall_key(name):
                 key = key[: -len(suffix)].strip()
                 changed = True
     return key.replace("北京", "").strip() or name
+
+
+# 同名且挨得很近的，是同一个地方在 OSM 里被标了好几次（抗日战争纪念馆、
+# 国家版本馆、铁道博物馆东郊展馆都有两条；元大都城垣遗址公园被切成了好几段）。
+# 不能按名字一刀切——万达影城、保利影院的分店同名但确实是不同的地方。
+# 只合并 800 米以内的，保留标签多的那条。
+def dedupe_same_name(pois, radius_m=800):
+    kept = []
+    for poi in sorted(pois, key=lambda p: -p["tag_count"]):
+        twin = next((k for k in kept
+                     if k["name"] == poi["name"] and k["subtype"] == poi["subtype"]
+                     and haversine_m(k["latitude"], k["longitude"],
+                                     poi["latitude"], poi["longitude"]) <= radius_m), None)
+        if twin is None:
+            kept.append(poi)
+    return kept
 
 
 def dedupe_malls(pois):

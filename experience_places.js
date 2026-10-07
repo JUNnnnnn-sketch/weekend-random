@@ -25,19 +25,24 @@
 /** 按 POI 的 subtype 取地点。键是 experiences.js 里的 name。 */
 export const EXPERIENCE_PLACES = {
   // ---- 文化 / 奇趣探索：博物馆与美术馆 ----
-  "奇趣博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "艺术博物馆": { mode: "anchor", subtypes: ["博物馆", "美术馆 / 画廊"] },
-  "历史博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "科技博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "自然博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "军事博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "汽车博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "工业博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "食物博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "民俗博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "冷门博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "普通主题博物馆": { mode: "anchor", subtypes: ["博物馆"] },
-  "美术馆": { mode: "anchor", subtypes: ["美术馆 / 画廊"] },
+  // 这 12 条原先全挂同一个 subtype「博物馆」，于是抽到「军事博物馆」挂上来的
+  // 是北京人艺戏剧博物馆。OSM 的 tourism=museum 不分类别，现在按馆名在
+  // tools/fetch_station_pois.py 里细分过了，这里一一对上。
+  "奇趣博物馆": { mode: "anchor", subtypes: ["冷门 / 奇趣博物馆"] },
+  "冷门博物馆": { mode: "anchor", subtypes: ["冷门 / 奇趣博物馆"] },
+  "艺术博物馆": { mode: "anchor", subtypes: ["艺术博物馆", "美术馆 / 画廊"] },
+  "历史博物馆": { mode: "anchor", subtypes: ["历史博物馆"] },
+  "科技博物馆": { mode: "anchor", subtypes: ["科技博物馆"] },
+  "自然博物馆": { mode: "anchor", subtypes: ["自然博物馆"] },
+  "军事博物馆": { mode: "anchor", subtypes: ["军事博物馆"] },
+  "汽车博物馆": { mode: "anchor", subtypes: ["汽车博物馆"] },
+  "工业博物馆": { mode: "anchor", subtypes: ["工业博物馆"] },
+  "食物博物馆": { mode: "anchor", subtypes: ["食物博物馆"] },
+  "民俗博物馆": { mode: "anchor", subtypes: ["民俗博物馆"] },
+  "普通主题博物馆": { mode: "anchor", subtypes: ["综合博物馆", "规划展览馆"] },
+  "美术馆": { mode: "anchor", subtypes: ["美术馆 / 画廊", "艺术博物馆"] },
+  // 「故居 / 纪念馆」这一类分出来之后正好对上这条玩法，不用再手工填了。
+  "老建筑探索": { mode: "anchor", subtypes: ["故居 / 纪念馆"] },
   "小众展览": { mode: "anchor", subtypes: ["美术馆 / 画廊", "艺术中心"] },
   "特色文化空间": { mode: "anchor", subtypes: ["艺术中心", "书店", "图书馆"] },
   "奇怪的主题展览": { mode: "anchor", subtypes: ["美术馆 / 画廊", "艺术中心"] },
