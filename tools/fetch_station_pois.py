@@ -192,7 +192,9 @@ CATEGORY = {
 }
 
 # 按名字排除的噪声：街边自助借书机、无人值守阅读空间不是「去处」。
-NAME_NOISE = ["自助图书馆", "智能文化空间", "自助借阅", "图书借阅机", "新华书店"]
+NAME_NOISE = ["自助图书馆", "智能文化空间", "自助借阅", "图书借阅机", "新华书店",
+              # 同一类东西的英文名，照样是街边的借书机
+              "Self-service Library", "self-service library"]
 
 # 名字就是个品类词，等于没名字——推荐里出现一条「美术馆」毫无用处。
 GENERIC_NAMES = {"美术馆", "博物馆", "图书馆", "画廊", "艺术中心", "剧场",
@@ -285,6 +287,31 @@ def museum_subtype(name):
         if re.search(pattern, name):
             return label
     return "综合博物馆"
+
+
+# ---- 街区与单体景点的区分 ------------------------------------------------
+# 「给商圈不指定店」的玩法（陶艺、绘画、汉服这类手作）原先从整个「特色去处」和
+# 「商场 / 商圈」里挑，于是挑出了「乐器体验课 → 在这一带 荣宝斋」
+# 「绘画体验 → 在这一带 克勤郡王府」。荣宝斋是一家店，克勤郡王府是一座王府，
+# 都不是「一带」。
+#
+# 46 条特色去处里真正是街区的只有 6 条，其余是故宫、祈年殿、永定门、各种石刻
+# 和墓——它们该留在命运模式的名单里，但不该当成街区用。
+
+AREA_NAME = r"街$|大街|巷$|胡同|hutong|Hutong|艺术区|园区|商业街|步行街"
+AREA_EXPLICIT = {"国子监"}
+# 商圈侧：沿用商场那张品牌表，另加几个本身就是一片地方的
+AREA_BRANDS = MALL_BRANDS + ["798", "潘家园", "艺术区", "商业街", "步行街", "更新场",
+                             "THE BOX", "燕莎", "红桥市场"]
+
+
+def is_area_place(name, category):
+    """这个地方能不能当「一带」用。"""
+    if any(word in name for word in MALL_EXCLUDE):
+        return False
+    if category == "🧭 特色去处":
+        return bool(re.search(AREA_NAME, name)) or name in AREA_EXPLICIT
+    return any(brand in name for brand in AREA_BRANDS)
 
 
 def has_quality_signal(tags):
@@ -414,6 +441,11 @@ def parse(raws):
                 subtype = museum_subtype(name)
                 if not subtype:
                     continue
+            elif category in ("🧭 特色去处", "🛍 商场 / 商圈"):
+                if is_area_place(name, category):
+                    subtype = "街区 / 商圈"
+                elif category == "🧭 特色去处":
+                    subtype = "地标 / 古迹"
             osm_id = "%s/%s" % (element["type"], element["id"])
             if osm_id in seen:
                 continue

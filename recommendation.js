@@ -1,7 +1,7 @@
 import { experiences } from "./data/experiences.js";
 import { stationCoordinates } from "./data/station_coordinates.js";
 import { nearbyPois } from "./data/station_pois.js";
-import { placeRuleFor, AREA_CATEGORIES } from "./experience_places.js";
+import { placeRuleFor, AREA_SUBTYPES } from "./experience_places.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -361,10 +361,10 @@ function matchPlace(experience, pois, taken) {
   const rule = placeRuleFor(experience.name);
   if (!rule) return { mode: "none" };
   if (rule.mode === "area") {
-    // 按品类优先级挑，而不是单纯就近：798、国子监、南锣鼓巷这类「特色去处」
-    // 比一个商场更像「做陶艺、拍汉服该去的那一片」。
-    for (const category of AREA_CATEGORIES) {
-      const area = pois.find((p) => p.category === category && !taken.has(p.id));
+    // 只认标成「街区 / 商圈」的——798、国子监、南锣鼓巷、各大商圈。
+    // pois 已按距离排过，find 取到的就是最近的那一片。
+    for (const subtype of AREA_SUBTYPES) {
+      const area = pois.find((p) => p.subtype === subtype && !taken.has(p.id));
       if (area) return { mode: "area", place: area, hint: rule.hint };
     }
     return { mode: "none", hint: rule.hint };
@@ -382,7 +382,7 @@ function placeableAt(experience, pois, taken = new Set()) {
   const rule = placeRuleFor(experience.name);
   if (!rule) return false;                         // 没登记地点规则的，周末方案不提供
   const free = pois.filter((p) => !taken.has(p.id));
-  if (rule.mode === "area") return free.some((p) => AREA_CATEGORIES.includes(p.category));
+  if (rule.mode === "area") return free.some((p) => AREA_SUBTYPES.includes(p.subtype));
   return free.some((p) => rule.subtypes.includes(p.subtype));
 }
 

@@ -42,7 +42,7 @@ export const EXPERIENCE_PLACES = {
   "普通主题博物馆": { mode: "anchor", subtypes: ["综合博物馆", "规划展览馆"] },
   "美术馆": { mode: "anchor", subtypes: ["美术馆 / 画廊", "艺术博物馆"] },
   // 「故居 / 纪念馆」这一类分出来之后正好对上这条玩法，不用再手工填了。
-  "老建筑探索": { mode: "anchor", subtypes: ["故居 / 纪念馆"] },
+  "老建筑探索": { mode: "anchor", subtypes: ["故居 / 纪念馆", "地标 / 古迹"] },
   "小众展览": { mode: "anchor", subtypes: ["美术馆 / 画廊", "艺术中心"] },
   "特色文化空间": { mode: "anchor", subtypes: ["艺术中心", "书店", "图书馆"] },
   "奇怪的主题展览": { mode: "anchor", subtypes: ["美术馆 / 画廊", "艺术中心"] },
@@ -93,8 +93,15 @@ export const EXPERIENCE_PLACES = {
   "其他体验课": { mode: "area" },
 };
 
-/** area 模式去哪些品类里挑街区。 */
-export const AREA_CATEGORIES = ["🧭 特色去处", "🛍 商场 / 商圈"];
+/**
+ * area 模式去哪个 subtype 里挑街区。
+ *
+ * 原先是按品类挑（整个「特色去处」加整个「商场 / 商圈」），结果挑出了
+ * 「乐器体验课 → 在这一带 荣宝斋」「绘画体验 → 在这一带 克勤郡王府」——
+ * 荣宝斋是一家店，克勤郡王府是一座王府，都不是「一带」。
+ * 现在数据里把真街区单独标成了「街区 / 商圈」，只认这一个。
+ */
+export const AREA_SUBTYPES = ["街区 / 商圈"];
 
 /** 查某个玩法该怎么给地点；没登记的就是「不给地点」。 */
 export function placeRuleFor(experienceName) {
