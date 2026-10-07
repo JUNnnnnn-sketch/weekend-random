@@ -3,13 +3,13 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-07T20:23:59+08:00
+ * 获取时间：2026-10-07T20:30:21+08:00
  *
- * 共 1017 条：
- *   🎵 音乐 / 演出  218
+ * 共 1011 条：
  *   🎨 艺术 / 展览  216
+ *   🎵 音乐 / 演出  216
  *   🍸 夜生活  172
- *   🏛 寺庙 / 古迹  128
+ *   🏛 寺庙 / 古迹  124
  *   🌳 公园 / 自然  64
  *   🎯 玩乐场地  56
  *   🛍 商场 / 商圈  46
@@ -666,7 +666,6 @@ export const nearbyPois = [
   { id: "way/1354577579", name: "只有红楼梦", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.559997, longitude: 116.714253, source_url: "https://www.openstreetmap.org/way/1354577579" },
   { id: "node/1787497648", name: "嘉华影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 40.007553, longitude: 116.347186, source_url: "https://www.openstreetmap.org/node/1787497648" },
   { id: "way/1354577577", name: "四合院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.559798, longitude: 116.712375, source_url: "https://www.openstreetmap.org/way/1354577577" },
-  { id: "way/1354577572", name: "四水归堂", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.562114, longitude: 116.713458, source_url: "https://www.openstreetmap.org/way/1354577572" },
   { id: "way/377569800", name: "国安剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.980114, longitude: 116.364398, source_url: "https://www.openstreetmap.org/way/377569800" },
   { id: "way/4974233", name: "国家大剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.903342, longitude: 116.383547, source_url: "https://www.openstreetmap.org/way/4974233" },
   { id: "way/1058100253", name: "国家大剧院台湖舞美艺术中心", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.837421, longitude: 116.625874, source_url: "https://www.openstreetmap.org/way/1058100253" },
@@ -722,7 +721,6 @@ export const nearbyPois = [
   { id: "node/2400198399", name: "珠影耳东传奇影城", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.947759, longitude: 116.47015, source_url: "https://www.openstreetmap.org/node/2400198399" },
   { id: "way/630766635", name: "球幕剧院", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.968557, longitude: 116.387342, source_url: "https://www.openstreetmap.org/way/630766635" },
   { id: "node/13248079250", name: "电影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.709324, longitude: 116.055864, source_url: "https://www.openstreetmap.org/node/13248079250" },
-  { id: "node/4168365789", name: "畅音阁", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.9194, longitude: 116.394576, source_url: "https://www.openstreetmap.org/node/4168365789" },
   { id: "node/12837264169", name: "疯狂理发店", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.921084, longitude: 116.441944, source_url: "https://www.openstreetmap.org/node/12837264169" },
   { id: "node/6354047421", name: "百老汇影城(东方广场店)", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.908558, longitude: 116.410689, source_url: "https://www.openstreetmap.org/node/6354047421" },
   { id: "way/1354577566", name: "真亦假剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.560924, longitude: 116.712486, source_url: "https://www.openstreetmap.org/way/1354577566" },
@@ -817,7 +815,6 @@ export const nearbyPois = [
   { id: "way/187199950", name: "大高玄殿", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.923014, longitude: 116.386967, source_url: "https://www.openstreetmap.org/way/187199950" },
   { id: "way/1198080689", name: "天泉寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 40.045061, longitude: 116.013131, source_url: "https://www.openstreetmap.org/way/1198080689" },
   { id: "way/25109939", name: "太庙", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.909979, longitude: 116.393628, source_url: "https://www.openstreetmap.org/way/25109939" },
-  { id: "way/43525082", name: "奉先殿", category: "🏛 寺庙 / 古迹", subtype: "古寺", latitude: 39.918237, longitude: 116.392834, source_url: "https://www.openstreetmap.org/way/43525082" },
   { id: "way/33614641", name: "妙应寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.923551, longitude: 116.356997, source_url: "https://www.openstreetmap.org/way/33614641" },
   { id: "node/9802128238", name: "妙行大师灵塔", category: "🏛 寺庙 / 古迹", subtype: "遗址", latitude: 40.045955, longitude: 116.045992, source_url: "https://www.openstreetmap.org/node/9802128238" },
   { id: "way/1072486336", name: "孔雀庵遗址", category: "🏛 寺庙 / 古迹", subtype: "遗址", latitude: 39.892326, longitude: 116.051969, source_url: "https://www.openstreetmap.org/way/1072486336" },
@@ -850,7 +847,6 @@ export const nearbyPois = [
   { id: "node/9768674688", name: "极乐洞", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.995766, longitude: 116.013813, source_url: "https://www.openstreetmap.org/node/9768674688" },
   { id: "way/656351646", name: "柏林寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.944659, longitude: 116.413634, source_url: "https://www.openstreetmap.org/way/656351646" },
   { id: "way/795172455", name: "正福寺天主堂", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.948605, longitude: 116.276067, source_url: "https://www.openstreetmap.org/way/795172455" },
-  { id: "way/984073425", name: "水思殿", category: "🏛 寺庙 / 古迹", subtype: "古寺", latitude: 39.926256, longitude: 116.391558, source_url: "https://www.openstreetmap.org/way/984073425" },
   { id: "way/124007370", name: "永安寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.923594, longitude: 116.382757, source_url: "https://www.openstreetmap.org/way/124007370" },
   { id: "node/13267247608", name: "永安观", category: "🏛 寺庙 / 古迹", subtype: "遗址", latitude: 40.001447, longitude: 116.32313, source_url: "https://www.openstreetmap.org/node/13267247608" },
   { id: "node/13897154868", name: "永恩寺", category: "🏛 寺庙 / 古迹", subtype: "遗址", latitude: 39.999904, longitude: 116.318172, source_url: "https://www.openstreetmap.org/node/13897154868" },
@@ -885,9 +881,7 @@ export const nearbyPois = [
   { id: "way/1072523530", name: "西峰寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.884246, longitude: 116.072362, source_url: "https://www.openstreetmap.org/way/1072523530" },
   { id: "way/170431450", name: "西直门天主堂 (西堂)", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.938528, longitude: 116.359774, source_url: "https://www.openstreetmap.org/way/170431450" },
   { id: "way/1412301397", name: "西贯市清真寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 40.134793, longitude: 116.139687, source_url: "https://www.openstreetmap.org/way/1412301397" },
-  { id: "way/654418858", name: "观德殿", category: "🏛 寺庙 / 古迹", subtype: "古寺", latitude: 39.925454, longitude: 116.392176, source_url: "https://www.openstreetmap.org/way/654418858" },
   { id: "way/1414829161", name: "观音庵", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 40.050466, longitude: 116.099637, source_url: "https://www.openstreetmap.org/way/1414829161" },
-  { id: "way/40605851", name: "诚肃殿", category: "🏛 寺庙 / 古迹", subtype: "古寺", latitude: 39.91848, longitude: 116.391785, source_url: "https://www.openstreetmap.org/way/40605851" },
   { id: "node/9870106121", name: "谷积山院塔（鞭塔）", category: "🏛 寺庙 / 古迹", subtype: "遗址", latitude: 39.844164, longitude: 116.005914, source_url: "https://www.openstreetmap.org/node/9870106121" },
   { id: "way/1419325475", name: "辛庄关帝庙", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 40.062691, longitude: 116.147244, source_url: "https://www.openstreetmap.org/way/1419325475" },
   { id: "way/187210788", name: "通教寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.942892, longitude: 116.420027, source_url: "https://www.openstreetmap.org/way/187210788" },
@@ -1050,5 +1044,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-07T20:23:59+08:00",
+  fetched_at: "2026-10-07T20:30:21+08:00",
 };
