@@ -2,6 +2,7 @@ import { experiences } from "./data/experiences.js";
 import { stationCoordinates } from "./data/station_coordinates.js";
 import { nearbyPois } from "./data/station_pois.js";
 import { placeRuleFor, AREA_SUBTYPES } from "./experience_places.js";
+import { curatedPlaces, curatedRoutes } from "./data/curated_places.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -447,6 +448,118 @@ function matchPlace(experience, pois, taken) {
 }
 
 /**
+ * 人气加权抽取。
+ *
+ * 手工整理的那批数据带「百分之多少的人推荐」——划船里亮马河 38%、通州大运河 2%。
+ * 这是 OSM 给不了的信号，均匀随机会把它浪费掉：一个 2% 的地方和一个 38% 的
+ * 地方同样容易被抽到，用户体感就是推荐质量忽高忽低。
+ *
+ * 但也不能只给最高的那个，否则每次都是亮马河，这个产品就没意思了。
+ * 加权随机是中间路线：人气高的更常出现，冷门的仍然有机会。
+ * 没标人气的按 8 算（比最低的 1% 高，比热门的低），不至于永远抽不到。
+ */
+const DEFAULT_WEIGHT = 8;
+
+export function weightedPick(items, weightOf = (x) => x.popularity || DEFAULT_WEIGHT) {
+  if (!items.length) return null;
+  const total = items.reduce((sum, item) => sum + Math.max(1, weightOf(item)), 0);
+  let roll = Math.random() * total;
+  for (const item of items) {
+    roll -= Math.max(1, weightOf(item));
+    if (roll <= 0) return item;
+  }
+  return items[items.length - 1];
+}
+
+/** 出城的门槛：离最近地铁站 20 公里以上，地铁去不了，得开车。 */
+export const OUTSKIRTS_MIN_KM = 20;
+
+/**
+ * 「一整天」里有多大比例给出城方案。
+ *
+ * 不是越多越好：出城要开车，不是每个人每个周末都愿意。但也不能太少，
+ * 否则那 24 条出城数据基本等于不存在。三分之一是个让它稳定出现、
+ * 又不喧宾夺主的比例。
+ */
+const OUTSKIRTS_SHARE = 1 / 3;
+
+let outskirtsCache = null;
+/** 出城目的地：按地点聚合，一个地方带着它能干的所有事。 */
+export function outskirtsDestinations() {
+  if (outskirtsCache) return outskirtsCache;
+  const byName = new Map();
+  for (const place of curatedPlaces) {
+    if (place.latitude === undefined || place.nearest_km < OUTSKIRTS_MIN_KM) continue;
+    const entry = byName.get(place.name) || {
+      name: place.name, latitude: place.latitude, longitude: place.longitude,
+      nearest_station: place.nearest_station, nearest_km: place.nearest_km,
+      source_url: place.source_url, options: [],
+    };
+    entry.options.push(place);
+    byName.set(place.name, entry);
+  }
+  outskirtsCache = [...byName.values()];
+  return outskirtsCache;
+}
+
+/**
+ * 出城方案：锚是目的地本身，不是地铁站。
+ *
+ * 城区方案的逻辑是「先定地铁站，再看站周边 1.2 公里内有什么」——那成立是因为
+ * 城区地铁站周边东西够密。出城数据的形状相反：地点孤立，但很深。金海湖一个地方
+ * 能钓鱼、野餐、玩帆板、看日落；妙峰山能看日出、看日落、观星。
+ *
+ * 所以逻辑一样、粒度不同：先定一个地方，再看那儿能干什么。
+ * 不是跑三个地方，是去一个地方待一天。
+ */
+export function buildOutskirtsPlan({ people, duration, exclude = [], now = new Date() } = {}) {
+  const season = currentSeason(now);
+  const code = peopleCodeOf(people);
+  const byId = new Map(experiences.map((e) => [e.name, e]));
+  const excluded = new Set(exclude);
+
+  const usable = outskirtsDestinations().map((dest) => {
+    const options = dest.options.filter((place) => {
+      const exp = byId.get(place.experience);
+      if (!exp || excluded.has(exp.id)) return false;
+      if (!exp.suitable_people.includes(code)) return false;
+      if (!inSeason(exp, season)) return false;              // 七月的滑雪场没有意义
+      return place.season === "all_year" || place.season === season;
+    });
+    return { ...dest, options };
+  }).filter((dest) => dest.options.length);
+  if (!usable.length) return null;
+
+  // 先按「这地方最热门的那件事有多热门」挑目的地，再在它支持的事里挑
+  const destination = weightedPick(usable, (d) =>
+    Math.max(...d.options.map((o) => o.popularity || DEFAULT_WEIGHT)));
+
+  const picked = [];
+  const pool = [...destination.options];
+  while (picked.length < 3 && pool.length) {
+    const choice = weightedPick(pool);
+    picked.push(choice);
+    pool.splice(pool.indexOf(choice), 1);
+    // 同一个地方的玩法彼此不重复，但也不必凑满三个——金海湖只有四件事可干
+    if (picked.length >= 2 && Math.random() < 0.5) break;
+  }
+
+  return {
+    people, duration, kind: "outskirts", empty: false,
+    destination,
+    steps: picked.map((place) => ({
+      experience: byId.get(place.experience),
+      place: { ...place, name: destination.name },
+      placeMode: "outskirts",
+      hint: place.note || null,
+    })),
+    experiences: picked.map((place) => byId.get(place.experience)),
+    anchored: picked.length,
+    structure: { type: "outskirts", moduleCount: picked.length },
+  };
+}
+
+/**
  * 这条玩法在这批 POI 里能不能落地。
  * taken 是本次行程已经用掉的地点——同一个剧场不能既算「音乐厅」又算「京剧」，
  * 否则第二环会挂空。
@@ -489,7 +602,13 @@ export function matchPlaceFor(experience, station, taken = new Set()) {
  * 看夜景、胡同夜游这类氛围型需要一份人工整理的地点表。它们留在词典里，
  * 只是暂时不由周末方案提供。
  */
-export function buildAnchoredPlan({ people, duration, locationScope, lines, exclude = [], attempts = 40 } = {}) {
+export function buildAnchoredPlan({ people, duration, locationScope, lines, exclude = [], attempts = 40, now = new Date() } = {}) {
+  // 一整天才可能出城——2-3 小时和半天开车去金海湖不现实。
+  // 出城方案失败（比如七月份只剩滑雪场）就照常走城区逻辑，不留空。
+  if (duration === "一整天" && Math.random() < OUTSKIRTS_SHARE) {
+    const trip = buildOutskirtsPlan({ people, duration, exclude, now });
+    if (trip) return trip;
+  }
   const emptyResult = {
     people, duration, locationScope: locationScope || "both",
     structure: { type: "empty", moduleCount: 0 },

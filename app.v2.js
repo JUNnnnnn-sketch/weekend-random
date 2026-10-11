@@ -3,6 +3,7 @@ import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
 import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, placeableExperiencesAt, matchPlaceFor, pickWorthATrip } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
+import { experiences as allExperiences } from "./data/experiences.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
 const CATEGORY_BLACKLIST = new Set(["便民活动", "招考招聘", "惠企活动"]);
@@ -311,6 +312,23 @@ function renderWorthATrip(place) {
   });
   return card;
 }
+/** 出城方案换玩法：只能换成这同一个目的地还能干的别的事。 */
+function swapTripModule(i) {
+  const shown = new Set(planExperiences.map((e) => e.name));
+  const options = planTrip.options.filter((o) => !shown.has(o.experience)
+    && !planModuleHistory[i].includes(o.experience));
+  if (!options.length) return;
+  const next = options[Math.floor(Math.random() * options.length)];
+  const exp = allExperiences.find((e) => e.name === next.experience);
+  if (!exp) return;
+  planModuleHistory[i].push(planExperiences[i].name);
+  planExperiences[i] = exp;
+  planSwapCounts[i] += 1;
+  planSteps[i] = { experience: exp, place: { ...next, name: planTrip.name },
+                   placeMode: "outskirts", hint: next.note || null };
+  renderPlan();
+}
+
 function renderPlace(item) {
   const card = document.createElement("article"); card.className = "place-card";
   card.innerHTML = `<div><p class="place-category">${item.category}</p><h3>${item.name}</h3></div><p>${item.category} · ${state.party}</p><p>距离 ${item.distance_km.toFixed(1)} km · 约 ${state.duration}</p><p class="place-freshness">数据${freshness(item.updated_at)}</p><a href="${item.source_url}" target="_blank" rel="noreferrer">查看数据来源 ↗</a>`;
@@ -322,13 +340,15 @@ let planExperiences = [];
 let planSwapCounts = [];
 let planModuleHistory = [];
 let planSteps = [];      // 与 planExperiences 一一对应：时刻、地点
-let planStation = null;  // 这次方案锚定的那一站
+let planStation = null;  // 这次方案锚定的那一站（出城方案没有）
+let planTrip = null;     // 出城方案锚定的那个目的地
 
 function startPlan() {
   const plan = buildAnchoredPlan({ people: state.party, duration: state.duration, lines: subwayLines });
   if (!plan || plan.empty || !plan.experiences.length) { showScreen("setup"); return; }
   planExperiences = plan.experiences.slice();
   planSteps = (plan.steps || []).slice();
+  planTrip = plan.kind === "outskirts" ? plan.destination : null;
   planStation = plan.station ? { station: plan.station, line: plan.line } : null;
   planSwapCounts = planExperiences.map(() => 0);
   planModuleHistory = planExperiences.map(() => []);
@@ -341,7 +361,8 @@ function scopeLabel(scope) { return scope === "suburban" ? "京郊" : scope === 
 function renderPlan() {
   const container = document.getElementById("plan-list");
   container.replaceChildren();
-  const where = planStation ? ` · ${planStation.line.line_name} ${planStation.station.station_name}一带` : "";
+  const where = planTrip ? ` · 🚗 出城 · ${planTrip.name}`
+    : planStation ? ` · ${planStation.line.line_name} ${planStation.station.station_name}一带` : "";
   document.getElementById("plan-subtitle").textContent =
     `${state.party} · ${state.duration}${where} · 共 ${planExperiences.length} 个环节`;
   planExperiences.forEach((exp, i) => {
@@ -352,7 +373,14 @@ function renderPlan() {
     const step = planSteps[i];
     // 有具体地点就报地点；没有就老实说「地点你定」，不编一个出来。
     let place = '<p class="activity-meta">地点你定</p>';
-    if (step && step.place) {
+    if (step && step.placeMode === "outskirts") {
+      // 出城方案的每一环都在同一个地方，第一环报地名，后面的说「同一个地方」
+      const where = i === 0 ? `<strong>${esc(step.place.name)}</strong>` : "同一个地方";
+      const pop = step.place.popularity ? ` · ${step.place.popularity}% 的人推荐` : "";
+      place = `<p class="activity-meta">${where}${pop}`
+        + (step.hint ? `<br /><span class="place-freshness">${esc(step.hint)}</span>` : "")
+        + "</p>";
+    } else if (step && step.place) {
       const metres = Math.round(step.place.distance_km * 1000);
       const lead = step.placeMode === "area" ? "在这一带 " : "";
       place = `<p class="activity-meta">${lead}<strong>${esc(step.place.name)}</strong>`
@@ -369,11 +397,21 @@ function renderPlan() {
       <button class="btn btn-ghost btn-swap" type="button" data-index="${i}" ${swapped ? "disabled" : ""}>${swapped ? "命运已定 ✦" : "换一个"}</button>`;
     container.append(card);
   });
+  if (planTrip) {
+    // 出城方案得说清楚有多远——「一整天」不等于「地铁能到」
+    const note = document.createElement("p");
+    note.className = "place-freshness";
+    note.innerHTML = `这几件事都在 ${esc(planTrip.name)}，地铁到不了——最近的是 `
+      + `${esc(planTrip.nearest_station)}站，还有 ${Math.round(planTrip.nearest_km)} 公里，得开车`
+      + (planTrip.source_url ? ` · <a href="${planTrip.source_url}" target="_blank" rel="noreferrer">地图 ↗</a>` : "");
+    container.append(note);
+  }
   container.querySelectorAll(".btn-swap").forEach((btn) => btn.addEventListener("click", () => swapModule(Number(btn.dataset.index))));
 }
 
 function swapModule(i) {
   if (i < 0 || i >= planExperiences.length || planSwapCounts[i] >= 3) return;
+  if (planTrip) { swapTripModule(i); return; }
   if (!planStation) return;
   const role = planExperiences[i].role;
   // 只在「这一站附近能落地」的玩法里换，否则换完就退回「地点你定」
