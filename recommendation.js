@@ -432,6 +432,11 @@ function finalize(plan, ctx, type) {
 /** 每种时长的起始时刻，用来排出先后顺序。 */
 /** 在一批已按距离排好的 POI 里，挑出符合该玩法的那个。 */
 function matchPlace(experience, pois, taken) {
+  const curated = pois.filter((p) => p.curated_for === experience.name && !taken.has(p.id));
+  if (curated.length) {
+    const pick = weightedPick(curated);
+    return { mode: "curated", place: pick, hint: pick.note || null };
+  }
   const rule = placeRuleFor(experience.name);
   if (!rule) return { mode: "none" };
   if (rule.mode === "area") {
@@ -560,6 +565,40 @@ export function buildOutskirtsPlan({ people, duration, exclude = [], now = new D
 }
 
 /**
+ * 把手工整理的地点并进某一站的「附近有什么」。
+ *
+ * station_pois.js 是按地理标签扫出来的，覆盖不到「适合划船的地方」「看夜景的
+ * 机位」这类判断——OSM 没有这种字段。实测这 23 个玩法（划船、看夜景、野餐、
+ * 钓鱼、看日落、滑冰……）一个都没有 OSM 规则，全靠这批手工数据。
+ *
+ * 只并入有坐标的。没坐标的那 111 条（壁球馆、汤泉馆、采摘园这些 OSM 不收的
+ * 商业场所）进不了按站点锚定的方案——不知道它在哪，就不能说它在这一站附近。
+ * 它们留在数据里，等一个不依赖坐标的出口。
+ *
+ * 出城的（离最近站 20 公里以上）也不并入：那是 buildOutskirtsPlan 的事。
+ */
+function curatedNear(station, { radiusKm = NEARBY_RADIUS_KM, now = new Date() } = {}) {
+  const coords = coordinatesOf(station);
+  if (coords.latitude === null) return [];
+  const season = currentSeason(now);
+  const out = [];
+  for (const place of curatedPlaces) {
+    if (place.latitude === undefined || place.nearest_km >= OUTSKIRTS_MIN_KM) continue;
+    if (place.season !== "all_year" && place.season !== season) continue;   // 户外冰场只在冬天
+    const km = distanceKm(coords, place);
+    if (km > radiusKm) continue;
+    out.push({ ...place, distance_km: km, curated_for: place.experience });
+  }
+  return out.sort((a, b) => a.distance_km - b.distance_km);
+}
+
+/** 某一站附近的全部可用地点：OSM 扫出来的 + 手工整理的。 */
+export function placesAround(station, { radiusKm = NEARBY_RADIUS_KM, now = new Date() } = {}) {
+  return [...findNearbyPois(coordinatesOf(station), { radiusKm }),
+          ...curatedNear(station, { radiusKm, now })];
+}
+
+/**
  * 路线方案。
  *
  * 路线是数据里的第三种东西：点是「在哪」（军事博物馆），面是「在这一带」
@@ -611,7 +650,7 @@ export function buildRoutePlan({ people, duration, lines, exclude = [], now = ne
 
   // 路线比这次的时长短时，后面还塞得下一件轻的——比如走完胡同去喝杯下午茶
   if ((DURATION_RANK[route.duration] ?? 3) < (DURATION_RANK[duration] ?? 3)) {
-    const pois = findNearbyPois(coordinatesOf(spot.entry.station));
+    const pois = placesAround(spot.entry.station, { now });
     const { support } = filterExperiences({ people, duration, combining: true, now });
     const tail = support.filter((e) => !excluded.has(e.id) && placeableAt(e, pois));
     if (tail.length) {
@@ -637,16 +676,18 @@ export function buildRoutePlan({ people, duration, lines, exclude = [], now = ne
  * 否则第二环会挂空。
  */
 function placeableAt(experience, pois, taken = new Set()) {
-  const rule = placeRuleFor(experience.name);
-  if (!rule) return false;                         // 没登记地点规则的，周末方案不提供
   const free = pois.filter((p) => !taken.has(p.id));
+  // 手工整理的地点带人气和一句话，比 OSM 的标签匹配靠谱，优先
+  if (free.some((p) => p.curated_for === experience.name)) return true;
+  const rule = placeRuleFor(experience.name);
+  if (!rule) return false;                         // 既没手工地点也没 OSM 规则的，不提供
   if (rule.mode === "area") return free.some((p) => AREA_SUBTYPES.includes(p.subtype));
   return free.some((p) => rule.subtypes.includes(p.subtype));
 }
 
 /** 某一站附近能落地的玩法，供界面「换一个」时限定范围。 */
-export function placeableExperiencesAt(station, { people, duration, locationScope, role = "core", taken = [] } = {}) {
-  const pois = findNearbyPois(coordinatesOf(station));
+export function placeableExperiencesAt(station, { people, duration, locationScope, role = "core", taken = [], now = new Date() } = {}) {
+  const pois = placesAround(station, { now });
   const used = new Set(taken);
   const pools = filterExperiences({ people, duration, locationScope, combining: true });
   const pool = role === "support" ? pools.support : pools.core;
@@ -654,8 +695,8 @@ export function placeableExperiencesAt(station, { people, duration, locationScop
 }
 
 /** 换玩法之后重新给这一环挂地点。 */
-export function matchPlaceFor(experience, station, taken = new Set()) {
-  const pois = findNearbyPois(coordinatesOf(station));
+export function matchPlaceFor(experience, station, taken = new Set(), { now = new Date() } = {}) {
+  const pois = placesAround(station, { now });
   const matched = matchPlace(experience, pois, taken);
   return { placeMode: matched.mode, place: matched.place || null, hint: matched.hint || null };
 }
@@ -701,8 +742,8 @@ export function buildAnchoredPlan({ people, duration, locationScope, lines, excl
 
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const entry = randomItem(candidates);
-    const pois = findNearbyPois(coordinatesOf(entry.station));
-    const pools = filterExperiences({ people, duration, locationScope, combining: true });
+    const pois = placesAround(entry.station, { now });
+    const pools = filterExperiences({ people, duration, locationScope, combining: true, now });
     const coreOk = pools.core.filter((e) => !excluded.has(e.id) && placeableAt(e, pois));
     if (!coreOk.length) continue;
     const supportOk = pools.support.filter((e) => !excluded.has(e.id) && placeableAt(e, pois));

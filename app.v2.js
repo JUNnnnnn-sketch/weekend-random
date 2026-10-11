@@ -392,6 +392,15 @@ function renderPlan() {
       place = `<p class="activity-meta">${where}${pop}`
         + (step.hint ? `<br /><span class="place-freshness">${esc(step.hint)}</span>` : "")
         + "</p>";
+    } else if (step && step.placeMode === "curated") {
+      // 手工整理的地点：带人气和一句话，这是 OSM 给不了的
+      const metres = Math.round(step.place.distance_km * 1000);
+      const pop = step.place.popularity ? ` · ${step.place.popularity}% 的人推荐` : "";
+      const map = step.place.source_url
+        ? ` · <a href="${step.place.source_url}" target="_blank" rel="noreferrer">地图 ↗</a>` : "";
+      place = `<p class="activity-meta"><strong>${esc(step.place.name)}</strong>${pop}`
+        + `<br /><span class="place-freshness">步行约 ${metres} 米${map}</span></p>`
+        + (step.hint ? `<p class="place-freshness">${esc(step.hint)}</p>` : "");
     } else if (step && step.place) {
       const metres = Math.round(step.place.distance_km * 1000);
       const lead = step.placeMode === "area" ? "在这一带 " : "";
