@@ -548,7 +548,9 @@ def parse(raws):
                 "latitude": round(lat, 6),
                 "longitude": round(lon, 6),
                 "source_url": "https://www.openstreetmap.org/%s/%s" % (element["type"], element["id"]),
-                "website": tags.get("website") or tags.get("contact:website") or None,
+                "website": (tags.get("website") or tags.get("contact:website")
+                            or tags.get("url") or tags.get("contact:url") or None),
+                "wikidata": tags.get("wikidata") or None,
                 "opening_hours": tags.get("opening_hours") or None,
                 "tag_count": len(tags),
             })
@@ -689,7 +691,20 @@ def dedupe_malls(pois):
     merged.sort(key=lambda p: (p["category"], p["name"]))
     for poi in merged:
         poi.pop("tag_count", None)
+    # wikidata 留着，write_js 要用它去查官网
     return merged
+
+
+def load_official_sites():
+    """Wikidata 解析出来的官网，没跑过那个脚本就是空的，不影响生成。"""
+    path = os.path.join(CACHE, "official_sites.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+OFFICIAL_SITES = {}
 
 
 def write_js(pois, missing):
@@ -723,7 +738,10 @@ def write_js(pois, missing):
     for p in pois:
         # website 一直在抓，只是以前没写出来。界面上要给地名挂官网链接，
         # 这比把人送到 OSM 的页面有用得多——有官网的占三成多，没有的退回地图搜索。
-        site = p.get("website")
+        # OSM 自己填的官网只有一百多条。带 wikidata 标签的有四百多，
+        # Wikidata 上的「官方网站」（P856）能把这批补上——
+        # 由 tools/fetch_official_sites.py 解析好存在缓存里，这里直接取。
+        site = p.get("website") or OFFICIAL_SITES.get(p.get("wikidata") or "")
         w("  { id: %s, name: %s, category: %s, subtype: %s, latitude: %s, longitude: %s%s, source_url: %s },"
           % (json.dumps(p["id"]), json.dumps(p["name"], ensure_ascii=False),
              json.dumps(p["category"], ensure_ascii=False), json.dumps(p["subtype"], ensure_ascii=False),
@@ -756,6 +774,12 @@ def main():
         raise SystemExit("一组都没取到，本次不生成文件。")
 
     pois = parse(raws)
+    OFFICIAL_SITES.update(load_official_sites())
+    # 顺手把看到的 wikidata id 存下来，给 fetch_official_sites.py 用
+    ids = sorted({p["wikidata"] for p in pois if p.get("wikidata")})
+    with open(os.path.join(CACHE, "wikidata_ids.json"), "w", encoding="utf-8") as handle:
+        json.dump(ids, handle)
+    print("   带 wikidata 标签的 %d 条，已解析出官网 %d 个" % (len(ids), len(OFFICIAL_SITES)))
     print()
     print("解析得到 %d 条 POI：" % len(pois))
     for name, count in Counter(p["category"] for p in pois).most_common():

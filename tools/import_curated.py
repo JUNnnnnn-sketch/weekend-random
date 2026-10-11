@@ -151,6 +151,11 @@ def main():
             "season": SEASON_CODE.get(row["季节"].strip(), "all_year"),
             "source": row["来源"].strip(),
         }
+        # 官网是人工填的：OSM 和 Wikidata 都查不到这批地方（营地、汤泉馆、
+        # 球馆），只能碰到一个记一个。空着就只给地图。
+        site = (row.get("官网") or "").strip()
+        if site:
+            record["website"] = site
         popularity = row["人气"].strip().rstrip("%")
         if popularity:
             record["popularity"] = int(popularity)

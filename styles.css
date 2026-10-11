@@ -558,3 +558,15 @@ h2 {
   text-decoration-thickness: 2px;
 }
 .plan-place a:hover { text-decoration-color: var(--lime); }
+
+/* 地图按钮：和「官网」区分开，做成一个小胶囊 */
+.plan-map {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 12px;
+}
+.plan-map:hover { background: rgba(215, 255, 62, 0.18); color: var(--lime); }

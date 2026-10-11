@@ -387,6 +387,18 @@ function mapSearchUrl(keyword) {
   return `https://uri.amap.com/search?keyword=${q}&city=北京&callnative=1`;
 }
 
+/**
+ * 找店用大众点评，不用高德。
+ *
+ * 「这一带哪儿能上陶艺课」这种问题，地图答不了——它只知道哪儿有个商场。
+ * 点评是按「能干什么」组织的，搜「中关村 陶艺」直接出店、出价、出评价。
+ * 地图负责「在哪、怎么去」，点评负责「有没有、值不值」，各管各的。
+ */
+function dianpingSearchUrl(keyword) {
+  // 2 是大众点评的北京城市号
+  return `https://www.dianping.com/search/keyword/2/0_${encodeURIComponent(String(keyword || "").trim())}`;
+}
+
 /** 一个地点的两个出口：有官网就给官网，地图总是给。 */
 function placeLinks(place, keyword) {
   const parts = [];
@@ -477,23 +489,28 @@ function renderPlan() {
         + (meta ? ` · ${esc(meta)}` : "");
       extra = r.highlight ? esc(r.highlight) : "";
     } else if (step && step.placeMode === "outskirts") {
-      lead = `<a href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">${esc(step.place.name)}</a>`;
-      sub = i === 0 ? esc(exp.sub_type || exp.main_type) : "和上一项同一个地方";
+      const tripSite = step.place.website;
+      lead = `<a href="${tripSite ? esc(tripSite) : mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">${esc(step.place.name)}</a>`;
+      sub = (i === 0 ? esc(exp.sub_type || exp.main_type) : "和上一项同一个地方")
+        + ` · <a class="plan-map" href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">📍 地图</a>`;
       extra = step.hint ? esc(step.hint) : "";
     } else if (step && step.placeMode === "area") {
       // 手作这一类不指定店：OSM 收不到工作室和体验课，硬挂一个商场就是编的
       // ——「凯德MALL 不一定有乐器体验课」。这一带确实能找到，具体哪家交给你搜。
       const spot = planStation ? `${planStation.station.station_name}一带` : "这一带";
-      lead = `<a href="${mapSearchUrl(`${spot.replace("一带", "")} ${exp.name}`)}" target="_blank" rel="noreferrer">${esc(spot)}</a>`;
-      sub = `${esc(exp.sub_type || exp.main_type)} · 点开搜这一带的店`;
+      const query = `${spot.replace("一带", "")} ${exp.name}`;
+      lead = `<a href="${dianpingSearchUrl(query)}" target="_blank" rel="noreferrer">${esc(spot)}</a>`;
+      sub = `${esc(exp.sub_type || exp.main_type)} · 点开在大众点评搜这一带的店`;
       extra = step.hint ? esc(step.hint) : "";
     } else if (step && step.place) {
       const metres = Math.round(step.place.distance_km * 1000);
-      // 地名本身就是地图链接，底下不必再放一个「地图 ↗」；有官网才多给一个出口
-      lead = `<a href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">${esc(step.place.name)}</a>`;
+      // 名字点进官网（有的话），地图单独一个按钮。
+      // 没官网的就让名字去地图——总比点了没反应强。
+      const site = step.place.website;
+      lead = `<a href="${site ? esc(site) : mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">${esc(step.place.name)}</a>`;
       sub = `步行约 ${metres} 米`
-        + (step.place.website
-          ? ` · <a href="${esc(step.place.website)}" target="_blank" rel="noreferrer">官网 ↗</a>` : "");
+        + ` · <a class="plan-map" href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">📍 地图</a>`
+        + (site ? "" : "（没找到官网）");
       extra = step.hint ? esc(step.hint) : "";
     } else {
       sub = "地点你定";
