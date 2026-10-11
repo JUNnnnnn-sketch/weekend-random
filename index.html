@@ -157,13 +157,18 @@
         </div>
       </section>
 
-      <section class="screen" id="screen-locked" data-screen="locked" hidden>
-        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
-        <p class="orb" aria-hidden="true">✨</p>
-        <h2>周末别想了。</h2>
-        <p class="subtitle" id="locked-subtitle">已经锁定。出门就好。</p>
-        <div class="place-list" id="locked-detail"></div>
-        <button class="btn btn-ghost" id="btn-home" type="button">回到开始</button>
+      <!-- 锁定页是终点，不是中转站：没有「返回」。
+           做成票根的样子，是想让它看起来值得截图带走。 -->
+      <section class="screen screen-locked" id="screen-locked" data-screen="locked" hidden>
+        <header class="topbar"><button class="home-link" data-home type="button">⌂ 首页</button></header>
+        <div class="ticket">
+          <p class="ticket-kicker">✦ 就这么定了</p>
+          <h2 class="ticket-title" id="locked-subtitle">已经锁定。出门就好。</h2>
+          <p class="ticket-date" id="locked-date"></p>
+          <div class="ticket-body" id="locked-detail"></div>
+          <p class="ticket-foot">📸 截个图带走 · 出门别再想了</p>
+        </div>
+        <button class="btn btn-ghost" id="btn-home" type="button">再摇一次</button>
       </section>
     </main>
     <script type="module" src="app.v2.js"></script>

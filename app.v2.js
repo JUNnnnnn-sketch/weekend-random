@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, placeableExperiencesAt, matchPlaceFor, pickWorthATrip } from "./recommendation.js";
+import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, fortuneCandidates, placeableExperiencesAt, matchPlaceFor, pickWorthATrip } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 import { experiences as allExperiences } from "./data/experiences.js";
 
@@ -45,7 +45,10 @@ function showScreen(name, { remember = true } = {}) {
   if (remember && currentScreen !== name) navigationStack.push(currentScreen);
   currentScreen = name;
   if (name === "setup") document.getElementById("setup-title").textContent = setupTitleFor(state.mode);
-  if (name === "roll") document.getElementById("roll-kicker").textContent = state.mode === "fortune" ? "命运正在抽签" : "探索路线正在生成";
+  if (name === "roll") {
+    document.getElementById("roll-kicker").textContent =
+      state.mode === "plan" ? "正在给你凑一套" : "命运正在抽签";
+  }
   Object.entries(screens).forEach(([key, screen]) => { const active = key === name; screen.classList.toggle("is-active", active); screen.toggleAttribute("hidden", !active); screen.setAttribute("aria-hidden", String(!active)); });
   saveSession();
 }
@@ -82,6 +85,12 @@ document.getElementById("btn-retry").addEventListener("click", startRoll);
  */
 function lockWith(subtitle, sourceNode) {
   document.getElementById("locked-subtitle").textContent = subtitle;
+  // 票根上印个日期，截图发出去才看得出是哪天的事
+  const now = new Date();
+  const weekday = "日一二三四五六"[now.getDay()];
+  document.getElementById("locked-date").textContent =
+    `${now.getFullYear()} 年 ${now.getMonth() + 1} 月 ${now.getDate()} 日 · 星期${weekday}`
+    + (state.party && state.duration ? ` · ${state.party} · ${state.duration}` : "");
   const detail = document.getElementById("locked-detail");
   detail.replaceChildren();
   if (sourceNode) [...sourceNode.children].forEach((node) => detail.append(node.cloneNode(true)));
@@ -89,7 +98,7 @@ function lockWith(subtitle, sourceNode) {
   showScreen("locked");
 }
 document.getElementById("btn-accept").addEventListener("click", () => {
-  lockWith(`${state.destination.label || state.destination.name} 已经锁定。出门就好。`,
+  lockWith(`${state.destination.label || state.destination.name}。出门就好。`,
            document.getElementById("place-list"));
 });
 document.getElementById("btn-home").addEventListener("click", goHome);
@@ -344,9 +353,40 @@ let planStation = null;  // 这次方案锚定的那一站（出城方案没有�
 let planTrip = null;     // 出城方案锚定的那个目的地
 let planRoute = null;    // 路线方案走的那条线
 
-function startPlan() {
+/**
+ * 周末方案也要走一遍「正在凑」的过程。
+ *
+ * 之前点完「继续」立刻就是结果，看着像早就准备好的答案——这个产品卖的是
+ * 「交给命运」，过程本身就是体验的一部分。命运模式一直有摇签动画，周末方案
+ * 没有，两边手感不一致。
+ *
+ * 和命运模式同一套做法：先把结果算出来，再倒过来演一遍。不是假装在算，
+ * 是把已经定下来的东西一个个揭晓。
+ */
+async function startPlan() {
   const plan = buildAnchoredPlan({ people: state.party, duration: state.duration, lines: subwayLines });
   if (!plan || plan.empty || !plan.experiences.length) { showScreen("setup"); return; }
+
+  const runId = ++rollRunId;
+  rollLog.replaceChildren();
+  showScreen("roll");
+
+  const where = plan.kind === "outskirts" ? plan.destination.name
+    : plan.station ? plan.station.station_name : "城里";
+  const pool = fortuneCandidates(subwayLines).map((c) => c.station.station_name);
+  addLog("正在挑地方……");
+  if (!await spinTo(pool.length ? pool : [where], where, "正在挑地方……", runId)) return;
+  addLog(where, true);
+  await wait(300);
+
+  const names = plan.experiences.map((e) => e.name);
+  const allNames = allExperiences.map((e) => e.name);
+  addLog("正在排环节……");
+  if (!await spinTo(allNames, names.join(" + "), "正在排环节……", runId)) return;
+  addLog(names.join(" + "), true);
+  if (runId !== rollRunId) return;
+  await wait(350);
+
   planExperiences = plan.experiences.slice();
   planSteps = (plan.steps || []).slice();
   planTrip = plan.kind === "outskirts" ? plan.destination : null;
@@ -375,45 +415,47 @@ function renderPlan() {
     const isRoute = step && step.placeMode === "route";
     const swapped = planSwapCounts[i] >= 3;
     const tags = (exp.vibe || []).map((v) => `<span class="tag">${esc(v)}</span>`).join("");
-    // 有具体地点就报地点；没有就老实说「地点你定」，不编一个出来。
-    let place = '<p class="activity-meta">地点你定</p>';
-    if (step && step.placeMode === "route") {
+
+    // 层级：地名是主角，玩法是标签。
+    //
+    // 原先反过来——「鸡尾酒活动」是大标题，「CONTAINER BEER SHOP」缩在灰色小字里。
+    // 用户看完根本没注意到被推荐的是哪家店。真正要记住、要搜、要去的是地名。
+    let lead = esc(exp.name);          // 卡片主标题
+    let sub = "";                      // 主标题下面那行
+    let extra = "";                    // 再下面的补充
+
+    if (isRoute) {
       const r = step.route;
+      lead = esc(r.name);
       const stops = (r.stops || []).map(esc).join(" → ");
       const meta = [r.length, r.duration].filter(Boolean).join(" · ");
-      place = `<p class="activity-meta"><strong>${esc(r.name)}</strong>`
-        + `<br /><span class="place-freshness">${esc(r.start_station || "")}站出发`
-        + (stops ? ` → ${stops}` : "") + (meta ? ` · ${esc(meta)}` : "") + "</span></p>"
-        + (r.highlight ? `<p class="place-freshness">${esc(r.highlight)}</p>` : "");
+      sub = `${esc(r.start_station || "")}站出发` + (stops ? ` → ${stops}` : "")
+        + (meta ? ` · ${esc(meta)}` : "");
+      extra = r.highlight ? esc(r.highlight) : "";
     } else if (step && step.placeMode === "outskirts") {
-      // 出城方案的每一环都在同一个地方，第一环报地名，后面的说「同一个地方」
-      const where = i === 0 ? `<strong>${esc(step.place.name)}</strong>` : "同一个地方";
-      const pop = step.place.popularity ? ` · ${step.place.popularity}% 的人推荐` : "";
-      place = `<p class="activity-meta">${where}${pop}`
-        + (step.hint ? `<br /><span class="place-freshness">${esc(step.hint)}</span>` : "")
-        + "</p>";
-    } else if (step && step.placeMode === "curated") {
-      // 手工整理的地点：带人气和一句话，这是 OSM 给不了的
-      const metres = Math.round(step.place.distance_km * 1000);
-      const pop = step.place.popularity ? ` · ${step.place.popularity}% 的人推荐` : "";
-      const map = step.place.source_url
-        ? ` · <a href="${step.place.source_url}" target="_blank" rel="noreferrer">地图 ↗</a>` : "";
-      place = `<p class="activity-meta"><strong>${esc(step.place.name)}</strong>${pop}`
-        + `<br /><span class="place-freshness">步行约 ${metres} 米${map}</span></p>`
-        + (step.hint ? `<p class="place-freshness">${esc(step.hint)}</p>` : "");
+      lead = esc(step.place.name);
+      sub = i === 0 ? esc(exp.sub_type || exp.main_type) : "和上一项同一个地方";
+      extra = step.hint ? esc(step.hint) : "";
     } else if (step && step.place) {
+      lead = esc(step.place.name);
       const metres = Math.round(step.place.distance_km * 1000);
-      const lead = step.placeMode === "area" ? "在这一带 " : "";
-      place = `<p class="activity-meta">${lead}<strong>${esc(step.place.name)}</strong>`
-        + ` · ${esc(step.place.subtype)}<br /><span class="place-freshness">步行约 ${metres} 米 · `
-        + `<a href="${step.place.source_url}" target="_blank" rel="noreferrer">地图 ↗</a></span></p>`;
-    } else if (step && step.hint) {
-      place = `<p class="activity-meta">地点你定 · <span class="place-freshness">${esc(step.hint)}</span></p>`;
+      const area = step.placeMode === "area" ? "这一带 · " : "";
+      sub = `${area}步行约 ${metres} 米`;
+      extra = step.hint ? esc(step.hint) : "";
+    } else {
+      sub = "地点你定";
+      extra = step && step.hint ? esc(step.hint) : "";
     }
+
+    const role = exp.role === "support" ? "顺带" : "主玩";
+    const kind = isRoute ? "路线" : esc(exp.sub_type || exp.main_type);
     card.innerHTML = `
-      <div><p class="place-category">${exp.role === "support" ? "顺带" : "主玩"}</p><h3>${esc(exp.name)}</h3></div>
-      ${place}
-      ${isRoute ? "" : `<p class="activity-date">⏱ ${exp.duration_min}–${exp.duration_max} 分钟 · ${esc(exp.sub_type || exp.main_type)}</p>`}
+      <p class="plan-kicker"><span class="plan-role">${role}</span><span class="plan-exp">${esc(exp.name)}</span>
+        ${isRoute ? "" : `<span class="plan-kind">${kind}</span>`}</p>
+      <h3 class="plan-place">${lead}</h3>
+      ${sub ? `<p class="plan-sub">${sub}</p>` : ""}
+      ${extra ? `<p class="plan-extra">${extra}</p>` : ""}
+      ${isRoute ? "" : `<p class="plan-time">⏱ ${exp.duration_min}–${exp.duration_max} 分钟</p>`}
       ${tags ? `<p class="plan-vibe">${tags}</p>` : ""}
       ${isRoute ? "" : `<button class="btn btn-ghost btn-swap" type="button" data-index="${i}" ${swapped ? "disabled" : ""}>${swapped ? "命运已定 ✦" : "换一个"}</button>`}`;
     container.append(card);
@@ -481,7 +523,7 @@ populateDistricts();
 
 /* plan 模式交互绑定（不改动命运/随便逛逛/recent/locked 等其它屏幕） */
 document.getElementById("btn-plan-lock").addEventListener("click", () => {
-  lockWith(`${state.party} · ${state.duration} 的周末方案已经锁定。出门就好。`,
+  lockWith("周末方案已经锁定。出门就好。",
            document.getElementById("plan-list"));
 });
 document.getElementById("btn-plan-regenerate").addEventListener("click", startPlan);
