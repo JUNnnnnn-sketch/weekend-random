@@ -204,7 +204,7 @@ export function freshness(updatedAt, now = new Date()) {
 }
 
 function freshnessScore(updatedAt, now) { return { "24小时内更新": 4, "3天内更新": 3, "7天内更新": 2, "超过7天": 1 }[freshness(updatedAt, now)]; }
-function radiusFor(duration) { return { "2-3小时": 2, "半天": 5, "一整天": 12 }[duration]; }
+function radiusFor(duration) { return { "下班后": 2, "半天": 5, "一天以上": 12 }[duration]; }
 
 /**
  * “附近有什么”阶段：真地点 -> 人数 -> 时长 -> 去掉已结束活动 -> 距离/新鲜度排序 -> 从优先候选池随机抽取。
@@ -237,10 +237,12 @@ export function recommend({ destination, people, duration, places, activities, n
 const PEOPLE_CODE = { "一个人": "1", "两个人": "2", "一群人": "3+" };
 
 // duration：接受 schema.supportedDurations 的中文档位，映射为「分钟窗口」[min, max]。
+// 档位用场景命名，不用钟点。「2-3小时」是个数字，「下班后」是个画面——
+// 后者才说得清这一档该给什么。
 const DURATION_WINDOW = {
-  "2-3小时": [120, 180],
+  "下班后": [120, 180],
   "半天": [180, 300],
-  "一整天": [300, 600],
+  "一天以上": [300, 1440],   // 上界放到 24 小时，容得下过夜
 };
 
 // 每个时长档位的总时间预算（分钟上限），用于可行性校验（support 不能让总时间明显超预算）。
@@ -248,16 +250,21 @@ const DURATION_WINDOW = {
 const TRANSIT_MINUTES = 30;
 
 const DURATION_BUDGET = {
-  "2-3小时": 180,
+  "下班后": 180,
   "半天": 300,
-  "一整天": 600,
+  // 不按 24 小时给预算：过夜的那一件事（露营）本身就占满了，
+  // 剩下的时间是睡觉，不该再排进两个环节。按一个白天算。
+  "一天以上": 600,
 };
 
 // 每个时长档位允许出现的 duration_type。multi_day 在任何 MVP 档位都不参与（需住宿的京郊目的地直接排除）。
 const ALLOW_TYPE = {
-  "2-3小时": ["short"],
+  "下班后": ["short"],
   "半天": ["short", "half_day"],
-  "一整天": ["short", "half_day", "full_day"],
+  // multi_day 原先任何档位都不放行，于是「野营过夜」在词典里躺着却永远抽不到。
+  // 档位改成「一天以上」之后它有了归宿——露营的时长本来就写的是 6-24 小时，
+  // 24 小时就是过夜。
+  "一天以上": ["short", "half_day", "full_day", "multi_day"],
 };
 
 // 地点兼容：避免让用户在城市与京郊之间来回跑。任一方为 both 则互通；否则必须同 scope。
@@ -281,7 +288,7 @@ function durationOverlap(min, max, win) { return min <= win[1] && max >= win[0];
  * 按人数 / 时长 / 城市范围过滤 Experience，返回分离后的 core 与 support 候选池。
  * 新增两层约束（与 buildWeekendPlan 共用，保证「换一个」也遵循同一套可行性规则）：
  *   - duration_type 必须属于本档位允许的集合（multi_day 在任何档位都被排除）。
- *   - suburban（京郊）Experience 只在「一整天」进入候选；2-3小时 / 半天完全不出现京郊。
+ *   - suburban（京郊）Experience 只在「一天以上」进入候选；下班后 / 半天完全不出现京郊。
  * 返回真实存在于 data/experiences.js 的 Experience 对象，不自行生成任何名称。
  */
 /**
@@ -306,7 +313,7 @@ function inSeason(experience, season) {
 
 /**
  * combining：这批玩法会被拼成一个多环节行程，所以不要求单条玩法自己撑满档位。
- * 不开这个开关时，「一整天」只会留下 duration_max >= 300 的玩法——实测每站
+ * 不开这个开关时，「一天以上」只会留下 duration_max >= 300 的玩法——实测每站
  * 只剩植物园和动物园两条，排不出行程。
  */
 export function filterExperiences({ people, duration, locationScope, combining = false, now = new Date() } = {}) {
@@ -314,7 +321,7 @@ export function filterExperiences({ people, duration, locationScope, combining =
   const season = currentSeason(now);
   const win = DURATION_WINDOW[duration] || [0, Number.MAX_SAFE_INTEGER];
   const allowType = ALLOW_TYPE[duration] || ["short"];
-  const suburbanAllowed = duration === "一整天";
+  const suburbanAllowed = duration === "一天以上";
   const supportCap = Math.min(win[1], 240);
   const core = [];
   const support = [];
@@ -327,7 +334,7 @@ export function filterExperiences({ people, duration, locationScope, combining =
       if (exp.duration_max <= supportCap) support.push(exp);
     } else {
       if (!allowType.includes(exp.duration_type)) continue;            // 排除 multi_day / 不匹配时长档
-      if (exp.location_scope === "suburban" && !suburbanAllowed) continue; // 京郊仅「一整天」
+      if (exp.location_scope === "suburban" && !suburbanAllowed) continue; // 京郊仅「一天以上」
       if (combining) {
         if (exp.duration_min <= win[1]) core.push(exp);
         continue;
@@ -357,7 +364,7 @@ export function pickExperience({ people, duration, locationScope, role = "core",
  *
  * 设计原则（可行性 > 丰富度）：
  *   1. 先筛合法 core，再判断它是 short / half_day / full_day / multi_day。
- *   2. multi_day 任何档位都不参与；京郊(suburban)只在「一整天」出现，且作为完整出行场景。
+ *   2. multi_day 任何档位都不参与；京郊(suburban)只在「一天以上」出现，且作为完整出行场景。
  *   3. full_day core 或 combinable:false 的 core 单独成方案（情况A），不强行叠加。
  *   4. 其余情况在「剩余时间预算」内尝试补充，且补充项必须与 primary core 地点兼容、不超时。
  *   5. 宁可少一张卡，也不生成明显不合理的行程。
@@ -376,21 +383,21 @@ export function buildWeekendPlan({ people, duration, locationScope, exclude = []
   const plan = [randomItem(candidateCores)];
   used.add(plan[0].id);
 
-  // 2-3小时：一个 short core 即成立，不强行加 support。
-  if (duration === "2-3小时") return finalize(plan, ctx, "single_core");
+  // 下班后：一个 short core 即成立，不强行加 support。
+  if (duration === "下班后") return finalize(plan, ctx, "single_core");
   // 不可组合的 core：单独成方案。
   if (plan[0].combinable === false) {
     return finalize(plan, ctx, "non_combinable_core");
   }
   // full_day 的 core 占满了白天，但晚上还能接一段轻的——爬了一天山，晚上吃个饭
-  // 喝一杯是成立的。原先直接单条返回，是「一整天反而最空」的主因之一。
+  // 喝一杯是成立的。原先直接单条返回，是「一天以上反而最空」的主因之一。
   if (plan[0].duration_type === "full_day") {
     const tail = supportPool.filter((e) => !used.has(e.id) && compatibleScope(e, plan[0]));
     if (tail.length) plan.push(randomItem(tail));
     return finalize(plan, ctx, plan.length > 1 ? "full_day_core_support" : "full_day_core");
   }
 
-  // 半天 / 一整天：在剩余预算内尝试补充（不强制），至多 2 个 core + 1 个 support。
+  // 半天 / 一天以上：在剩余预算内尝试补充（不强制），至多 2 个 core + 1 个 support。
   const MAX_MODULES = 3;
   let remaining = budget - plan[0].duration_max;
   let coreCount = 1;
@@ -480,7 +487,7 @@ export function weightedPick(items, weightOf = (x) => x.popularity || DEFAULT_WE
 export const OUTSKIRTS_MIN_KM = 20;
 
 /**
- * 「一整天」里有多大比例给出城方案。
+ * 「一天以上」里有多大比例给出城方案。
  *
  * 不是越多越好：出城要开车，不是每个人每个周末都愿意。但也不能太少，
  * 否则那 24 条出城数据基本等于不存在。三分之一是个让它稳定出现、
@@ -610,7 +617,7 @@ export function placesAround(station, { radiusKm = NEARBY_RADIUS_KM, now = new D
  *
  * 而且路线天然是站点锚定的：18 条里 16 条的起点就是地铁站，不用查坐标。
  */
-const DURATION_RANK = { "2-3小时": 1, "半天": 2, "一整天": 3 };
+const DURATION_RANK = { "下班后": 1, "半天": 2, "一天以上": 3 };
 
 /** 路线在「周末方案」里出现的比例。比出城低——路线只有 18 条，刷太勤会腻。 */
 const ROUTE_SHARE = 1 / 5;
@@ -716,13 +723,13 @@ export function matchPlaceFor(experience, station, taken = new Set(), { now = ne
  * 只是暂时不由周末方案提供。
  */
 export function buildAnchoredPlan({ people, duration, locationScope, lines, exclude = [], attempts = 40, now = new Date() } = {}) {
-  // 一整天才可能出城——2-3 小时和半天开车去金海湖不现实。
+  // 一天以上才可能出城——2-3 小时和半天开车去金海湖不现实。
   // 出城方案失败（比如七月份只剩滑雪场）就照常走城区逻辑，不留空。
-  if (duration === "一整天" && Math.random() < OUTSKIRTS_SHARE) {
+  if (duration === "一天以上" && Math.random() < OUTSKIRTS_SHARE) {
     const trip = buildOutskirtsPlan({ people, duration, exclude, now });
     if (trip) return trip;
   }
-  // 路线放在出城之后：出城是「一整天」专属，路线哪个时长都可能有
+  // 路线放在出城之后：出城是「一天以上」专属，路线哪个时长都可能有
   if (Math.random() < ROUTE_SHARE) {
     const walk = buildRoutePlan({ people, duration, lines, exclude, now });
     if (walk) return walk;

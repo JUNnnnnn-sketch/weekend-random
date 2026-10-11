@@ -56,7 +56,7 @@ function addLog(text, done = false) { const item = document.createElement("li");
 /**
  * 命运模式不问任何问题——它的全部意思就是「不用想，让命运决定」，
  * 还要先填两道题是自相矛盾的。人数对「附近有什么」没有真实影响；时长也没有：
- * 有半天还是有一整天，并不改变你愿不愿意多走十分钟。两个都去掉。
+ * 有半天还是有一天以上，并不改变你愿不愿意多走十分钟。两个都去掉。
  * 周末方案继续问人数和时长，那里 buildWeekendPlan 真的在用。
  */
 function needsSetup(mode) { return mode !== "fortune"; }
@@ -419,7 +419,7 @@ function renderPlan() {
     container.append(card);
   });
   if (planTrip) {
-    // 出城方案得说清楚有多远——「一整天」不等于「地铁能到」
+    // 出城方案得说清楚有多远——「一天以上」不等于「地铁能到」
     const note = document.createElement("p");
     note.className = "place-freshness";
     note.innerHTML = `这几件事都在 ${esc(planTrip.name)}，地铁到不了——最近的是 `

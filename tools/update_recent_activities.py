@@ -163,7 +163,7 @@ def to_output_record(raw, collected_at):
         # 无限制默认：仅用于不破坏 recommendation.js 的 recommend()（它对 activities 调 .includes）；
         # 不参与「最近在玩」展示，也不表示活动有真实的人数/时长限制。
         "suitable_for_people": ["一个人", "两个人", "一群人"],
-        "suitable_duration": ["2-3小时", "半天", "一整天"],
+        "suitable_duration": ["下班后", "半天", "一天以上"],
         "district": raw.get("district") or "",
         "venue": raw.get("venue") or "",
         "start_date": raw.get("start_date"),

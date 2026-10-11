@@ -17,7 +17,7 @@
  * 一条路线本身就是整个方案，不是其中一个环节。
  *
  * 地点 214 条（103 条有坐标），路线 18 条。
- * 生成时间：2026-10-11T13:22:57+08:00
+ * 生成时间：2026-10-11T13:55:22+08:00
  * 本文件由 tools/import_curated.py 生成，要改请改那两张 CSV。
  */
 export const curatedPlaces = [
@@ -241,19 +241,19 @@ export const curatedRoutes = [
   {"id": "route/2", "experience": "City Walk", "name": "前门—杨梅竹斜街线", "stops": ["杨梅竹斜街", "北京坊", "西兴隆街"], "duration": "半天", "season": "all_year", "highlight": "杨梅竹斜街有京味拾光、铃木食堂、Soloist独奏公司；西兴隆街藏着JollyJolly礼物店和能看胡同屋顶的摄影咖啡", "source": "点点AI·北京citywalk·参考26篇", "start_station": "虎坊桥"},
   {"id": "route/3", "experience": "City Walk", "name": "什刹海—国子监线", "stops": ["国子监街", "方家胡同", "鼓楼东大街", "什刹海"], "duration": "半天", "season": "all_year", "highlight": "国子监街的古柏、老牌坊和红墙；傍晚在什刹海湖边吃铜锅涮肉，或去糖房咖啡露台看日落", "source": "点点AI·北京citywalk·参考26篇", "start_station": "雍和宫"},
   {"id": "route/4", "experience": "City Walk", "name": "秋日氛围胡同线", "stops": ["东交民巷", "西兴隆街", "三里河公园", "北京坊", "杨梅竹斜街"], "duration": "半天", "season": "autumn", "highlight": "京味拾光的玻璃窗仰拍能拍到被金色秋叶包围的天空；为水咖啡是秋日限定门头", "source": "点点AI·北京citywalk·参考26篇", "start_station": "崇文门"},
-  {"id": "route/5", "experience": "City Walk", "name": "亮马河线", "stops": ["蓝色港湾", "亮马河", "三里屯北小街"], "duration": "2-3小时", "season": "all_year", "highlight": "河边有很多氛围感的餐厅和酒馆，傍晚可以吹着晚风散步，也能划桨板", "source": "点点AI·北京citywalk·参考26篇", "start_station": "亮马桥"},
+  {"id": "route/5", "experience": "City Walk", "name": "亮马河线", "stops": ["蓝色港湾", "亮马河", "三里屯北小街"], "duration": "下班后", "season": "all_year", "highlight": "河边有很多氛围感的餐厅和酒馆，傍晚可以吹着晚风散步，也能划桨板", "source": "点点AI·北京citywalk·参考26篇", "start_station": "亮马桥"},
   {"id": "route/6", "experience": "City Walk", "name": "西四—白塔寺线", "stops": ["西四南大街", "东斜街", "妙应白塔寺", "宫门口东岔西岔"], "duration": "半天", "season": "all_year", "highlight": "比东城的热门胡同游客少、街道也更宽；沿途有鲁迅博物馆、历代帝王庙，咖啡馆有JM Cafe", "source": "点点AI·北京citywalk·参考26篇", "start_station": "西四"},
   {"id": "route/7", "experience": "街区探索", "name": "经典胡同漫游线", "stops": ["东交民巷", "西兴隆街", "三里河公园", "杨梅竹斜街", "前门大街"], "duration": "半天", "season": "all_year", "highlight": "东交民巷有哥特式教堂和法式红砖邮局；三里河公园是藏在胡同里的首都小江南", "source": "点点AI·北京街区探索·参考65篇", "start_station": "崇文门", "length": "3.5公里"},
   {"id": "route/8", "experience": "街区探索", "name": "文艺潮流漫步线", "stops": ["东四南大街", "隆福寺街区", "北新桥", "鼓楼东大街"], "duration": "半天", "season": "all_year", "highlight": "隆福寺分南院东院北里三区；鼓楼东大街是面包和咖啡的天堂，有24个面包师、红星前进", "source": "点点AI·北京街区探索·参考65篇", "start_station": "东四"},
   {"id": "route/9", "experience": "街区探索", "name": "丹枫隆福", "stops": ["77文创园", "中国美术馆", "隆福寺", "史家胡同"], "duration": "半天", "season": "all_year", "highlight": "北京市文旅局官方Citywalk路线，适合喜欢文艺和老城松弛感的", "source": "点点AI·北京街区探索·参考65篇", "start_station": "东四"},
   {"id": "route/10", "experience": "街区探索", "name": "潮创西四", "stops": ["白塔寺", "宫门口东西岔"], "duration": "半天", "season": "all_year", "highlight": "北京市文旅局官方Citywalk路线，古建、书店、咖啡、小吃集中在一条线上", "source": "点点AI·北京街区探索·参考65篇", "start_station": "西四"},
-  {"id": "route/11", "experience": "街区探索", "name": "橙跃朝外", "stops": ["THE BOX", "侨福芳草地"], "duration": "2-3小时", "season": "all_year", "highlight": "北京市文旅局官方Citywalk路线，一边是老北京历史一边是年轻潮流街拍", "source": "点点AI·北京街区探索·参考65篇", "start_station": "朝阳门"},
-  {"id": "route/12", "experience": "骑行", "name": "亮马河滨水绿道", "stops": ["蓝色港湾", "三里屯"], "duration": "2-3小时", "season": "all_year", "highlight": "塑胶骑行道，没有红灯，新手首选", "source": "点点AI·北京骑行·参考26篇", "start_station": "亮马桥", "length": "6公里"},
-  {"id": "route/13", "experience": "骑行", "name": "奥林匹克森林公园环线", "stops": ["奥森南园外环"], "duration": "2-3小时", "season": "all_year", "highlight": "闭环绿道，路很平缓，共享单车就能完成", "source": "点点AI·北京骑行·参考26篇", "start_station": "森林公园南门", "length": "7公里"},
-  {"id": "route/14", "experience": "骑行", "name": "营城建都滨水绿道", "stops": ["老护城河沿线"], "duration": "2-3小时", "season": "all_year", "highlight": "途经白云观、陶然亭等地，人少景美", "source": "点点AI·北京骑行·参考26篇", "start_station": "陶然亭", "length": "9.3公里"},
-  {"id": "route/15", "experience": "骑行", "name": "中轴线文化骑行", "stops": ["永定门", "天坛", "前门", "天安门广场"], "duration": "2-3小时", "season": "all_year", "highlight": "串联十多处文化遗产，能深度感受古都脉络", "source": "点点AI·北京骑行·参考26篇", "start_station": "永定门外", "length": "7.8公里"},
+  {"id": "route/11", "experience": "街区探索", "name": "橙跃朝外", "stops": ["THE BOX", "侨福芳草地"], "duration": "下班后", "season": "all_year", "highlight": "北京市文旅局官方Citywalk路线，一边是老北京历史一边是年轻潮流街拍", "source": "点点AI·北京街区探索·参考65篇", "start_station": "朝阳门"},
+  {"id": "route/12", "experience": "骑行", "name": "亮马河滨水绿道", "stops": ["蓝色港湾", "三里屯"], "duration": "下班后", "season": "all_year", "highlight": "塑胶骑行道，没有红灯，新手首选", "source": "点点AI·北京骑行·参考26篇", "start_station": "亮马桥", "length": "6公里"},
+  {"id": "route/13", "experience": "骑行", "name": "奥林匹克森林公园环线", "stops": ["奥森南园外环"], "duration": "下班后", "season": "all_year", "highlight": "闭环绿道，路很平缓，共享单车就能完成", "source": "点点AI·北京骑行·参考26篇", "start_station": "森林公园南门", "length": "7公里"},
+  {"id": "route/14", "experience": "骑行", "name": "营城建都滨水绿道", "stops": ["老护城河沿线"], "duration": "下班后", "season": "all_year", "highlight": "途经白云观、陶然亭等地，人少景美", "source": "点点AI·北京骑行·参考26篇", "start_station": "陶然亭", "length": "9.3公里"},
+  {"id": "route/15", "experience": "骑行", "name": "中轴线文化骑行", "stops": ["永定门", "天坛", "前门", "天安门广场"], "duration": "下班后", "season": "all_year", "highlight": "串联十多处文化遗产，能深度感受古都脉络", "source": "点点AI·北京骑行·参考26篇", "start_station": "永定门外", "length": "7.8公里"},
   {"id": "route/16", "experience": "骑行", "name": "通州大运河线", "stops": ["大运河沿岸骑行专用道"], "duration": "半天", "season": "all_year", "highlight": "被称作京骑行的天花板，沿途风光旖旎", "source": "点点AI·北京骑行·参考26篇", "start_station": "通州北关", "length": "35公里"},
-  {"id": "route/17", "experience": "徒步", "name": "香八拉", "stops": ["香山", "八大处"], "duration": "一整天", "season": "all_year", "highlight": "累计爬升800米 初级进阶 部分路段需要手脚并用 路上人多不用担心走错", "source": "点点AI·北京徒步·参考28篇", "start_station": "香山", "length": "12公里"},
-  {"id": "route/18", "experience": "徒步", "name": "桑峪村—潭柘寺—定都阁环线", "stops": ["桑峪村", "潭柘寺", "定都阁"], "duration": "一整天", "season": "all_year", "highlight": "不走回头路 石板古道和土路 可经过千年古刹 风景和人文景观结合得好", "source": "点点AI·北京徒步·参考28篇｜门头沟 无地铁直达 需自驾或公交", "length": "8公里"},
-  {"id": "route/19", "experience": "骑行", "name": "长安街及天安门环线", "stops": ["长安街", "天安门"], "duration": "2-3小时", "season": "all_year", "highlight": "路况很好自行车道宽阔 晚上骑能看长安街和天安门的夜景 非常适合拍照", "source": "点点AI·北京骑行·参考26篇", "start_station": "天安门东"},
+  {"id": "route/17", "experience": "徒步", "name": "香八拉", "stops": ["香山", "八大处"], "duration": "一天以上", "season": "all_year", "highlight": "累计爬升800米 初级进阶 部分路段需要手脚并用 路上人多不用担心走错", "source": "点点AI·北京徒步·参考28篇", "start_station": "香山", "length": "12公里"},
+  {"id": "route/18", "experience": "徒步", "name": "桑峪村—潭柘寺—定都阁环线", "stops": ["桑峪村", "潭柘寺", "定都阁"], "duration": "一天以上", "season": "all_year", "highlight": "不走回头路 石板古道和土路 可经过千年古刹 风景和人文景观结合得好", "source": "点点AI·北京徒步·参考28篇｜门头沟 无地铁直达 需自驾或公交", "length": "8公里"},
+  {"id": "route/19", "experience": "骑行", "name": "长安街及天安门环线", "stops": ["长安街", "天安门"], "duration": "下班后", "season": "all_year", "highlight": "路况很好自行车道宽阔 晚上骑能看长安街和天安门的夜景 非常适合拍照", "source": "点点AI·北京骑行·参考26篇", "start_station": "天安门东"},
 ];
