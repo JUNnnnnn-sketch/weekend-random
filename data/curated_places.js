@@ -17,7 +17,7 @@
  * 一条路线本身就是整个方案，不是其中一个环节。
  *
  * 地点 223 条（102 条有坐标），路线 18 条。
- * 生成时间：2026-10-11T14:12:04+08:00
+ * 生成时间：2026-10-11T14:19:34+08:00
  * 本文件由 tools/import_curated.py 生成，要改请改那两张 CSV。
  */
 export const curatedPlaces = [
@@ -262,7 +262,7 @@ export const curatedRoutes = [
   {"id": "route/14", "experience": "骑行", "name": "营城建都滨水绿道", "stops": ["老护城河沿线"], "duration": "下班后", "season": "all_year", "highlight": "途经白云观、陶然亭等地，人少景美", "source": "点点AI·北京骑行·参考26篇", "start_station": "陶然亭", "length": "9.3公里"},
   {"id": "route/15", "experience": "骑行", "name": "中轴线文化骑行", "stops": ["永定门", "天坛", "前门", "天安门广场"], "duration": "下班后", "season": "all_year", "highlight": "串联十多处文化遗产，能深度感受古都脉络", "source": "点点AI·北京骑行·参考26篇", "start_station": "永定门外", "length": "7.8公里"},
   {"id": "route/16", "experience": "骑行", "name": "通州大运河线", "stops": ["大运河沿岸骑行专用道"], "duration": "半天", "season": "all_year", "highlight": "被称作京骑行的天花板，沿途风光旖旎", "source": "点点AI·北京骑行·参考26篇", "start_station": "通州北关", "length": "35公里"},
-  {"id": "route/17", "experience": "徒步", "name": "香八拉", "stops": ["香山", "八大处"], "duration": "一天以上", "season": "all_year", "highlight": "累计爬升800米 初级进阶 部分路段需要手脚并用 路上人多不用担心走错", "source": "点点AI·北京徒步·参考28篇", "start_station": "香山", "length": "12公里"},
-  {"id": "route/18", "experience": "徒步", "name": "桑峪村—潭柘寺—定都阁环线", "stops": ["桑峪村", "潭柘寺", "定都阁"], "duration": "一天以上", "season": "all_year", "highlight": "不走回头路 石板古道和土路 可经过千年古刹 风景和人文景观结合得好", "source": "点点AI·北京徒步·参考28篇｜门头沟 无地铁直达 需自驾或公交", "length": "8公里"},
+  {"id": "route/17", "experience": "徒步", "name": "香八拉", "stops": ["香山", "八大处"], "duration": "一天或以上", "season": "all_year", "highlight": "累计爬升800米 初级进阶 部分路段需要手脚并用 路上人多不用担心走错", "source": "点点AI·北京徒步·参考28篇", "start_station": "香山", "length": "12公里"},
+  {"id": "route/18", "experience": "徒步", "name": "桑峪村—潭柘寺—定都阁环线", "stops": ["桑峪村", "潭柘寺", "定都阁"], "duration": "一天或以上", "season": "all_year", "highlight": "不走回头路 石板古道和土路 可经过千年古刹 风景和人文景观结合得好", "source": "点点AI·北京徒步·参考28篇｜门头沟 无地铁直达 需自驾或公交", "length": "8公里"},
   {"id": "route/19", "experience": "骑行", "name": "长安街及天安门环线", "stops": ["长安街", "天安门"], "duration": "下班后", "season": "all_year", "highlight": "路况很好自行车道宽阔 晚上骑能看长安街和天安门的夜景 非常适合拍照", "source": "点点AI·北京骑行·参考26篇", "start_station": "天安门东"},
 ];

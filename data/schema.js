@@ -11,4 +11,4 @@ export const activityRequiredFields = [
 ];
 
 export const supportedPeople = ["一个人", "两个人", "一群人"];
-export const supportedDurations = ["下班后", "半天", "一天以上"];
+export const supportedDurations = ["下班后", "半天", "一天或以上"];
