@@ -3,9 +3,9 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-07T20:39:22+08:00
+ * 获取时间：2026-10-11T15:01:06+08:00
  *
- * 共 986 条：
+ * 共 981 条：
  *   🎨 艺术 / 展览  214
  *   🎵 音乐 / 演出  195
  *   🍸 夜生活  172
@@ -16,7 +16,7 @@
  *   🧭 特色去处  44
  *   📚 书店 / 图书馆  29
  *   🍜 吃喝  24
- *   🏟 场馆 / 运动  18
+ *   🏟 场馆 / 运动  13
  *
  * 刻意不收餐厅、咖啡、泛化景点——理由见 tools/fetch_station_pois.py 的说明。
  * 公园与寺庙古迹额外过了一道质量筛（须有维基/官网/门票/营业时间，或标签足够丰富），
@@ -875,22 +875,17 @@ export const nearbyPois = [
   { id: "node/6813641718", name: "麒麟", category: "🏛 寺庙 / 古迹", subtype: "古迹", latitude: 39.99654, longitude: 116.274327, source_url: "https://www.openstreetmap.org/node/6813641718" },
   { id: "relation/7301352", name: "鼓楼", category: "🏛 寺庙 / 古迹", subtype: "古迹", latitude: 39.93935, longitude: 116.389728, source_url: "https://www.openstreetmap.org/relation/7301352" },
   { id: "way/1049594280", name: "龙泉寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 40.102288, longitude: 116.085317, source_url: "https://www.openstreetmap.org/way/1049594280" },
-  { id: "way/280166215", name: "世纪馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.968175, longitude: 116.304938, source_url: "https://www.openstreetmap.org/way/280166215" },
-  { id: "way/389132078", name: "中国石油大学体育馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 40.214111, longitude: 116.250221, source_url: "https://www.openstreetmap.org/way/389132078" },
   { id: "relation/9106276", name: "丰台体育中心体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.86565, longitude: 116.27245, source_url: "https://www.openstreetmap.org/relation/9106276" },
   { id: "way/697557974", name: "京东英特尔电子竞技中心", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.815955, longitude: 116.552876, source_url: "https://www.openstreetmap.org/way/697557974" },
   { id: "way/191693413", name: "北京工人体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.9295, longitude: 116.440997, source_url: "https://www.openstreetmap.org/way/191693413" },
   { id: "way/25375821", name: "北京海洋馆", category: "🏟 场馆 / 运动", subtype: "水族馆", latitude: 39.943269, longitude: 116.334756, source_url: "https://www.openstreetmap.org/way/25375821" },
-  { id: "way/399009424", name: "北邮体育馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.960527, longitude: 116.353952, source_url: "https://www.openstreetmap.org/way/399009424" },
   { id: "way/152301551", name: "国家体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.991415, longitude: 116.390287, source_url: "https://www.openstreetmap.org/way/152301551" },
   { id: "way/55883993", name: "国家体育馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.99509, longitude: 116.383943, source_url: "https://www.openstreetmap.org/way/55883993" },
   { id: "way/29201257", name: "国家游泳中心", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.991579, longitude: 116.384173, source_url: "https://www.openstreetmap.org/way/29201257" },
   { id: "way/899874039", name: "国家速滑馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 40.01599, longitude: 116.371384, source_url: "https://www.openstreetmap.org/way/899874039" },
-  { id: "way/518469023", name: "大操场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.973062, longitude: 116.307143, source_url: "https://www.openstreetmap.org/way/518469023" },
   { id: "way/4974227", name: "奥体中心体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.982175, longitude: 116.393046, source_url: "https://www.openstreetmap.org/way/4974227" },
   { id: "way/958624302", name: "富国海底世界", category: "🏟 场馆 / 运动", subtype: "水族馆", latitude: 39.926807, longitude: 116.440793, source_url: "https://www.openstreetmap.org/way/958624302" },
   { id: "way/29131580", name: "石景山体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.904722, longitude: 116.195446, source_url: "https://www.openstreetmap.org/way/29131580" },
-  { id: "way/83799756", name: "综合体育馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 40.003098, longitude: 116.326276, source_url: "https://www.openstreetmap.org/way/83799756" },
   { id: "way/77083638", name: "首都体育馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.938844, longitude: 116.321156, source_url: "https://www.openstreetmap.org/way/77083638" },
   { id: "way/196302031", name: "首钢篮球中心", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.924269, longitude: 116.193433, source_url: "https://www.openstreetmap.org/way/196302031" },
   { id: "node/3409007595", name: "123书店", category: "📚 书店 / 图书馆", subtype: "书店", latitude: 39.907233, longitude: 116.387878, source_url: "https://www.openstreetmap.org/node/3409007595" },
@@ -1019,5 +1014,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-07T20:39:22+08:00",
+  fetched_at: "2026-10-11T15:01:06+08:00",
 };

@@ -376,6 +376,18 @@ def within_reach(lat, lon, stations):
     return any(haversine_m(lat, lon, sa, sb) <= MAX_STATION_KM * 1000 for sa, sb in stations)
 
 
+# ---- 场馆的筛选 -------------------------------------------------------
+# 和图书馆一样的问题：18 条场馆里有 5 条是校园或名不副实的。
+# 「世纪馆」在中国人民大学（离人大博物馆 189 米），「大操场」「综合体育馆」
+# 名字就是个通用词。外人进不去，或者说了等于没说。
+VENUE_NOISE = (r"大学|学院|学校|校区|北邮|石油大学"
+               r"|^大操场$|^综合体育馆$|^世纪馆$|^体育馆$|^运动场$")
+
+
+def venue_is_open_to_public(name):
+    return not re.search(VENUE_NOISE, name)
+
+
 def has_quality_signal(tags):
     """有人愿意为它填维基条目、官网、门票或营业时间，通常说明它值得专门去一趟。"""
     return bool(tags.get("wikidata") or tags.get("wikipedia") or tags.get("website")
@@ -516,6 +528,8 @@ def parse(raws):
                 if not subtype:
                     continue
             elif category == "📚 书店 / 图书馆" and not library_is_open_to_public(name):
+                continue
+            elif category == "🏟 场馆 / 运动" and not venue_is_open_to_public(name):
                 continue
             elif category in ("🧭 特色去处", "🛍 商场 / 商圈"):
                 if is_area_place(name, category):

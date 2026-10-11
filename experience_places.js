@@ -56,11 +56,9 @@ export const EXPERIENCE_PLACES = {
   "京剧": { mode: "anchor", subtypes: ["剧场"] },
   "曲艺/小曲": { mode: "anchor", subtypes: ["剧场"] },
   "蹦迪": { mode: "anchor", subtypes: ["Live House / 夜店"] },
-  "鸡尾酒活动": { mode: "anchor", subtypes: ["酒吧", "酒馆"] },
   "KTV": { mode: "anchor", subtypes: ["KTV"] },
 
   // ---- 放松：能落地的几项 ----
-  "鸡尾酒": { mode: "anchor", subtypes: ["酒吧", "酒馆"] },
   "酒吧": { mode: "anchor", subtypes: ["酒吧", "酒馆"] },
 
   // ---- 游戏 / 轻刺激：场地稀缺、必须给地点的 ----
@@ -76,7 +74,7 @@ export const EXPERIENCE_PLACES = {
   "马术观赛": { mode: "anchor", subtypes: ["马术", "体育场馆"] },
   "花滑观赛": { mode: "anchor", subtypes: ["体育场馆"] },
   "电竞观赛": { mode: "anchor", subtypes: ["体育场馆"] },
-  "其他低门槛现场赛事": { mode: "anchor", subtypes: ["体育场馆"] },
+  "现场赛事": { mode: "anchor", subtypes: ["体育场馆"] },
 
   // ---- 手作 / 体验：给商圈，不指定店 ----
   "陶艺": { mode: "area", hint: "艺术区一带的工作室最多" },

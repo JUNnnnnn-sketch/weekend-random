@@ -572,6 +572,25 @@ export function buildOutskirtsPlan({ people, duration, exclude = [], now = new D
 }
 
 /**
+ * 两条玩法是不是「一类东西」。
+ *
+ * 用户抽到过「主玩 鸡尾酒活动 → CONTAINER BEER SHOP · 酒吧」加
+ * 「顺带 酒吧 → 单一纯麦威士忌俱乐部 · 酒馆」——一晚上安排两次喝酒，很傻。
+ *
+ * 判据不是维护一张「哪些算同类」的名单，而是看它们挂的地点类型有没有重叠：
+ * 都往「酒吧 / 酒馆」里找的，就是一回事。这样新增玩法时不用记得去更新名单，
+ * 而且「艺术博物馆」和「美术馆」这种也一并挡住了（两者都认「美术馆 / 画廊」）。
+ */
+function sameFamily(a, b) {
+  const ruleA = placeRuleFor(a.name);
+  const ruleB = placeRuleFor(b.name);
+  if (!ruleA || !ruleB) return false;
+  if (ruleA.mode !== ruleB.mode) return false;
+  if (ruleA.mode === "area") return true;          // area 模式都是「找这一带」，一次就够
+  return (ruleA.subtypes || []).some((t) => (ruleB.subtypes || []).includes(t));
+}
+
+/**
  * 把手工整理的地点并进某一站的「附近有什么」。
  *
  * station_pois.js 是按地理标签扫出来的，覆盖不到「适合划船的地方」「看夜景的
@@ -659,7 +678,8 @@ export function buildRoutePlan({ people, duration, lines, exclude = [], now = ne
   if ((DURATION_RANK[route.duration] ?? 3) < (DURATION_RANK[duration] ?? 3)) {
     const pois = placesAround(spot.entry.station, { now });
     const { support } = filterExperiences({ people, duration, combining: true, now });
-    const tail = support.filter((e) => !excluded.has(e.id) && placeableAt(e, pois));
+    const tail = support.filter((e) => !excluded.has(e.id) && placeableAt(e, pois)
+      && !sameFamily(experience, e));
     if (tail.length) {
       const pick = randomItem(tail);
       const matched = matchPlace(pick, pois, new Set());
@@ -770,7 +790,8 @@ export function buildAnchoredPlan({ people, duration, locationScope, lines, excl
     if (plan[0].combinable !== false) {
       if (plan[0].duration_type === "full_day") {
         // 整天型玩法占满白天，但晚上还能接一段轻的
-        const tail = supportOk.filter((e) => !used.has(e.id) && compatibleScope(e, plan[0]) && placeableAt(e, pois, taken));
+        const tail = supportOk.filter((e) => !used.has(e.id) && compatibleScope(e, plan[0])
+          && placeableAt(e, pois, taken) && !sameFamily(plan[0], e));
         if (tail.length) { const pick = randomItem(tail); plan.push(pick); place(pick); }
       } else {
         // 按 duration_min（赶一点的版本）排，不按 duration_max。一个展览写的是
@@ -784,7 +805,8 @@ export function buildAnchoredPlan({ people, duration, locationScope, lines, excl
           guard += 1;
           const primary = plan[0];
           const fits = (e) => !used.has(e.id) && compatibleScope(e, primary)
-            && e.duration_min <= remaining && placeableAt(e, pois, taken);
+            && e.duration_min <= remaining && placeableAt(e, pois, taken)
+            && !plan.some((picked) => sameFamily(picked, e));
           const co = coreCount < 2 ? coreOk.filter(fits) : [];
           const so = supportCount < 1 ? supportOk.filter(fits) : [];
           const pick = co.length ? randomItem(co) : (so.length ? randomItem(so) : null);
