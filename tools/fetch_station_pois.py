@@ -721,10 +721,15 @@ def write_js(pois, missing):
     w(" */")
     w("export const nearbyPois = [")
     for p in pois:
-        w("  { id: %s, name: %s, category: %s, subtype: %s, latitude: %s, longitude: %s, source_url: %s },"
+        # website 一直在抓，只是以前没写出来。界面上要给地名挂官网链接，
+        # 这比把人送到 OSM 的页面有用得多——有官网的占三成多，没有的退回地图搜索。
+        site = p.get("website")
+        w("  { id: %s, name: %s, category: %s, subtype: %s, latitude: %s, longitude: %s%s, source_url: %s },"
           % (json.dumps(p["id"]), json.dumps(p["name"], ensure_ascii=False),
              json.dumps(p["category"], ensure_ascii=False), json.dumps(p["subtype"], ensure_ascii=False),
-             p["latitude"], p["longitude"], json.dumps(p["source_url"])))
+             p["latitude"], p["longitude"],
+             (", website: %s" % json.dumps(site, ensure_ascii=False)) if site else "",
+             json.dumps(p["source_url"])))
     w("];")
     w("")
     w("/** POI 来源署名，展示这些内容时应当带上。 */")

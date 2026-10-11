@@ -289,7 +289,7 @@ function renderDestinationOnly() {
     const card = document.createElement("article"); card.className = "place-card";
     const SHOWN = 8;   // 显示 5 条却提示「另有 1 个未列出」很奇怪，放宽到 8 条
     const rows = items.slice(0, SHOWN).map((poi) =>
-      `<p><strong>${poi.name}</strong> · ${poi.subtype}<br /><span class="place-freshness">步行约 ${Math.round(poi.distance_km * 1000)} 米 · <a href="${poi.source_url}" target="_blank" rel="noreferrer">地图 ↗</a></span></p>`).join("");
+      `<p><strong>${esc(poi.name)}</strong> · ${esc(poi.subtype)}<br /><span class="place-freshness">步行约 ${Math.round(poi.distance_km * 1000)} 米 · ${placeLinks(poi, poi.name)}</span></p>`).join("");
     const more = items.length > SHOWN ? `<p class="place-freshness">另有 ${items.length - SHOWN} 个</p>` : "";
     card.innerHTML = `<div><p class="place-category">${category}</p><h3>${items.length} 个</h3></div>${rows}${more}`;
     list.append(card);
@@ -329,7 +329,7 @@ function renderWorthATrip(place) {
     <div><p class="place-category">🧳 或者，专程去一趟</p><h3>${esc(pick.name)}</h3></div>
     <p class="activity-meta">${esc(pick.category)} · ${esc(pick.subtype)}</p>
     <p class="place-freshness">地铁到不了——最近的是 ${esc(pick.nearest.station_name)}站，出来还有 ${km.toFixed(1)} 公里，
-      得换公交或打车 · <a href="${pick.source_url}" target="_blank" rel="noreferrer">地图 ↗</a></p>
+      得换公交或打车 · ${placeLinks(pick, pick.name)}</p>
     <button class="btn btn-ghost btn-trip" type="button">换一个</button>`;
   card.querySelector(".btn-trip").addEventListener("click", () => {
     card.replaceWith(renderWorthATrip());
@@ -367,6 +367,35 @@ let planSteps = [];      // 与 planExperiences 一一对应：时刻、地点
 let planStation = null;  // 这次方案锚定的那一站（出城方案没有）
 let planTrip = null;     // 出城方案锚定的那个目的地
 let planRoute = null;    // 路线方案走的那条线
+
+/**
+ * 地图链接：搜名字，不传坐标。
+ *
+ * 原先链到 OpenStreetMap 的要素页——手机上点不开，开了也是一张英文底图，
+ * 不是用户要的「这地方在哪、怎么去」。
+ *
+ * 为什么用关键词搜而不是传经纬度：我们的坐标是 WGS84（OSM 的标准），
+ * 高德用的是 GCJ-02，直接传过去会偏五百米左右。做一次坐标纠偏当然可以，
+ * 但搜名字反而更准——高德自己的 POI 库比我们全，而且搜出来是带电话、
+ * 营业时间、评论的正经页面。
+ *
+ * callnative=1 让手机上优先唤起高德 App，没装就退回网页版。
+ * OSM 的署名仍然留在页脚，那是 ODbL 的义务，和跳哪儿看地图是两回事。
+ */
+function mapSearchUrl(keyword) {
+  const q = encodeURIComponent(String(keyword || "").trim());
+  return `https://uri.amap.com/search?keyword=${q}&city=北京&callnative=1`;
+}
+
+/** 一个地点的两个出口：有官网就给官网，地图总是给。 */
+function placeLinks(place, keyword) {
+  const parts = [];
+  if (place && place.website) {
+    parts.push(`<a href="${esc(place.website)}" target="_blank" rel="noreferrer">官网 ↗</a>`);
+  }
+  parts.push(`<a href="${mapSearchUrl(keyword)}" target="_blank" rel="noreferrer">地图 ↗</a>`);
+  return parts.join(" · ");
+}
 
 /**
  * 周末方案也要走一遍「正在凑」的过程。
@@ -448,14 +477,23 @@ function renderPlan() {
         + (meta ? ` · ${esc(meta)}` : "");
       extra = r.highlight ? esc(r.highlight) : "";
     } else if (step && step.placeMode === "outskirts") {
-      lead = esc(step.place.name);
+      lead = `<a href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">${esc(step.place.name)}</a>`;
       sub = i === 0 ? esc(exp.sub_type || exp.main_type) : "和上一项同一个地方";
       extra = step.hint ? esc(step.hint) : "";
+    } else if (step && step.placeMode === "area") {
+      // 手作这一类不指定店：OSM 收不到工作室和体验课，硬挂一个商场就是编的
+      // ——「凯德MALL 不一定有乐器体验课」。这一带确实能找到，具体哪家交给你搜。
+      const spot = planStation ? `${planStation.station.station_name}一带` : "这一带";
+      lead = `<a href="${mapSearchUrl(`${spot.replace("一带", "")} ${exp.name}`)}" target="_blank" rel="noreferrer">${esc(spot)}</a>`;
+      sub = `${esc(exp.sub_type || exp.main_type)} · 点开搜这一带的店`;
+      extra = step.hint ? esc(step.hint) : "";
     } else if (step && step.place) {
-      lead = esc(step.place.name);
       const metres = Math.round(step.place.distance_km * 1000);
-      const area = step.placeMode === "area" ? "这一带 · " : "";
-      sub = `${area}步行约 ${metres} 米`;
+      // 地名本身就是地图链接，底下不必再放一个「地图 ↗」；有官网才多给一个出口
+      lead = `<a href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">${esc(step.place.name)}</a>`;
+      sub = `步行约 ${metres} 米`
+        + (step.place.website
+          ? ` · <a href="${esc(step.place.website)}" target="_blank" rel="noreferrer">官网 ↗</a>` : "");
       extra = step.hint ? esc(step.hint) : "";
     } else {
       sub = "地点你定";
@@ -481,9 +519,17 @@ function renderPlan() {
     note.className = "place-freshness";
     note.innerHTML = `这几件事都在 ${esc(planTrip.name)}，地铁到不了——最近的是 `
       + `${esc(planTrip.nearest_station)}站，还有 ${Math.round(planTrip.nearest_km)} 公里，得开车`
-      + (planTrip.source_url ? ` · <a href="${planTrip.source_url}" target="_blank" rel="noreferrer">地图 ↗</a>` : "");
+      + ` · <a href="${mapSearchUrl(planTrip.name)}" target="_blank" rel="noreferrer">地图 ↗</a>`;
     container.append(note);
   }
+  // 周末方案同样吃 OSM 的数据，ODbL 的署名义务在这一屏也成立。
+  // 地图链接改成跳高德之后更要标——不标的话这份数据从哪来就无从得知了。
+  const credit = document.createElement("p");
+  credit.className = "place-freshness";
+  credit.innerHTML = `场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>`
+    + `（${poiSource.license}），另含人工整理的地点；地图跳转由高德提供`;
+  container.append(credit);
+
   container.querySelectorAll(".btn-swap").forEach((btn) => btn.addEventListener("click", () => swapModule(Number(btn.dataset.index))));
 }
 

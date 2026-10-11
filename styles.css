@@ -547,3 +547,14 @@ h2 {
   box-shadow: var(--shadow);
   display: block;
 }
+
+/* 方案卡片里的地名是链接，但别让它看着像一串蓝字——
+   保持标题的样子，只用下划线暗示可点。 */
+.plan-place a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(215, 255, 62, 0.5);
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+.plan-place a:hover { text-decoration-color: var(--lime); }
