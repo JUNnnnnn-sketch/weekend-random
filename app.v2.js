@@ -342,6 +342,7 @@ let planModuleHistory = [];
 let planSteps = [];      // 与 planExperiences 一一对应：时刻、地点
 let planStation = null;  // 这次方案锚定的那一站（出城方案没有）
 let planTrip = null;     // 出城方案锚定的那个目的地
+let planRoute = null;    // 路线方案走的那条线
 
 function startPlan() {
   const plan = buildAnchoredPlan({ people: state.party, duration: state.duration, lines: subwayLines });
@@ -349,6 +350,7 @@ function startPlan() {
   planExperiences = plan.experiences.slice();
   planSteps = (plan.steps || []).slice();
   planTrip = plan.kind === "outskirts" ? plan.destination : null;
+  planRoute = plan.kind === "route" ? plan.route : null;
   planStation = plan.station ? { station: plan.station, line: plan.line } : null;
   planSwapCounts = planExperiences.map(() => 0);
   planModuleHistory = planExperiences.map(() => []);
@@ -362,18 +364,28 @@ function renderPlan() {
   const container = document.getElementById("plan-list");
   container.replaceChildren();
   const where = planTrip ? ` · 🚗 出城 · ${planTrip.name}`
+    : planRoute ? ` · 🚶 ${planStation.line.line_name} ${planStation.station.station_name}出发`
     : planStation ? ` · ${planStation.line.line_name} ${planStation.station.station_name}一带` : "";
   document.getElementById("plan-subtitle").textContent =
     `${state.party} · ${state.duration}${where} · 共 ${planExperiences.length} 个环节`;
   planExperiences.forEach((exp, i) => {
     const card = document.createElement("article");
     card.className = "place-card plan-card " + (exp.role === "support" ? "is-support" : "is-core");
+    const step = planSteps[i];
+    const isRoute = step && step.placeMode === "route";
     const swapped = planSwapCounts[i] >= 3;
     const tags = (exp.vibe || []).map((v) => `<span class="tag">${esc(v)}</span>`).join("");
-    const step = planSteps[i];
     // 有具体地点就报地点；没有就老实说「地点你定」，不编一个出来。
     let place = '<p class="activity-meta">地点你定</p>';
-    if (step && step.placeMode === "outskirts") {
+    if (step && step.placeMode === "route") {
+      const r = step.route;
+      const stops = (r.stops || []).map(esc).join(" → ");
+      const meta = [r.length, r.duration].filter(Boolean).join(" · ");
+      place = `<p class="activity-meta"><strong>${esc(r.name)}</strong>`
+        + `<br /><span class="place-freshness">${esc(r.start_station || "")}站出发`
+        + (stops ? ` → ${stops}` : "") + (meta ? ` · ${esc(meta)}` : "") + "</span></p>"
+        + (r.highlight ? `<p class="place-freshness">${esc(r.highlight)}</p>` : "");
+    } else if (step && step.placeMode === "outskirts") {
       // 出城方案的每一环都在同一个地方，第一环报地名，后面的说「同一个地方」
       const where = i === 0 ? `<strong>${esc(step.place.name)}</strong>` : "同一个地方";
       const pop = step.place.popularity ? ` · ${step.place.popularity}% 的人推荐` : "";
@@ -392,9 +404,9 @@ function renderPlan() {
     card.innerHTML = `
       <div><p class="place-category">${exp.role === "support" ? "顺带" : "主玩"}</p><h3>${esc(exp.name)}</h3></div>
       ${place}
-      <p class="activity-date">⏱ ${exp.duration_min}–${exp.duration_max} 分钟 · ${esc(exp.sub_type || exp.main_type)}</p>
+      ${isRoute ? "" : `<p class="activity-date">⏱ ${exp.duration_min}–${exp.duration_max} 分钟 · ${esc(exp.sub_type || exp.main_type)}</p>`}
       ${tags ? `<p class="plan-vibe">${tags}</p>` : ""}
-      <button class="btn btn-ghost btn-swap" type="button" data-index="${i}" ${swapped ? "disabled" : ""}>${swapped ? "命运已定 ✦" : "换一个"}</button>`;
+      ${isRoute ? "" : `<button class="btn btn-ghost btn-swap" type="button" data-index="${i}" ${swapped ? "disabled" : ""}>${swapped ? "命运已定 ✦" : "换一个"}</button>`}`;
     container.append(card);
   });
   if (planTrip) {

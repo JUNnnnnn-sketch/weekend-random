@@ -560,6 +560,78 @@ export function buildOutskirtsPlan({ people, duration, exclude = [], now = new D
 }
 
 /**
+ * 路线方案。
+ *
+ * 路线是数据里的第三种东西：点是「在哪」（军事博物馆），面是「在这一带」
+ * （798、南锣鼓巷），线是「怎么走」（前门—杨梅竹斜街线）。
+ *
+ * 线的特点是它占满时间，所以它本身就是整个方案，不是方案里的一个环节。
+ * 「经典胡同漫游线」写得清楚：3.5 公里，慢慢逛 4-5 小时——
+ * 你不可能走完它再去打两小时壁球。
+ *
+ * 而且路线天然是站点锚定的：18 条里 16 条的起点就是地铁站，不用查坐标。
+ */
+const DURATION_RANK = { "2-3小时": 1, "半天": 2, "一整天": 3 };
+
+/** 路线在「周末方案」里出现的比例。比出城低——路线只有 18 条，刷太勤会腻。 */
+const ROUTE_SHARE = 1 / 5;
+
+/** 从某一站出发、且时间放得下的路线。 */
+export function routesFrom(stationName, { duration, now = new Date() } = {}) {
+  const season = currentSeason(now);
+  const budget = DURATION_RANK[duration] ?? 3;
+  return curatedRoutes.filter((route) =>
+    route.start_station === stationName
+    && (route.season === "all_year" || route.season === season)
+    && (DURATION_RANK[route.duration] ?? 3) <= budget);
+}
+
+export function buildRoutePlan({ people, duration, lines, exclude = [], now = new Date() } = {}) {
+  const candidates = fortuneCandidates(lines);
+  if (!candidates.length) return null;
+  const byName = new Map(experiences.map((e) => [e.name, e]));
+  const code = peopleCodeOf(people);
+  const excluded = new Set(exclude);
+
+  // 哪些候选站有路线可走
+  const withRoutes = [];
+  for (const entry of candidates) {
+    const routes = routesFrom(entry.station.station_name, { duration, now }).filter((route) => {
+      const exp = byName.get(route.experience);
+      return exp && !excluded.has(exp.id) && exp.suitable_people.includes(code);
+    });
+    if (routes.length) withRoutes.push({ entry, routes });
+  }
+  if (!withRoutes.length) return null;
+
+  const spot = randomItem(withRoutes);
+  const route = randomItem(spot.routes);
+  const experience = byName.get(route.experience);
+  const steps = [{ experience, route, placeMode: "route", place: null, hint: route.highlight || null }];
+
+  // 路线比这次的时长短时，后面还塞得下一件轻的——比如走完胡同去喝杯下午茶
+  if ((DURATION_RANK[route.duration] ?? 3) < (DURATION_RANK[duration] ?? 3)) {
+    const pois = findNearbyPois(coordinatesOf(spot.entry.station));
+    const { support } = filterExperiences({ people, duration, combining: true, now });
+    const tail = support.filter((e) => !excluded.has(e.id) && placeableAt(e, pois));
+    if (tail.length) {
+      const pick = randomItem(tail);
+      const matched = matchPlace(pick, pois, new Set());
+      steps.push({ experience: pick, placeMode: matched.mode, place: matched.place || null,
+                   hint: matched.hint || null });
+    }
+  }
+
+  return {
+    people, duration, kind: "route", empty: false,
+    station: spot.entry.station, line: randomItem(spot.entry.lines),
+    route, steps, experiences: steps.map((s) => s.experience),
+    anchored: steps.length,
+    structure: { type: "route", moduleCount: steps.length },
+  };
+}
+
+/**
  * 这条玩法在这批 POI 里能不能落地。
  * taken 是本次行程已经用掉的地点——同一个剧场不能既算「音乐厅」又算「京剧」，
  * 否则第二环会挂空。
@@ -608,6 +680,11 @@ export function buildAnchoredPlan({ people, duration, locationScope, lines, excl
   if (duration === "一整天" && Math.random() < OUTSKIRTS_SHARE) {
     const trip = buildOutskirtsPlan({ people, duration, exclude, now });
     if (trip) return trip;
+  }
+  // 路线放在出城之后：出城是「一整天」专属，路线哪个时长都可能有
+  if (Math.random() < ROUTE_SHARE) {
+    const walk = buildRoutePlan({ people, duration, lines, exclude, now });
+    if (walk) return walk;
   }
   const emptyResult = {
     people, duration, locationScope: locationScope || "both",
