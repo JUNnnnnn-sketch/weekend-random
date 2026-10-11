@@ -80,8 +80,44 @@ def fetch(names):
         return None
 
 
+# 查询词和 OSM 名字差多少才算同一个地方。
+#
+# 一开始只要「互相包含」就算，错得很直接：
+#   元古        → 宋元古瓷（一件文物，只是字面包含）
+#   喇叭沟门     → 北京市公安局喇叭沟门森林公安派出所
+#   温榆河公园   → 温榆河（那条河。公园在后沙峪，河那个点在通州）
+#
+# 现在只认三种：完全同名；OSM 多了「北京」这类前缀或「风景区」这类后缀；
+# 查的是子地点而 OSM 给的是母体（妙峰山玫瑰梯田 → 妙峰山）。
+# 最后一种再加一条例外：查的是「某某公园」而匹配到一条河或一片水域时不算——
+# 公园是一块有边界的地方，河是另一回事。
+WATER_KINDS = ("waterway=", "natural=water", "natural=bay", "natural=strait")
+
+# 查询词夹在中间时，后面跟的得是个正经的场所词才算同一个地方：
+# 「周口店坡峰岭风景区」里的「坡峰岭」是对的，
+# 「宋元古瓷」里的「元古」不是——那只是「宋元」和「古瓷」拼在一起。
+VENUE_SUFFIX = ("风景区", "景区", "风景名胜区", "自然保护区", "森林公园", "公园",
+                "度假区", "滑雪场", "营地", "游乐园", "博物馆", "体育公园")
+
+
+def acceptable(query, got, kind):
+    if got == query:
+        return True
+    if got.endswith(query) or got.startswith(query):
+        return True
+    if query in got and any(got.endswith(suffix) for suffix in VENUE_SUFFIX):
+        return True
+    if query.startswith(got) and len(got) >= 2:
+        # 查的是「某某公园」而匹配到一条河或一片水域时不算——
+        # 公园是一块有边界的地方，河是另一回事
+        if query[len(got):] == "公园" and any(kind.startswith(w) for w in WATER_KINDS):
+            return False
+        return True
+    return False
+
+
 def pick(elements, name):
-    """从返回结果里挑最像的一条：名字完全相同 > 名字包含 > 没有。"""
+    """从返回结果里挑最像的一条：名字完全相同 > 够接近的 > 没有。"""
     want = norm(name)
     exact, partial = [], []
     for el in elements:
@@ -97,7 +133,7 @@ def pick(elements, name):
                "longitude": round(lon, 6), "osm_id": "%s/%s" % (el["type"], el["id"])}
         if got == want:
             exact.append(row)
-        elif want in got or got in want:
+        elif acceptable(want, got, kind):
             partial.append(row)
     return (exact or partial or [None])[0]
 
@@ -114,6 +150,11 @@ ALIAS = {
     "朝阳公园冰场": "朝阳公园",
     "朝阳公园匹克球场": "朝阳公园",
     "朝阳大悦城冠军冰场": "朝阳大悦城",
+    # 营地是山里/园子里的一块地，OSM 不会单独收，用它所在的那座山/那个园子
+    "妙峰山玫瑰梯田观景台": "妙峰山",
+    "西山国家森林公园鬼笑石": "北京西山国家森林公园",
+    "北灵山韭菜坡": "北灵山",
+    "金海湖碧波岛营地": "金海湖",
 }
 
 
@@ -149,8 +190,20 @@ def main():
         if os.path.exists(path):
             found[name] = json.load(open(path, encoding="utf-8"))
             continue
-        local = known.get(name) or known.get(ALIAS.get(name, ""))
+        # 别名先看自有 POI，再看已经查过的坐标缓存——
+        # 妙峰山、北灵山这些不在 station_pois.js 里，但前几轮查过了
+        parent = ALIAS.get(name, "")
+        local = known.get(name) or known.get(parent)
+        if not local and parent:
+            parent_path = os.path.join(CACHE, "geo_%s.json"
+                                       % re.sub(r"[^\w一-鿿-]", "_", parent))
+            if os.path.exists(parent_path):
+                with open(parent_path, encoding="utf-8") as handle:
+                    local = json.load(handle)
         if local:
+            # 标明是走别名拿的坐标。别名是人工声明的从属关系（「鬼笑石在西山森林公园
+            # 里」），不该再被名字相似度那套规则拦一次——两边名字本来就不像。
+            local = dict(local, alias_of=parent or name)
             json.dump(local, open(path, "w", encoding="utf-8"), ensure_ascii=False)
             found[name] = local
             reused += 1

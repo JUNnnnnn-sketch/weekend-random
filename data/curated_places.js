@@ -16,12 +16,12 @@
  * 路线不需要坐标——它的起点就是地铁站。路线占满时间，在周末方案里
  * 一条路线本身就是整个方案，不是其中一个环节。
  *
- * 地点 214 条（103 条有坐标），路线 18 条。
- * 生成时间：2026-10-11T13:55:22+08:00
+ * 地点 223 条（102 条有坐标），路线 18 条。
+ * 生成时间：2026-10-11T14:12:04+08:00
  * 本文件由 tools/import_curated.py 生成，要改请改那两张 CSV。
  */
 export const curatedPlaces = [
-  {"id": "curated/2", "experience": "观星", "name": "喇叭沟门", "season": "summer", "source": "点点AI·北京观星·参考2170人", "popularity": 41, "note": "怀柔最北 光污染少", "latitude": 40.899158, "longitude": 116.616509, "source_url": "https://www.openstreetmap.org/node/2454669116", "nearest_station": "北邵洼", "nearest_km": 80.76},
+  {"id": "curated/2", "experience": "观星", "name": "喇叭沟门", "season": "summer", "source": "点点AI·北京观星·参考2170人", "popularity": 41, "note": "怀柔最北 光污染少"},
   {"id": "curated/3", "experience": "观星", "name": "国家天文台密云站", "season": "summer", "source": "点点AI·北京观星·参考2170人", "popularity": 28, "note": "即不老屯天文台 两条已合并", "latitude": 40.558603, "longitude": 116.977792, "source_url": "https://www.openstreetmap.org/node/1947418813", "nearest_station": "俸伯", "nearest_km": 53.83},
   {"id": "curated/4", "experience": "观星", "name": "东灵山", "season": "summer", "source": "点点AI·北京观星·参考2170人", "popularity": 10, "note": "门头沟 北京最高峰", "latitude": 40.03091, "longitude": 115.454228, "source_url": "https://www.openstreetmap.org/node/4239169209", "nearest_station": "燕山", "nearest_km": 55.9},
   {"id": "curated/5", "experience": "观星", "name": "妙峰山", "season": "summer", "source": "点点AI·北京观星·参考2170人", "popularity": 8, "note": "门头沟", "latitude": 40.072595, "longitude": 116.014101, "source_url": "https://www.openstreetmap.org/node/5062604605", "nearest_station": "北安河", "nearest_km": 9.41},
@@ -32,7 +32,7 @@ export const curatedPlaces = [
   {"id": "curated/10", "experience": "看日出", "name": "北京西山国家森林公园", "season": "all_year", "source": "点点AI·北京看日出·参考26篇", "note": "鬼笑石观景台 上下约2小时", "latitude": 39.975527, "longitude": 116.188883, "source_url": "https://www.openstreetmap.org/way/798193635", "nearest_station": "西黄村", "nearest_km": 4.89},
   {"id": "curated/11", "experience": "看日出", "name": "妙峰山", "season": "all_year", "source": "点点AI·北京看日出·参考26篇", "note": "可开车直达山顶 门票10元车 20元人 云海", "latitude": 40.072595, "longitude": 116.014101, "source_url": "https://www.openstreetmap.org/node/5062604605", "nearest_station": "北安河", "nearest_km": 9.41},
   {"id": "curated/12", "experience": "看日出", "name": "雾灵山", "season": "all_year", "source": "点点AI·北京看日出·参考26篇", "note": "自驾直达山顶 需小程序预约 日限200辆 主峰在河北兴隆", "latitude": 40.59826, "longitude": 117.481044, "source_url": "https://www.openstreetmap.org/node/2495012605", "nearest_station": "俸伯", "nearest_km": 85.51},
-  {"id": "curated/13", "experience": "看日出", "name": "海坨山", "season": "all_year", "source": "点点AI·北京看日出·参考26篇", "note": "延庆 北京第二高峰 需凌晨开始登山"},
+  {"id": "curated/13", "experience": "看日出", "name": "海坨山", "season": "all_year", "source": "点点AI·北京看日出·参考26篇", "note": "延庆 北京第二高峰 需凌晨开始登山", "latitude": 40.582235, "longitude": 115.723331, "source_url": "https://www.openstreetmap.org/node/10229749653", "nearest_station": "昌平西山口", "nearest_km": 54.56},
   {"id": "curated/14", "experience": "看日出", "name": "青灰岭", "season": "all_year", "source": "点点AI·北京看日出·参考26篇", "note": "又名北齐岭 车可开到山顶附近", "latitude": 40.226882, "longitude": 115.885974, "source_url": "https://www.openstreetmap.org/node/10095503538", "nearest_station": "昌平西山口", "nearest_km": 25.82},
   {"id": "curated/15", "experience": "爬山", "name": "百望山森林公园", "season": "all_year", "source": "点点AI·北京爬山·参考4845人", "popularity": 29, "latitude": 40.027895, "longitude": 116.249445, "source_url": "https://www.openstreetmap.org/way/655136687", "nearest_station": "马连洼", "nearest_km": 1.56},
   {"id": "curated/16", "experience": "爬山", "name": "香山公园", "season": "all_year", "source": "点点AI·北京爬山·参考4845人", "popularity": 22, "latitude": 39.989405, "longitude": 116.181598, "source_url": "https://www.openstreetmap.org/relation/8758884", "nearest_station": "西黄村", "nearest_km": 6.53},
@@ -51,7 +51,7 @@ export const curatedPlaces = [
   {"id": "curated/29", "experience": "徒步", "name": "龙泉峪-水泉沟", "season": "all_year", "source": "点点AI·北京徒步·参考28篇", "note": "入门级 8-12km 爬升400-700m"},
   {"id": "curated/30", "experience": "徒步", "name": "坡峰岭", "season": "autumn", "source": "点点AI·北京徒步·参考28篇", "note": "进阶初级 12-16km 爬升600-1000m", "latitude": 39.694937, "longitude": 115.838702, "source_url": "https://www.openstreetmap.org/node/5181259641", "nearest_station": "燕山", "nearest_km": 11.32},
   {"id": "curated/31", "experience": "徒步", "name": "凤凰岭", "season": "all_year", "source": "点点AI·北京徒步·参考28篇", "note": "进阶初级 12-16km 爬升600-1000m", "latitude": 40.105402, "longitude": 116.081644, "source_url": "https://www.openstreetmap.org/node/9314311217", "nearest_station": "北安河", "nearest_km": 5.62},
-  {"id": "curated/32", "experience": "露营", "name": "温榆河公园", "season": "all_year", "source": "点点AI·北京露营·参考4082人", "popularity": 35, "latitude": 39.942263, "longitude": 116.648886, "source_url": "https://www.openstreetmap.org/way/29141428", "nearest_station": "物资学院路", "nearest_km": 2.24},
+  {"id": "curated/32", "experience": "露营", "name": "温榆河公园", "season": "all_year", "source": "点点AI·北京露营·参考4082人", "popularity": 35},
   {"id": "curated/33", "experience": "露营", "name": "金海湖碧波岛", "season": "all_year", "source": "点点AI·北京露营·参考4082人", "popularity": 20},
   {"id": "curated/34", "experience": "露营", "name": "玉渡山", "season": "all_year", "source": "点点AI·北京露营·参考4082人", "popularity": 13, "latitude": 40.53824, "longitude": 115.883936, "source_url": "https://www.openstreetmap.org/way/721559243", "nearest_station": "昌平西山口", "nearest_km": 41.77},
   {"id": "curated/35", "experience": "露营", "name": "大运河森林公园", "season": "all_year", "source": "点点AI·北京露营·参考4082人", "popularity": 9, "latitude": 39.870013, "longitude": 116.733601, "source_url": "https://www.openstreetmap.org/way/231113730", "nearest_station": "潞城", "nearest_km": 3.58},
@@ -77,7 +77,7 @@ export const curatedPlaces = [
   {"id": "curated/55", "experience": "划船", "name": "什刹海", "season": "all_year", "source": "点点AI·北京划船·参考3379人", "popularity": 6, "latitude": 39.939472, "longitude": 116.378364, "source_url": "https://www.openstreetmap.org/relation/20613748", "nearest_station": "北海北", "nearest_km": 0.87},
   {"id": "curated/56", "experience": "划船", "name": "朝阳公园", "season": "all_year", "source": "点点AI·北京划船·参考3379人", "popularity": 4, "latitude": 39.944409, "longitude": 116.475586, "source_url": "https://www.openstreetmap.org/way/233205070", "nearest_station": "枣营", "nearest_km": 0.58},
   {"id": "curated/57", "experience": "划船", "name": "奥林匹克森林公园", "season": "all_year", "source": "点点AI·北京划船·参考3379人", "popularity": 4, "latitude": 40.020758, "longitude": 116.385512, "source_url": "https://www.openstreetmap.org/way/33616744", "nearest_station": "森林公园南门", "nearest_km": 1.29},
-  {"id": "curated/58", "experience": "划船", "name": "温榆河公园", "season": "all_year", "source": "点点AI·北京划船·参考3379人", "popularity": 3, "latitude": 39.942263, "longitude": 116.648886, "source_url": "https://www.openstreetmap.org/way/29141428", "nearest_station": "物资学院路", "nearest_km": 2.24},
+  {"id": "curated/58", "experience": "划船", "name": "温榆河公园", "season": "all_year", "source": "点点AI·北京划船·参考3379人", "popularity": 3},
   {"id": "curated/59", "experience": "划船", "name": "通州大运河", "season": "all_year", "source": "点点AI·北京划船·参考3379人", "popularity": 2},
   {"id": "curated/60", "experience": "钓鱼", "name": "永定河", "season": "all_year", "source": "点点AI·北京钓鱼·参考3087人", "popularity": 24},
   {"id": "curated/61", "experience": "钓鱼", "name": "温榆河", "season": "all_year", "source": "点点AI·北京钓鱼·参考3087人", "popularity": 22, "latitude": 39.942263, "longitude": 116.648886, "source_url": "https://www.openstreetmap.org/way/29141428", "nearest_station": "物资学院路", "nearest_km": 2.24},
@@ -100,7 +100,7 @@ export const curatedPlaces = [
   {"id": "curated/78", "experience": "桨板", "name": "北护城河", "season": "summer", "source": "点点AI·北京水上运动·参考86篇", "note": "二环边 唯码头水上基地 有教练指导 新手友好"},
   {"id": "curated/79", "experience": "桨板", "name": "红领巾公园", "season": "summer", "source": "点点AI·北京水上运动·参考86篇", "note": "码头设施完善 有带空调的更衣室 可夜划", "latitude": 39.925302, "longitude": 116.48707, "source_url": "https://www.openstreetmap.org/way/235243285", "nearest_station": "十里堡", "nearest_km": 0.91},
   {"id": "curated/80", "experience": "桨板", "name": "顺义奥林匹克水上公园", "season": "summer", "source": "点点AI·北京水上运动·参考86篇", "note": "2008奥运赛场 国际级水上运动场"},
-  {"id": "curated/81", "experience": "桨板", "name": "温榆河公园", "season": "summer", "source": "点点AI·北京水上运动·参考86篇", "note": "12号门水上运动基地 有阳光沙滩和热水淋浴", "latitude": 39.942263, "longitude": 116.648886, "source_url": "https://www.openstreetmap.org/way/29141428", "nearest_station": "物资学院路", "nearest_km": 2.24},
+  {"id": "curated/81", "experience": "桨板", "name": "温榆河公园", "season": "summer", "source": "点点AI·北京水上运动·参考86篇", "note": "12号门水上运动基地 有阳光沙滩和热水淋浴"},
   {"id": "curated/82", "experience": "帆板", "name": "金海湖", "season": "summer", "source": "点点AI·北京水上运动·参考86篇", "note": "有帆船赛 可感受扬帆起航", "latitude": 40.172714, "longitude": 117.323128, "source_url": "https://www.openstreetmap.org/way/58425435", "nearest_station": "俸伯", "nearest_km": 54.94},
   {"id": "curated/83", "experience": "帆板", "name": "顺义奥林匹克水上公园", "season": "summer", "source": "点点AI·北京水上运动·参考86篇", "note": "帆船 索道滑水 水上飞人"},
   {"id": "curated/84", "experience": "水上乐园", "name": "北京玛雅海滩水公园", "season": "summer", "source": "点点AI·北京水上乐园·参考3429人", "popularity": 36, "note": "位于欢乐谷内"},
@@ -185,7 +185,7 @@ export const curatedPlaces = [
   {"id": "curated/163", "experience": "下午茶", "name": "VOYAGE COFFEE", "season": "all_year", "source": "点点AI·北京下午茶·参考3504人", "popularity": 23},
   {"id": "curated/164", "experience": "下午茶", "name": "铁手咖啡制造局", "season": "all_year", "source": "点点AI·北京下午茶·参考3504人", "popularity": 20},
   {"id": "curated/165", "experience": "下午茶", "name": "静水StillWater", "season": "all_year", "source": "点点AI·北京下午茶·参考3504人", "popularity": 18},
-  {"id": "curated/166", "experience": "下午茶", "name": "元古", "season": "all_year", "source": "点点AI·北京下午茶·参考3504人", "popularity": 13, "latitude": 39.894239, "longitude": 116.38586, "source_url": "https://www.openstreetmap.org/node/5072992900", "nearest_station": "前门", "nearest_km": 0.75},
+  {"id": "curated/166", "experience": "下午茶", "name": "元古", "season": "all_year", "source": "点点AI·北京下午茶·参考3504人", "popularity": 13},
   {"id": "curated/167", "experience": "下午茶", "name": "万春金福", "season": "all_year", "source": "点点AI·北京下午茶·参考3504人", "popularity": 11},
   {"id": "curated/168", "experience": "下午茶", "name": "JM Cafe", "season": "all_year", "source": "点点AI·北京下午茶·参考3504人", "popularity": 9},
   {"id": "curated/169", "experience": "下午茶", "name": "Town House", "season": "all_year", "source": "点点AI·北京下午茶·参考3504人", "popularity": 8},
@@ -212,7 +212,7 @@ export const curatedPlaces = [
   {"id": "curated/190", "experience": "看日落", "name": "落坡岭水库", "season": "all_year", "source": "点点AI·北京看日落·参考26篇", "note": "原生态草地群山环抱 偶有绿皮火车驶过", "latitude": 39.987703, "longitude": 115.981269, "source_url": "https://www.openstreetmap.org/relation/5989722", "nearest_station": "北安河", "nearest_km": 15.03},
   {"id": "curated/191", "experience": "野餐", "name": "朝阳公园", "season": "all_year", "source": "点点AI·北京野餐", "popularity": 22, "latitude": 39.944409, "longitude": 116.475586, "source_url": "https://www.openstreetmap.org/way/233205070", "nearest_station": "枣营", "nearest_km": 0.58},
   {"id": "curated/192", "experience": "野餐", "name": "奥林匹克森林公园", "season": "all_year", "source": "点点AI·北京野餐", "popularity": 20, "latitude": 40.020758, "longitude": 116.385512, "source_url": "https://www.openstreetmap.org/way/33616744", "nearest_station": "森林公园南门", "nearest_km": 1.29},
-  {"id": "curated/193", "experience": "野餐", "name": "温榆河公园", "season": "all_year", "source": "点点AI·北京野餐", "popularity": 19, "latitude": 39.942263, "longitude": 116.648886, "source_url": "https://www.openstreetmap.org/way/29141428", "nearest_station": "物资学院路", "nearest_km": 2.24},
+  {"id": "curated/193", "experience": "野餐", "name": "温榆河公园", "season": "all_year", "source": "点点AI·北京野餐", "popularity": 19},
   {"id": "curated/194", "experience": "野餐", "name": "海淀公园", "season": "all_year", "source": "点点AI·北京野餐", "popularity": 13, "latitude": 39.984321, "longitude": 116.289523, "source_url": "https://www.openstreetmap.org/way/189801200", "nearest_station": "万泉河桥", "nearest_km": 0.41},
   {"id": "curated/195", "experience": "野餐", "name": "南苑森林湿地公园", "season": "all_year", "source": "点点AI·北京野餐", "popularity": 13, "latitude": 39.812213, "longitude": 116.372139, "source_url": "https://www.openstreetmap.org/way/910674876", "nearest_station": "新宫", "nearest_km": 1.07},
   {"id": "curated/196", "experience": "野餐", "name": "金海湖", "season": "all_year", "source": "点点AI·北京野餐", "popularity": 8, "latitude": 40.172714, "longitude": 117.323128, "source_url": "https://www.openstreetmap.org/way/58425435", "nearest_station": "俸伯", "nearest_km": 54.94},
@@ -235,6 +235,15 @@ export const curatedPlaces = [
   {"id": "curated/213", "experience": "街区探索", "name": "三里河公园", "season": "all_year", "source": "点点AI·北京街区探索·参考65篇", "note": "藏在胡同里的首都小江南 小桥流水闹中取静", "latitude": 39.893794, "longitude": 116.397329, "source_url": "https://www.openstreetmap.org/way/859951315", "nearest_station": "桥湾", "nearest_km": 0.5},
   {"id": "curated/214", "experience": "街区探索", "name": "隆福寺街区", "season": "all_year", "source": "点点AI·北京街区探索·参考65篇", "note": "分南院东院北里三区 传统京味文艺休闲潮流美食"},
   {"id": "curated/215", "experience": "街区探索", "name": "东四南大街", "season": "all_year", "source": "点点AI·北京街区探索·参考65篇", "note": "可能有书等特色小店 边走边逛边吃", "latitude": 39.916259, "longitude": 116.412788, "source_url": "https://www.openstreetmap.org/way/1068735571", "nearest_station": "灯市口", "nearest_km": 0.12},
+  {"id": "curated/216", "experience": "野营过夜", "name": "金海湖碧波岛营地", "season": "all_year", "source": "点点AI·北京露营过夜·参考28篇", "popularity": 42, "note": "商业营地 有卫生间淋浴间 草坪开阔可搭帐篷过夜 网红S弯极易出片", "latitude": 40.172714, "longitude": 117.323128, "source_url": "https://www.openstreetmap.org/way/58425435", "nearest_station": "俸伯", "nearest_km": 54.94},
+  {"id": "curated/217", "experience": "野营过夜", "name": "温榆河公园72号营地", "season": "all_year", "source": "点点AI·北京露营过夜·参考28篇", "popularity": 11, "note": "商业营地 独立木质露台干净防潮 周末需早去抢位"},
+  {"id": "curated/218", "experience": "野营过夜", "name": "Milky Way营地", "season": "all_year", "source": "点点AI·北京露营过夜·参考28篇", "popularity": 11, "note": "商业营地 梯田营位远眺长城 观星极佳 设施齐全"},
+  {"id": "curated/219", "experience": "野营过夜", "name": "温榆河公园东岸草坪", "season": "all_year", "source": "点点AI·北京露营过夜·参考28篇", "popularity": 8, "note": "免费营地 可挖沙玩水 严禁明火"},
+  {"id": "curated/220", "experience": "野营过夜", "name": "白河湾生态艺术营地", "season": "all_year", "source": "点点AI·北京露营过夜·参考28篇", "popularity": 8, "note": "商业营地 可溯溪捉鱼和烟火烧烤 有自建卫浴间"},
+  {"id": "curated/221", "experience": "野营过夜", "name": "妙峰山玫瑰梯田观景台", "season": "all_year", "source": "点点AI·北京露营过夜·参考28篇", "note": "野趣地点无公共设施 能看北京夜景和日出 有123号三个观景台 每人20元车10元 晚上九点前必须进山", "latitude": 40.072595, "longitude": 116.014101, "source_url": "https://www.openstreetmap.org/node/5062604605", "nearest_station": "北安河", "nearest_km": 9.41},
+  {"id": "curated/222", "experience": "野营过夜", "name": "西山国家森林公园鬼笑石", "season": "all_year", "source": "点点AI·北京露营过夜·参考28篇", "note": "野趣地点无公共设施 可夜爬到鬼笑石后方平台扎营 但夜间公园可能不开放 有人被拦在门口 出发前务必确认", "latitude": 39.975527, "longitude": 116.188883, "source_url": "https://www.openstreetmap.org/way/798193635", "nearest_station": "西黄村", "nearest_km": 4.89},
+  {"id": "curated/223", "experience": "野营过夜", "name": "北灵山韭菜坡", "season": "summer", "source": "点点AI·北京露营过夜·参考28篇", "note": "野趣地点无公共设施 海拔1600米高山草甸 夏季凉快 但是风口晚上风大要做好防风 没有卫生间", "latitude": 40.07728, "longitude": 115.529073, "source_url": "https://www.openstreetmap.org/node/837554551", "nearest_station": "北安河", "nearest_km": 50.67},
+  {"id": "curated/224", "experience": "野营过夜", "name": "怀柔五渡河村", "season": "all_year", "source": "点点AI·北京露营过夜·参考28篇", "note": "野趣地点无公共设施 可沿河扎营 但政策时有变动 节假日可能禁明火 去之前务必确认"},
 ];
 
 export const curatedRoutes = [

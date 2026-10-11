@@ -31,6 +31,9 @@ import math
 import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from geocode_curated import acceptable   # noqa: E402  同一套名字匹配标准
 from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -97,8 +100,13 @@ def load_coords():
             continue
         with open(path, encoding="utf-8") as handle:
             hit = json.load(handle)
-        if hit:
+        # 缓存里可能有按旧的宽松标准收下的错配（元古 → 宋元古瓷），
+        # 这里按现在的标准再过一道，不用重查
+        # alias_of 是人工声明的从属关系，跳过名字相似度校验
+        if hit and (hit.get("alias_of") or acceptable(name, hit["osm_name"], hit.get("kind", ""))):
             coords[name] = hit
+        elif hit:
+            print("   丢弃错配：%s → %s（%s）" % (name, hit["osm_name"], hit.get("kind", "")))
     return coords
 
 
