@@ -47,14 +47,31 @@ OUT = os.path.join(ROOT, "data", "station_coordinates.js")
 UA = "weekend-random/0.1 (personal hobby project; subway station coordinates)"
 OVERPASS = "https://overpass-api.de/api/interpreter"
 BBOX = "39.40,115.40,41.10,117.60"  # south,west,north,east
+# 第一版只查 subway=yes 的 railway/public_transport=station 节点，漏了 48 个站。
+# 探过一轮才知道它们在 OSM 里是别的标法：
+#   railway=stop + public_transport=stop_position + subway=yes —— 最常见的一种
+#   light_rail=yes  —— 西郊线（香山、万安、茶棚其实是有轨电车）
+#   tram=yes        —— 亦庄 T1 线
+#   monorail=yes    —— S1 线（磁浮）
+#   station=subway/monorail —— 新式标法
+# 现在按「轨道类 + 任一模式标记」来查，模式标记是必须的：
+# 不加的话，同名公交站会把响应撑爆（实测 IncompleteRead）。
+MODES = ("subway", "light_rail", "tram", "monorail")
+RAIL_KINDS = "^(station|halt|tram_stop|stop)$"
+PT_KINDS = "^(station|stop_position)$"
+
+_CLAUSES = (
+    ['  nwr["railway"~"%s"]["%s"="yes"](%s);' % (RAIL_KINDS, mode, BBOX) for mode in MODES]
+    + ['  nwr["public_transport"~"%s"]["%s"="yes"](%s);' % (PT_KINDS, mode, BBOX) for mode in MODES]
+    + ['  nwr["railway"="station"]["station"~"^(subway|monorail|light_rail)$"](%s);' % BBOX]
+)
 QUERY = """
-[out:json][timeout:120];
+[out:json][timeout:180];
 (
-  node["railway"="station"]["subway"="yes"](%(bbox)s);
-  node["public_transport"="station"]["subway"="yes"](%(bbox)s);
+%s
 );
 out tags center;
-""" % {"bbox": BBOX}
+""" % "\n".join(_CLAUSES)
 
 # 多节点取平均后，若最大偏离超过这个值，视为同名不同站，不写入
 MAX_SPREAD_M = 500
