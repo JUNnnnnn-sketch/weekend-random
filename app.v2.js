@@ -4,6 +4,7 @@ import { activitiesChncpa } from "./data/activities_chncpa.js";
 import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, fortuneCandidates, placeableExperiencesAt, matchPlaceFor, pickWorthATrip } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 import { experiences as allExperiences } from "./data/experiences.js";
+import { saveTicket } from "./ticket-image.js";
 
 /* ---------- 「最近在玩」共享过滤（与 tools/activity_filter.py 同一套规则） ---------- */
 const CATEGORY_BLACKLIST = new Set(["便民活动", "招考招聘", "惠企活动"]);
@@ -95,6 +96,7 @@ function lockWith(subtitle, sourceNode) {
   detail.replaceChildren();
   if (sourceNode) [...sourceNode.children].forEach((node) => detail.append(node.cloneNode(true)));
   detail.querySelectorAll("button").forEach((btn) => btn.remove());  // 锁定页不留可操作按钮
+  document.getElementById("ticket-shot").replaceChildren();          // 上一次存的图不留到这一次
   showScreen("locked");
 }
 document.getElementById("btn-accept").addEventListener("click", () => {
@@ -102,6 +104,19 @@ document.getElementById("btn-accept").addEventListener("click", () => {
            document.getElementById("place-list"));
 });
 document.getElementById("btn-home").addEventListener("click", goHome);
+document.getElementById("btn-ticket-save").addEventListener("click", (event) => {
+  const btn = event.currentTarget;
+  btn.disabled = true;
+  btn.textContent = "正在画……";
+  try {
+    saveTicket(document.getElementById("ticket-shot"));
+    btn.textContent = "✓ 已存图片";
+  } catch (error) {
+    btn.textContent = "存图失败，截个屏吧";
+    console.error(error);
+  }
+  setTimeout(() => { btn.disabled = false; btn.textContent = "💾 存成图片"; }, 2600);
+});
 
 /* ---------- 最近在玩（recent）模式：只读已接入的城市日历活动，不做热度/推荐 ---------- */
 // 筛选标签 → 来源官方类别（其余类别无独立标签，只出现在“全部”下）

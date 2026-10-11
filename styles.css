@@ -537,3 +537,13 @@ h2 {
   font-size: 13px;
   text-align: center;
 }
+
+/* 存下来的票根图：显示出来是给 iOS 用的——
+   那边 <a download> 行为很怪，长按这张图保存最稳。 */
+.ticket-shot-wrap:empty { display: none; }
+.ticket-shot {
+  width: 100%;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: block;
+}
