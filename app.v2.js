@@ -399,11 +399,53 @@ function dianpingSearchUrl(keyword) {
   return `https://www.dianping.com/search/keyword/2/0_${encodeURIComponent(String(keyword || "").trim())}`;
 }
 
-/** 一个地点的两个出口：有官网就给官网，地图总是给。 */
+/**
+ * 演出场馆搜大麦，不搜点评。
+ *
+ * 剧场和 Live House 这类地方，用户站在门口想知道的是「今晚演什么、还有票吗」。
+ * 点评答的是「环境怎么样、停车方不方便」——答非所问。
+ *
+ * 为什么用 m. 开头的移动版：桌面版 search.damai.cn 按场馆名搜出来是 0 条
+ * （它那个关键词只匹配演出名），移动版这个接口才会把「在这个场馆的演出」列出来。
+ * 实测搜「梅兰芳大剧院」，出来的是接下来几场京剧的日期和票价，正是要的东西。
+ */
+function damaiSearchUrl(keyword) {
+  return `https://m.damai.cn/shows/search.html?keyword=${encodeURIComponent(String(keyword || "").trim())}`;
+}
+
+// 这几类场馆的问题是「今晚演什么」，交给大麦；其余的问题是「这是个什么地方」，交给点评。
+// 剧场的官网尤其难找——搜出来几乎全是自称「XX剧场官网」的票务代理站，一个都不能挂。
+const TICKETED_VENUE = new Set(["剧场", "Live House / 夜店"]);
+
+/**
+ * 地名本身点进哪儿。
+ *
+ * 有官网就进官网。没有的话不进地图——地图回答的是「在哪」，可名字这个位置
+ * 问的是「这是个什么地方」，点进去看见一个图钉等于没答。退而求其次按场馆类型
+ * 分流：演出场馆进大麦，其余进大众点评，两边都能答上同一类问题。
+ * 「没找到官网」这几个字不必写出来——用户要的是地方，不是我们的查找过程。
+ */
+function placeNameLink(place, name) {
+  let href;
+  if (place && place.website) {
+    href = esc(place.website);
+  } else if (place && TICKETED_VENUE.has(place.subtype)) {
+    href = damaiSearchUrl(name);
+  } else {
+    href = dianpingSearchUrl(name);
+  }
+  return `<a href="${href}" target="_blank" rel="noreferrer">${esc(name)}</a>`;
+}
+
+/** 一个地点的两个出口：第一个按场馆类型给官网/演出/点评，地图总是给。 */
 function placeLinks(place, keyword) {
   const parts = [];
   if (place && place.website) {
     parts.push(`<a href="${esc(place.website)}" target="_blank" rel="noreferrer">官网 ↗</a>`);
+  } else if (place && TICKETED_VENUE.has(place.subtype)) {
+    parts.push(`<a href="${damaiSearchUrl(keyword)}" target="_blank" rel="noreferrer">演出 ↗</a>`);
+  } else {
+    parts.push(`<a href="${dianpingSearchUrl(keyword)}" target="_blank" rel="noreferrer">点评 ↗</a>`);
   }
   parts.push(`<a href="${mapSearchUrl(keyword)}" target="_blank" rel="noreferrer">地图 ↗</a>`);
   return parts.join(" · ");
@@ -489,8 +531,7 @@ function renderPlan() {
         + (meta ? ` · ${esc(meta)}` : "");
       extra = r.highlight ? esc(r.highlight) : "";
     } else if (step && step.placeMode === "outskirts") {
-      const tripSite = step.place.website;
-      lead = `<a href="${tripSite ? esc(tripSite) : mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">${esc(step.place.name)}</a>`;
+      lead = placeNameLink(step.place, step.place.name);
       sub = (i === 0 ? esc(exp.sub_type || exp.main_type) : "和上一项同一个地方")
         + ` · <a class="plan-map" href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">📍 地图</a>`;
       extra = step.hint ? esc(step.hint) : "";
@@ -504,13 +545,10 @@ function renderPlan() {
       extra = step.hint ? esc(step.hint) : "";
     } else if (step && step.place) {
       const metres = Math.round(step.place.distance_km * 1000);
-      // 名字点进官网（有的话），地图单独一个按钮。
-      // 没官网的就让名字去地图——总比点了没反应强。
-      const site = step.place.website;
-      lead = `<a href="${site ? esc(site) : mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">${esc(step.place.name)}</a>`;
+      // 名字点进官网，没官网就按场馆类型进大麦或点评；地图单独一个按钮。
+      lead = placeNameLink(step.place, step.place.name);
       sub = `步行约 ${metres} 米`
-        + ` · <a class="plan-map" href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">📍 地图</a>`
-        + (site ? "" : "（没找到官网）");
+        + ` · <a class="plan-map" href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">📍 地图</a>`;
       extra = step.hint ? esc(step.hint) : "";
     } else {
       sub = "地点你定";

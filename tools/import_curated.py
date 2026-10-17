@@ -34,6 +34,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from geocode_curated import acceptable   # noqa: E402  同一套名字匹配标准
+from official_sites import load_sites    # noqa: E402  手工填的官网表
 from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,7 +52,8 @@ def read(name):
 
 
 def read_csv(name):
-    with open(os.path.join(ROOT, "data", name), encoding="utf-8") as handle:
+    # utf-8-sig：用 Excel 另存回来会带 BOM，不认的话第一个列名会变成 "﻿玩法"
+    with open(os.path.join(ROOT, "data", name), encoding="utf-8-sig") as handle:
         return list(csv.DictReader(handle))
 
 
@@ -129,6 +131,7 @@ def main():
     stations = load_stations()
     station_names = all_station_names()
     coords = load_coords()
+    manual_sites = load_sites()
     problems = []
 
     places, seen = [], set()
@@ -152,8 +155,9 @@ def main():
             "source": row["来源"].strip(),
         }
         # 官网是人工填的：OSM 和 Wikidata 都查不到这批地方（营地、汤泉馆、
-        # 球馆），只能碰到一个记一个。空着就只给地图。
-        site = (row.get("官网") or "").strip()
+        # 球馆），只能碰到一个记一个。本行的「官网」列优先，其次查
+        # data/official_sites.csv 那张统一的待填表。空着就只给点评和地图。
+        site = (row.get("官网") or "").strip() or manual_sites.get(name, "")
         if site:
             record["website"] = site
         popularity = row["人气"].strip().rstrip("%")

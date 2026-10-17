@@ -37,12 +37,17 @@ import json
 import math
 import os
 import re
+import sys
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
 from datetime import datetime, timezone
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from official_sites import load_sites as load_manual_sites   # noqa: E402
+from official_sites import load_name_fixes                   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, "tools", ".cache")
@@ -705,6 +710,36 @@ def load_official_sites():
 
 
 OFFICIAL_SITES = {}
+# 人手填的官网表（data/official_sites.csv），按名字生效
+MANUAL_SITES = load_manual_sites()
+# OSM 名字的人工更正表（data/name_fixes.csv）：改名，或整条丢掉
+NAME_FIXES = load_name_fixes()
+
+
+def apply_name_fixes(pois):
+    """按 data/name_fixes.csv 改名、丢弃。
+
+    OSM 是别人维护的地图，里面难免有只写了英文名的中国机构、拼音地名，
+    也有早该撤掉的东西——比如一条 2014 年办了三个星期的快闪展览，到今天
+    还挂着 tourism=museum。这些不去改 OSM（那是别人的数据），
+    在我们这边按名字纠正一遍。
+    """
+    kept, renamed, dropped = [], 0, []
+    for poi in pois:
+        if poi["name"] not in NAME_FIXES:
+            kept.append(poi)
+            continue
+        new_name = NAME_FIXES[poi["name"]]
+        if not new_name:
+            dropped.append(poi["name"])
+            continue
+        poi["name"] = new_name
+        renamed += 1
+        kept.append(poi)
+    if renamed or dropped:
+        print("   名字更正：改名 %d 条，丢弃 %d 条%s"
+              % (renamed, len(dropped), ("（%s）" % "、".join(dropped)) if dropped else ""))
+    return kept
 
 
 def write_js(pois, missing):
@@ -741,7 +776,10 @@ def write_js(pois, missing):
         # OSM 自己填的官网只有一百多条。带 wikidata 标签的有四百多，
         # Wikidata 上的「官方网站」（P856）能把这批补上——
         # 由 tools/fetch_official_sites.py 解析好存在缓存里，这里直接取。
-        site = p.get("website") or OFFICIAL_SITES.get(p.get("wikidata") or "")
+        # 手填的排在最前：那是刚核对过的，比标签里躺了几年的旧网址可信
+        site = (MANUAL_SITES.get(p["name"])
+                or p.get("website")
+                or OFFICIAL_SITES.get(p.get("wikidata") or ""))
         w("  { id: %s, name: %s, category: %s, subtype: %s, latitude: %s, longitude: %s%s, source_url: %s },"
           % (json.dumps(p["id"]), json.dumps(p["name"], ensure_ascii=False),
              json.dumps(p["category"], ensure_ascii=False), json.dumps(p["subtype"], ensure_ascii=False),
@@ -773,7 +811,7 @@ def main():
     if not raws:
         raise SystemExit("一组都没取到，本次不生成文件。")
 
-    pois = parse(raws)
+    pois = apply_name_fixes(parse(raws))
     OFFICIAL_SITES.update(load_official_sites())
     # 顺手把看到的 wikidata id 存下来，给 fetch_official_sites.py 用
     ids = sorted({p["wikidata"] for p in pois if p.get("wikidata")})
