@@ -22,8 +22,8 @@
         </div>
         <div class="mode-list">
           <button class="mode-card" type="button" data-mode="recent"><span>🔥</span><strong>最近在玩</strong><small>看看最近有什么新鲜的</small></button>
-          <button class="mode-card" type="button" data-mode="fortune"><span>🎲</span><strong>命运模式</strong><small>交给随机</small></button>
-          <button class="mode-card" type="button" data-mode="plan"><span>🎯</span><strong>周末方案</strong><small>让它帮你凑一套玩法</small></button>
+          <button class="mode-card" type="button" data-mode="browse"><span>🚇</span><strong>按线翻一翻</strong><small>沿着一条地铁线，看看每站有什么</small></button>
+          <button class="mode-card" type="button" data-mode="plan"><span>🎲</span><strong>命运模式</strong><small>交给它，凑一套今天怎么过</small></button>
         </div>
         <p class="hint">把选择权交出去，周末会轻松一点。</p>
       </section>
@@ -81,24 +81,6 @@
         <ol class="log" id="roll-log"></ol>
       </section>
 
-      <section class="screen" id="screen-result" data-screen="result" hidden>
-        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
-        <p class="brand" id="result-kicker">命运已揭晓</p>
-        <h2 class="result-title">🎯 今天的目的地<br /><span id="result-station">青年路</span></h2>
-        <p class="result-meta" id="result-meta"></p>
-        <p class="result-lead">📍 附近发现</p>
-        <div class="place-list" id="place-list"></div>
-        <div class="explore-task" id="explore-task" hidden></div>
-        <div class="actions">
-          <button class="btn btn-primary" id="btn-accept" type="button">
-            就去这里
-          </button>
-          <button class="btn btn-ghost" id="btn-retry" type="button">
-            我认输，再抽一次
-          </button>
-        </div>
-      </section>
-
       <section class="screen" id="screen-recent" data-screen="recent" hidden>
         <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
         <p class="brand">🔥 近期新鲜</p>
@@ -135,9 +117,24 @@
 
       <!-- 没有「返回」：这一屏的上一步是「正在凑方案」的动画，退回去只会又看一遍，
            而且方案已经重摇了一套，不是用户刚才那套。要换就点「重新生成」。 -->
+      <!-- 按线翻：唯一一个不摇签的模式。
+           摇签解决的是「不知道去哪」，这一屏解决的是「明天要去国贸办事，
+           顺便能玩点啥」——这种时候用户不需要随机，他需要查。
+           做成册子而不是搜索框：搜索框要求用户先知道自己想搜什么，
+           而这个产品卖的就是「不用先想」。 -->
+      <section class="screen" id="screen-browse" data-screen="browse" hidden>
+        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
+        <p class="brand">🚇 按线翻一翻</p>
+        <h2 class="result-title">这条线上有什么？</h2>
+        <div class="chips browse-lines" id="browse-lines" role="tablist" aria-label="地铁线路"></div>
+        <p class="result-meta" id="browse-meta"></p>
+        <div class="browse-stations" id="browse-stations"></div>
+        <div id="browse-trip"></div>
+      </section>
+
       <section class="screen" id="screen-plan" data-screen="plan" hidden>
         <header class="topbar"><button class="home-link" data-home type="button">⌂ 首页</button></header>
-        <p class="brand">🎯 周末方案</p>
+        <p class="brand">🎲 命运模式</p>
         <h2 class="result-title">今天这么过</h2>
         <p class="result-meta" id="plan-subtitle"></p>
         <div class="plan-list" id="plan-list"></div>

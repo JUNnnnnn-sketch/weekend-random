@@ -580,3 +580,58 @@ h2 {
   font-size: 12px;
 }
 .plan-map:hover { background: rgba(215, 255, 62, 0.18); color: var(--lime); }
+
+/* ---------- 按线翻 ---------- */
+/* 线路名很多（26 条），横向滚动比竖着堆成一长条更像一张地铁图的图例。
+   .chips 基类是 display:grid，这里必须显式改回 flex，否则 flex-wrap 不起作用。 */
+.browse-lines {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.browse-lines .chip {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.browse-stations { display: flex; flex-direction: column; gap: 6px; margin: 14px 0 22px; }
+
+.browse-station {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+/* 不足三个地方的站压暗，但不隐藏——册子要完整，
+   「这一段没什么可去的」本身也是信息 */
+.browse-station.is-thin { opacity: 0.45; }
+
+.browse-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.browse-head:hover { background: rgba(255, 255, 255, 0.05); }
+.browse-name { flex: 1; font-size: 16px; font-weight: 600; }
+.browse-count { color: var(--muted); font-size: 13px; }
+.browse-caret { color: var(--muted); font-size: 12px; width: 1em; }
+
+.browse-body { padding: 0 14px 12px; display: flex; flex-direction: column; gap: 10px; }
+.browse-place { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 14px; }
+.browse-sub { color: var(--muted); font-size: 12px; }

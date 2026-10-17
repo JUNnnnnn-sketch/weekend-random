@@ -34,7 +34,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from geocode_curated import acceptable   # noqa: E402  同一套名字匹配标准
-from official_sites import load_sites    # noqa: E402  手工填的官网表
+from official_sites import load_sites, load_suppressed   # noqa: E402  手工填的官网表
 from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -148,6 +148,7 @@ def main():
     station_names = all_station_names()
     coords = load_coords()
     manual_sites = load_sites()
+    suppressed = load_suppressed()
     poi_sites = websites_from_pois()
     problems = []
 
@@ -177,7 +178,7 @@ def main():
         site = ((row.get("官网") or "").strip()
                 or manual_sites.get(name, "")
                 or poi_sites.get(name, ""))
-        if site:
+        if site and name not in suppressed:
             record["website"] = site
         popularity = row["人气"].strip().rstrip("%")
         if popularity:

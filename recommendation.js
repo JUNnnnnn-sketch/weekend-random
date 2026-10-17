@@ -16,7 +16,7 @@ export function randomItem(items) { return items[Math.floor(Math.random() * item
  * WGS84 不是同一个坐标系。两者混用会在那几个站上引入约 500 m 的系统性误差，
  * 足以毁掉按距离做的“附近有什么”。宁可缺坐标，也不要混坐标系。
  */
-function coordinatesOf(station) {
+export function coordinatesOf(station) {
   const hit = stationCoordinates[station.physical_station_id];
   return hit ? { latitude: hit.latitude, longitude: hit.longitude } : { latitude: null, longitude: null };
 }

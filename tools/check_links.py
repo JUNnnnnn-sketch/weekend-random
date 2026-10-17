@@ -42,6 +42,22 @@ def links():
     return out
 
 
+# 域名过期被抢注是最危险的一种坏链：它返回 200，看着"活着"，点进去是
+# 盗版影视站或赌博站。百工博物馆的 jcbgf.com 就是这样——我这边看是 404，
+# 用户在国内看到的是「66电影网」。所以光看状态码不够，还得看页面讲的是什么。
+SPAM = ("电影", "影视", "在线观看", "彩票", "赌", "棋牌", "贷款", "域名出售",
+        "本站出售", "购买此域名", "This domain", "for sale")
+
+
+def page_title(url):
+    """取回页面标题，用来判断内容对不对得上。失败返回空串。"""
+    result = subprocess.run(
+        ["curl", "-sS", "-L", "--max-time", str(TIMEOUT), "-A", UA, url],
+        capture_output=True, text=True, errors="replace")
+    match = re.search(r"<title[^>]*>(.*?)</title>", result.stdout or "", re.S | re.I)
+    return re.sub(r"\s+", " ", match.group(1)).strip()[:80] if match else ""
+
+
 def probe(url):
     """用 curl 发请求，不用 urllib。
 
@@ -71,6 +87,12 @@ def main():
     for index, (name, url) in enumerate(items, 1):
         status, why = probe(url)
         ok = 200 <= status < 400
+        if ok:
+            title = page_title(url)
+            hit = [w for w in SPAM if w in title]
+            if hit:
+                ok = False
+                why = "标题可疑：%s ← %s" % (title, "/".join(hit))
         if not ok:
             bad.append((name, url, status, why))
         if not args.only_bad:

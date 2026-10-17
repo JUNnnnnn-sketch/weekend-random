@@ -48,6 +48,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from official_sites import load_sites as load_manual_sites   # noqa: E402
 from official_sites import load_name_fixes                   # noqa: E402
+from official_sites import load_suppressed                   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, "tools", ".cache")
@@ -712,6 +713,8 @@ def load_official_sites():
 OFFICIAL_SITES = {}
 # 人手填的官网表（data/official_sites.csv），按名字生效
 MANUAL_SITES = load_manual_sites()
+# 官网作废的地方（死域名、被抢注的域名）
+SUPPRESSED_SITES = load_suppressed()
 # OSM 名字的人工更正表（data/name_fixes.csv）：改名，或整条丢掉
 NAME_FIXES = load_name_fixes()
 
@@ -780,6 +783,8 @@ def write_js(pois, missing):
         site = (MANUAL_SITES.get(p["name"])
                 or p.get("website")
                 or OFFICIAL_SITES.get(p.get("wikidata") or ""))
+        if p["name"] in SUPPRESSED_SITES:
+            site = None
         w("  { id: %s, name: %s, category: %s, subtype: %s, latitude: %s, longitude: %s%s, source_url: %s },"
           % (json.dumps(p["id"]), json.dumps(p["name"], ensure_ascii=False),
              json.dumps(p["category"], ensure_ascii=False), json.dumps(p["subtype"], ensure_ascii=False),

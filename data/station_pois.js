@@ -3,7 +3,7 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-17T21:16:36+08:00
+ * 获取时间：2026-10-17T22:33:25+08:00
  *
  * 共 949 条：
  *   🎨 艺术 / 展览  205
@@ -49,7 +49,7 @@ export const nearbyPois = [
   { id: "way/26514859", name: "后海公园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.94075, longitude: 116.376362, source_url: "https://www.openstreetmap.org/way/26514859" },
   { id: "way/108382017", name: "四得公园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.971224, longitude: 116.468946, website: "https://yllhj.beijing.gov.cn/ggfw/bjsggml/zhgy/cyq/202206/t20220614_2740307.shtml", source_url: "https://www.openstreetmap.org/way/108382017" },
   { id: "relation/8758747", name: "国家植物园（北园）", category: "🌳 公园 / 自然", subtype: "园林", latitude: 40.001842, longitude: 116.201339, website: "http://www.beijingbg.com/", source_url: "https://www.openstreetmap.org/relation/8758747" },
-  { id: "way/661458570", name: "国家植物园（南园）", category: "🌳 公园 / 自然", subtype: "园林", latitude: 39.988247, longitude: 116.209291, website: "https://garden.ibcas.ac.cn/index.htm", source_url: "https://www.openstreetmap.org/way/661458570" },
+  { id: "way/661458570", name: "国家植物园（南园）", category: "🌳 公园 / 自然", subtype: "园林", latitude: 39.988247, longitude: 116.209291, source_url: "https://www.openstreetmap.org/way/661458570" },
   { id: "way/24827108", name: "圆明园遗址公园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 40.005081, longitude: 116.297153, website: "https://www.yuanmingyuanpark.cn/", source_url: "https://www.openstreetmap.org/way/24827108" },
   { id: "way/24825400", name: "地坛公园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.952774, longitude: 116.409038, website: "http://www.dtpark.com", source_url: "https://www.openstreetmap.org/way/24825400" },
   { id: "way/156322316", name: "地铁文化公园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.780193, longitude: 116.32, website: "https://yllhj.beijing.gov.cn/ggfw/bjsggml/zlgy/dxq/202206/t20220615_2741776.shtml", source_url: "https://www.openstreetmap.org/way/156322316" },
@@ -452,7 +452,7 @@ export const nearbyPois = [
   { id: "node/6039590930", name: "王府井古人类文化遗址博物馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.90758, longitude: 116.406584, website: "https://s.visitbeijing.com.cn/attraction/118168", source_url: "https://www.openstreetmap.org/node/6039590930" },
   { id: "node/11521261704", name: "现代汽车文化中心", category: "🎨 艺术 / 展览", subtype: "美术馆 / 画廊", latitude: 39.982839, longitude: 116.487724, website: "https://motorstudio.hyundai.com.cn/", source_url: "https://www.openstreetmap.org/node/11521261704" },
   { id: "node/11521261702", name: "白盒子艺术馆", category: "🎨 艺术 / 展览", subtype: "美术馆 / 画廊", latitude: 39.985132, longitude: 116.490426, website: "http://whiteboxartcenter.org.cn/", source_url: "https://www.openstreetmap.org/node/11521261702" },
-  { id: "node/3809864708", name: "百工博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.882236, longitude: 116.428244, website: "http://jcbgf.com", source_url: "https://www.openstreetmap.org/node/3809864708" },
+  { id: "node/3809864708", name: "百工博物馆", category: "🎨 艺术 / 展览", subtype: "冷门 / 奇趣博物馆", latitude: 39.882236, longitude: 116.428244, source_url: "https://www.openstreetmap.org/node/3809864708" },
   { id: "node/12079943046", name: "瞭仓艺术馆", category: "🎨 艺术 / 展览", subtype: "艺术中心", latitude: 39.920079, longitude: 116.150347, website: "https://www.beijing.gov.cn/renwen/rwzyd/qxdw/xshjshqmzhl/lcyshg/202309/t20230922_3264355.html", source_url: "https://www.openstreetmap.org/node/12079943046" },
   { id: "node/283642585", name: "石景山区石刻博物馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.933574, longitude: 116.151855, website: "https://www.bjsjs.gov.cn/sjsfc/sjswwjd/202502/t20250206_475965.shtml", source_url: "https://www.openstreetmap.org/node/283642585" },
   { id: "way/1288212394", name: "石景山区规划展览馆", category: "🎨 艺术 / 展览", subtype: "规划展览馆", latitude: 39.940863, longitude: 116.170389, source_url: "https://www.openstreetmap.org/way/1288212394" },
@@ -470,7 +470,7 @@ export const nearbyPois = [
   { id: "way/240832217", name: "赛克勒考古与艺术博物馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.994427, longitude: 116.299811, website: "https://amsm.pku.edu.cn/", source_url: "https://www.openstreetmap.org/way/240832217" },
   { id: "way/1275290671", name: "路县故城遗址博物馆", category: "🎨 艺术 / 展览", subtype: "历史博物馆", latitude: 39.911438, longitude: 116.713513, website: "https://lyzz.visitbeijing.com.cn/news/detail?id=24939", source_url: "https://www.openstreetmap.org/way/1275290671" },
   { id: "way/691433338", name: "通州区博物馆", category: "🎨 艺术 / 展览", subtype: "综合博物馆", latitude: 39.90688, longitude: 116.661486, website: "https://www.bjszwhg.org.cn/detail/13303", source_url: "https://www.openstreetmap.org/way/691433338" },
-  { id: "way/1131425458", name: "遇见美术馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.982833, longitude: 116.488327, website: "https://meetyouart.com/北京798馆", source_url: "https://www.openstreetmap.org/way/1131425458" },
+  { id: "way/1131425458", name: "遇见美术馆", category: "🎨 艺术 / 展览", subtype: "艺术博物馆", latitude: 39.982833, longitude: 116.488327, source_url: "https://www.openstreetmap.org/way/1131425458" },
   { id: "way/493378159", name: "郭守敬纪念馆", category: "🎨 艺术 / 展览", subtype: "故居 / 纪念馆", latitude: 39.946551, longitude: 116.368029, source_url: "https://www.openstreetmap.org/way/493378159" },
   { id: "node/13204690291", name: "郭沫若故居", category: "🎨 艺术 / 展览", subtype: "故居 / 纪念馆", latitude: 39.933166, longitude: 116.381916, source_url: "https://www.openstreetmap.org/node/13204690291" },
   { id: "node/11530187639", name: "铁匠营艺术馆", category: "🎨 艺术 / 展览", subtype: "美术馆 / 画廊", latitude: 39.985538, longitude: 116.49039, website: "https://www.798artdistrict.com.cn/business/detail?shop_id=69", source_url: "https://www.openstreetmap.org/node/11530187639" },
@@ -660,7 +660,7 @@ export const nearbyPois = [
   { id: "way/1318861938", name: "广安门电影院", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.88269, longitude: 116.353336, source_url: "https://www.openstreetmap.org/way/1318861938" },
   { id: "node/6302602908", name: "广德楼德云社", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.894465, longitude: 116.388752, source_url: "https://www.openstreetmap.org/node/6302602908" },
   { id: "node/4827184437", name: "开心麻花磁力剧场", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.921305, longitude: 116.365238, source_url: "https://www.openstreetmap.org/node/4827184437" },
-  { id: "way/251434123", name: "当代MOMA百老汇电影中心", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.949179, longitude: 116.432012, website: "http://www.bc-cinema.cn/", source_url: "https://www.openstreetmap.org/way/251434123" },
+  { id: "way/251434123", name: "当代MOMA百老汇电影中心", category: "🎵 音乐 / 演出", subtype: "影院", latitude: 39.949179, longitude: 116.432012, source_url: "https://www.openstreetmap.org/way/251434123" },
   { id: "way/1259304558", name: "德云社", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.882507, longitude: 116.391563, website: "http://www.guodegang.org/", source_url: "https://www.openstreetmap.org/way/1259304558" },
   { id: "node/5660650521", name: "新国戏艺术中心", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 39.871831, longitude: 116.351111, source_url: "https://www.openstreetmap.org/node/5660650521" },
   { id: "way/158112141", name: "新清华学堂", category: "🎵 音乐 / 演出", subtype: "剧场", latitude: 40.000341, longitude: 116.323397, website: "https://www.hall.tsinghua.edu.cn/", source_url: "https://www.openstreetmap.org/way/158112141" },
@@ -974,7 +974,7 @@ export const nearbyPois = [
   { id: "way/703612796", name: "神乐署", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.877397, longitude: 116.398031, source_url: "https://www.openstreetmap.org/way/703612796" },
   { id: "way/602802468", name: "见心斋", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.992852, longitude: 116.185502, source_url: "https://www.openstreetmap.org/way/602802468" },
   { id: "way/856189717", name: "辛亥滦州起义纪念园", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 40.049425, longitude: 116.158919, source_url: "https://www.openstreetmap.org/way/856189717" },
-  { id: "node/6313986642", name: "齐白石故居", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.934321, longitude: 116.395264, website: "http://r.visitbeijing.com.cn/html/2018/Attractions_1101/519.html", source_url: "https://www.openstreetmap.org/node/6313986642" },
+  { id: "node/6313986642", name: "齐白石故居", category: "🧭 特色去处", subtype: "地标 / 古迹", latitude: 39.934321, longitude: 116.395264, source_url: "https://www.openstreetmap.org/node/6313986642" },
 ];
 
 /** POI 来源署名，展示这些内容时应当带上。 */
@@ -982,5 +982,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-17T21:16:36+08:00",
+  fetched_at: "2026-10-17T22:33:25+08:00",
 };

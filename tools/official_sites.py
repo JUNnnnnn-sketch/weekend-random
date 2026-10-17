@@ -31,14 +31,27 @@ def load_rows():
     return [row for row in read_table(CSV_PATH) if (row.get("名称") or "").strip()]
 
 
+# 在「官网」列里写这个词，表示这个地方的官网作废——哪怕 OSM 或 Wikidata
+# 里有，也不要挂出去。用于死域名：百工博物馆的 jcbgf.com 过期后被抢注，
+# 用户点进去看到的是盗版影视站。这种链接比没有链接危险得多。
+SUPPRESS = "无"
+
+
 def load_sites():
-    """名称 -> 官网。只收填了的，空着的当没这条。"""
+    """名称 -> 官网。只收填了的；写「无」的是作废标记，不算官网。"""
     sites = {}
     for row in load_rows():
         url = (row.get("官网") or "").strip()
-        if url:
+        if url and url != SUPPRESS:
             sites[(row.get("名称") or "").strip()] = url
     return sites
+
+
+def load_suppressed():
+    """官网作废的地方。这些名字即使别处查到了网址也不挂。"""
+    return {(row.get("名称") or "").strip()
+            for row in load_rows()
+            if (row.get("官网") or "").strip() == SUPPRESS}
 
 
 def read_table(path):

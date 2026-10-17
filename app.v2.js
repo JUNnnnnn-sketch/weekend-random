@@ -1,7 +1,7 @@
 import { subwayLines } from "./data/subway.js";
 import { activities, activityDataAsOf } from "./data/activities.js";
 import { activitiesChncpa } from "./data/activities_chncpa.js";
-import { pickDestination, findNearbyPois, NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, fortuneCandidates, placeableExperiencesAt, matchPlaceFor, pickWorthATrip } from "./recommendation.js";
+import { NEARBY_RADIUS_KM, freshness, buildAnchoredPlan, fortuneCandidates, placeableExperiencesAt, matchPlaceFor, pickWorthATrip, placesAround, coordinatesOf, MIN_NEARBY_COUNT } from "./recommendation.js";
 import { poiSource } from "./data/station_pois.js";
 import { experiences as allExperiences } from "./data/experiences.js";
 import { saveTicket } from "./ticket-image.js";
@@ -30,7 +30,7 @@ function districtTier(d) { return CENTRAL_DISTRICTS.has(d) ? 0 : (MID_DISTRICTS.
 function organizerTier(a) { return GRASS_RE.test([a.venue, a.address, a.name].filter(Boolean).join(" ")) ? 1 : 0; }
 
 const STORAGE_KEY = "weekend-dont-think-v02";
-const state = { mode: "fortune", party: "", duration: "", destination: null, result: null };
+const state = { mode: "plan", party: "", duration: "", result: null };
 let currentScreen = "home";
 let navigationStack = [];
 let rollRunId = 0;
@@ -48,7 +48,7 @@ function showScreen(name, { remember = true } = {}) {
   if (name === "setup") document.getElementById("setup-title").textContent = setupTitleFor(state.mode);
   if (name === "roll") {
     document.getElementById("roll-kicker").textContent =
-      state.mode === "plan" ? "正在给你凑一套" : "命运正在抽签";
+      "正在给你凑一套";
   }
   Object.entries(screens).forEach(([key, screen]) => { const active = key === name; screen.classList.toggle("is-active", active); screen.toggleAttribute("hidden", !active); screen.setAttribute("aria-hidden", String(!active)); });
   saveSession();
@@ -61,25 +61,137 @@ function addLog(text, done = false) { const item = document.createElement("li");
  * 命运模式不问任何问题——它的全部意思就是「不用想，让命运决定」，
  * 还要先填两道题是自相矛盾的。人数对「附近有什么」没有真实影响；时长也没有：
  * 有半天还是有一天或以上，并不改变你愿不愿意多走十分钟。两个都去掉。
- * 周末方案继续问人数和时长，那里 buildWeekendPlan 真的在用。
+ * 命运模式继续问人数和时长，那里 buildWeekendPlan 真的在用。
  */
-function needsSetup(mode) { return mode !== "fortune"; }
 function updateContinue() { continueBtn.disabled = !(state.party && state.duration); }
 function restoreSelectionUI() { document.querySelectorAll(".chip").forEach((chip) => chip.classList.toggle("is-selected", state[chip.dataset.group] === chip.dataset.value)); updateContinue(); }
 
-function setupTitleFor(mode) { return mode === "fortune" ? "先告诉命运一点情报" : mode === "plan" ? "先告诉它会怎么过" : "先告诉这次怎么探索"; }
+function setupTitleFor(mode) { return mode === "plan" ? "先告诉它会怎么过" : "先告诉这次怎么探索"; }
+/* ---------- 按线翻 ---------- */
+
+/**
+ * 一条线上每一站有什么。
+ *
+ * 和另外两个模式的区别只有一个：这里不摇。摇签回答的是「不知道去哪」，
+ * 这一屏回答的是「我明天要去国贸办事，顺便能玩点啥」——这种时候用户
+ * 已经知道自己在哪，他要的是查，不是碰运气。
+ *
+ * 为什么是册子不是搜索框：搜索框要求用户先想好关键词，而这个产品的前提
+ * 是「不用先想」。沿着一条线往下翻，不需要预先知道任何事，就是逛。
+ *
+ * 不足 MIN_NEARBY_COUNT 个地方的站照样列出来，只是压暗——册子要完整，
+ * 翻过去也是一种信息（「这一段没什么可去的」）。
+ */
+let browseLine = null;
+let browseOpen = new Set();
+
+function stationPlaceCount(station) {
+  if (coordinatesOf(station).latitude === null) return null;   // 没坐标就是不知道，不是 0
+  return placesAround(station).length;
+}
+
+function renderBrowseLines() {
+  const box = document.getElementById("browse-lines");
+  box.replaceChildren();
+  subwayLines.forEach((line) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip" + (line === browseLine ? " is-selected" : "");
+    chip.textContent = line.line_name;
+    chip.setAttribute("role", "tab");
+    chip.setAttribute("aria-selected", line === browseLine ? "true" : "false");
+    chip.addEventListener("click", () => { browseLine = line; browseOpen = new Set(); renderBrowse(); });
+    box.append(chip);
+  });
+}
+
+function renderBrowse() {
+  if (!browseLine) browseLine = subwayLines[0];
+  renderBrowseLines();
+  const list = document.getElementById("browse-stations");
+  list.replaceChildren();
+
+  // 环线的首尾是同一站（2号线西直门出现在 order 1 和 19），列两遍没意义
+  const seen = new Set();
+  const stations = (browseLine.stations || [])
+    .slice()
+    .sort((a, b) => a.station_order - b.station_order)
+    .filter((st) => { if (seen.has(st.physical_station_id)) return false; seen.add(st.physical_station_id); return true; });
+
+  let withPlaces = 0;
+  let noCoords = 0;
+  stations.forEach((station) => {
+    const count = stationPlaceCount(station);
+    if (count === null) noCoords += 1;
+    else if (count >= MIN_NEARBY_COUNT) withPlaces += 1;
+
+    const row = document.createElement("article");
+    const thin = count === null || count < MIN_NEARBY_COUNT;
+    row.className = "browse-station" + (thin ? " is-thin" : "");
+    const open = browseOpen.has(station.physical_station_id);
+
+    const head = document.createElement("button");
+    head.type = "button";
+    head.className = "browse-head";
+    head.innerHTML = `<span class="browse-name">${esc(station.station_name)}</span>`
+      + `<span class="browse-count">${count === null ? "缺坐标" : count === 0 ? "—" : count + " 个"}</span>`
+      + `<span class="browse-caret">${open ? "▾" : "▸"}</span>`;
+    head.addEventListener("click", () => {
+      if (browseOpen.has(station.physical_station_id)) browseOpen.delete(station.physical_station_id);
+      else browseOpen.add(station.physical_station_id);
+      renderBrowse();
+    });
+    row.append(head);
+
+    if (open && count) {
+      const body = document.createElement("div");
+      body.className = "browse-body";
+      body.innerHTML = placesAround(station)
+        .slice()
+        .sort((a, b) => (a.distance_km ?? 9) - (b.distance_km ?? 9))
+        .map((p) => `<p class="browse-place"><strong>${esc(p.name)}</strong>`
+          + `<span class="browse-sub">${esc(p.subtype || p.experience || "")}`
+          + (p.distance_km != null ? ` · ${Math.round(p.distance_km * 1000)} 米` : "")
+          + `</span><span class="plan-acts">${placeButtons(p, p.name)}</span></p>`)
+        .join("");
+      row.append(body);
+    }
+    list.append(row);
+  });
+
+  document.getElementById("browse-meta").textContent =
+    `${browseLine.line_name} · ${stations.length} 站，其中 ${withPlaces} 站周边有 ${MIN_NEARBY_COUNT} 个以上值得去的地方`
+    + (noCoords ? `；${noCoords} 站还没有坐标，查不了` : "");
+
+  renderBrowseTrip();
+}
+
+/**
+ * 「地铁到不了，但值得专程去一趟」。
+ *
+ * 这块原来在命运模式里。放到按线翻更合适：既然是沿着地铁线往下翻，
+ * 翻到最后说一句「还有些地方地铁够不着」，是同一个话题的下一句。
+ */
+function renderBrowseTrip() {
+  const box = document.getElementById("browse-trip");
+  box.replaceChildren();
+  const lead = document.createElement("p");
+  lead.className = "result-lead";
+  lead.textContent = "🧳 地铁到不了，但值得专程去一趟";
+  box.append(lead, renderWorthATrip());
+}
+
 function setupMode(mode) { state.mode = mode; document.getElementById("setup-title").textContent = setupTitleFor(mode); updateContinue(); showScreen("setup"); }
 document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => {
   const mode = button.dataset.mode;
   if (mode === "recent") { state.mode = "recent"; showScreen("recent"); renderRecent(); return; }
-  if (!needsSetup(mode)) { state.mode = mode; startRoll(); return; }   // 命运模式直接开抽
+  if (mode === "browse") { state.mode = "browse"; renderBrowse(); showScreen("browse"); return; }
   setupMode(mode);
 }));
 document.querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => { state[chip.dataset.group] = chip.dataset.value; restoreSelectionUI(); saveSession(); }));
 document.querySelectorAll("[data-back]").forEach((button) => button.addEventListener("click", goBack));
 document.querySelectorAll("[data-home]").forEach((button) => button.addEventListener("click", goHome));
-document.getElementById("btn-continue").addEventListener("click", () => { if (state.mode === "plan") { startPlan(); return; } startRoll(); });
-document.getElementById("btn-retry").addEventListener("click", startRoll);
+document.getElementById("btn-continue").addEventListener("click", () => { startPlan(); });
 /**
  * 锁定不该把前面看到的东西清空——锁完还得照着去玩，甚至截图发给朋友。
  * 这里把结果页的内容整块搬进锁定页，只改标题和状态。
@@ -99,10 +211,6 @@ function lockWith(subtitle, sourceNode) {
   document.getElementById("ticket-shot").replaceChildren();          // 上一次存的图不留到这一次
   showScreen("locked");
 }
-document.getElementById("btn-accept").addEventListener("click", () => {
-  lockWith(`${state.destination.label || state.destination.name}。出门就好。`,
-           document.getElementById("place-list"));
-});
 document.getElementById("btn-home").addEventListener("click", goHome);
 document.getElementById("btn-ticket-save").addEventListener("click", (event) => {
   const btn = event.currentTarget;
@@ -227,82 +335,6 @@ async function spinTo(pool, finalValue, status, runId) {
   reel.classList.remove("is-spinning"); reelValue.textContent = finalValue; return true;
 }
 
-async function startRoll() {
-  const runId = ++rollRunId; rollLog.replaceChildren();
-  document.getElementById("roll-kicker").textContent = "命运正在抽签";
-  showScreen("roll");
-  // 命运模式只做一件事：在覆盖范围内随机线路 -> 随机站点。“附近有什么”是下一阶段。
-  const radiusKm = NEARBY_RADIUS_KM;
-  const picked = pickDestination(subwayLines, { radiusKm });
-  if (!picked) { addLog("暂时没有可用的地铁线路数据", true); return; }
-  const { line, station, destination, lineNames, stationNames } = picked;
-  state.destination = destination;
-  addLog("正在决定地铁线……"); if (!await spinTo(lineNames, line.line_name, "正在决定地铁线……", runId)) return;
-  addLog(line.line_name, true); await wait(350); addLog("正在决定车站……");
-  if (!await spinTo(stationNames, station.station_name, "正在决定车站……", runId)) return;
-  addLog(station.station_name, true);
-  if (runId !== rollRunId) return;
-  state.result = null; // 抽签阶段到此结束；“附近有什么”是独立的下一阶段。
-  await wait(350); renderResult(); showScreen("result");
-}
-
-function renderResult() {
-  document.querySelector("#screen-result .actions").hidden = false;
-  document.getElementById("result-kicker").textContent = "命运已揭晓";
-  document.querySelector(".result-title").innerHTML = "🎯 今天的目的地<br /><span id=\"result-station\"></span>";
-  document.getElementById("result-station").textContent = state.destination.label || state.destination.name;
-  renderDestinationOnly();
-}
-
-/** 命运模式的结果页：只公布目的地（线路 + 站点），并为下一阶段留出入口。缺坐标不影响展示。 */
-function renderDestinationOnly() {
-  const { line_name, station_order } = state.destination;
-  const radiusKm = NEARBY_RADIUS_KM;
-  document.getElementById("result-meta").textContent = `${line_name} 第 ${station_order} 站 · 步行 ${radiusKm} km 内`;
-  document.getElementById("explore-task").hidden = true;
-
-  const pois = findNearbyPois(state.destination, { radiusKm });
-  const list = document.getElementById("place-list"); list.replaceChildren();
-
-  if (!pois.length) {
-    document.querySelector(".result-lead").textContent = "🚇 这一站";
-    list.innerHTML = '<p class="empty">这站附近还没有收录到值得推荐的地方。系统不会为了凑数扩大范围——出门随便走走也不错。</p>';
-    return;
-  }
-
-  document.querySelector(".result-lead").textContent = `📍 ${state.destination.station_name}附近`;
-  // 展示顺序：专程去的在前，吃喝是顺带的，放最后
-  const CATEGORY_ORDER = ["🧭 特色去处", "🎨 艺术 / 展览", "🎵 音乐 / 演出", "🏛 寺庙 / 古迹",
-                         "🌳 公园 / 自然", "🛍 商场 / 商圈", "📚 书店 / 图书馆",
-                         "🏟 场馆 / 运动", "🎯 玩乐场地", "🍸 夜生活", "🍜 吃喝"];
-  // 按品类分组展示；组内按距离升序。同一个站每次结果一致，随机性只发生在抽站那一步。
-  const groups = new Map();
-  pois.forEach((poi) => {
-    if (!groups.has(poi.category)) groups.set(poi.category, []);
-    groups.get(poi.category).push(poi);
-  });
-  const ordered = [...groups.entries()].sort((a, b) => {
-    const rank = (c) => { const i = CATEGORY_ORDER.indexOf(c); return i === -1 ? CATEGORY_ORDER.length : i; };
-    return rank(a[0]) - rank(b[0]);
-  });
-  ordered.forEach(([category, items]) => {
-    const card = document.createElement("article"); card.className = "place-card";
-    const SHOWN = 8;   // 显示 5 条却提示「另有 1 个未列出」很奇怪，放宽到 8 条
-    const rows = items.slice(0, SHOWN).map((poi) =>
-      `<p><strong>${esc(poi.name)}</strong> · ${esc(poi.subtype)}<br /><span class="place-freshness">步行约 ${Math.round(poi.distance_km * 1000)} 米 · ${placeLinks(poi, poi.name)}</span></p>`).join("");
-    const more = items.length > SHOWN ? `<p class="place-freshness">另有 ${items.length - SHOWN} 个</p>` : "";
-    card.innerHTML = `<div><p class="place-category">${category}</p><h3>${items.length} 个</h3></div>${rows}${more}`;
-    list.append(card);
-  });
-
-  list.append(renderWorthATrip());
-
-  const note = document.createElement("p");
-  note.className = "place-freshness";
-  note.innerHTML = `范围 ${radiusKm} km 内 · 场所数据来自 <a href="${poiSource.url}" target="_blank" rel="noreferrer">${poiSource.name}</a>（${poiSource.license}）· 只收录场所，不含演出排期`;
-  list.append(note);
-}
-
 // 已经摇出来过的，换一个时不重复
 let tripSeen = [];
 
@@ -353,12 +385,7 @@ function swapTripModule(i) {
   renderPlan();
 }
 
-function renderPlace(item) {
-  const card = document.createElement("article"); card.className = "place-card";
-  card.innerHTML = `<div><p class="place-category">${item.category}</p><h3>${item.name}</h3></div><p>${item.category} · ${state.party}</p><p>距离 ${item.distance_km.toFixed(1)} km · 约 ${state.duration}</p><p class="place-freshness">数据${freshness(item.updated_at)}</p><a href="${item.source_url}" target="_blank" rel="noreferrer">查看数据来源 ↗</a>`;
-  return card;
-}
-/* ---------- 周末方案（plan）模式：基于 experiences taxonomy 推荐，纯前端，不接外部数据 ---------- */
+/* ---------- 命运模式（plan）：基于 experiences taxonomy 推荐，纯前端，不接外部数据 ---------- */
 // 当前展示的方案、各模块换次数、各模块历史（避免连续重复同一 Experience）
 let planExperiences = [];
 let planSwapCounts = [];
@@ -473,11 +500,10 @@ function placeLinks(place, keyword) {
 }
 
 /**
- * 周末方案也要走一遍「正在凑」的过程。
+ * 命运模式也要走一遍「正在凑」的过程。
  *
  * 之前点完「继续」立刻就是结果，看着像早就准备好的答案——这个产品卖的是
- * 「交给命运」，过程本身就是体验的一部分。命运模式一直有摇签动画，周末方案
- * 没有，两边手感不一致。
+ * 「交给命运」，过程本身就是体验的一部分：结果不该一按就出来，像早就准备好的。
  *
  * 和命运模式同一套做法：先把结果算出来，再倒过来演一遍。不是假装在算，
  * 是把已经定下来的东西一个个揭晓。
@@ -600,7 +626,7 @@ function renderPlan() {
       + ` · <a href="${mapSearchUrl(planTrip.name)}" target="_blank" rel="noreferrer">地图 ↗</a>`;
     container.append(note);
   }
-  // 周末方案同样吃 OSM 的数据，ODbL 的署名义务在这一屏也成立。
+  // 这一屏同样吃 OSM 的数据，ODbL 的署名义务在这里也成立。
   // 地图链接改成跳高德之后更要标——不标的话这份数据从哪来就无从得知了。
   const credit = document.createElement("p");
   credit.className = "place-freshness";
@@ -642,7 +668,6 @@ function restoreSession() {
     if (previous.currentScreen === "recent") { renderRecent(); showScreen("recent", { remember: false }); return; }
     if (previous.currentScreen === "pick") { renderPick(); showScreen("pick", { remember: false }); return; }
     if (previous.currentScreen === "plan") { showScreen("setup", { remember: false }); return; }
-    if (previous.currentScreen === "result" && state.destination && (state.mode !== "wander" || state.result)) { renderResult(); showScreen("result", { remember: false }); return; }
     // 刷新时不伪造未完成动画，回到可继续的条件页。
     showScreen(previous.currentScreen === "roll" ? "setup" : (previous.currentScreen || "home"), { remember: false });
   } catch { sessionStorage.removeItem(STORAGE_KEY); restoreSelectionUI(); }
@@ -669,7 +694,7 @@ populateDistricts();
 
 /* plan 模式交互绑定（不改动命运/随便逛逛/recent/locked 等其它屏幕） */
 document.getElementById("btn-plan-lock").addEventListener("click", () => {
-  lockWith("周末方案已经锁定。出门就好。",
+  lockWith("已经定下来了。出门就好。",
            document.getElementById("plan-list"));
 });
 document.getElementById("btn-plan-regenerate").addEventListener("click", startPlan);
