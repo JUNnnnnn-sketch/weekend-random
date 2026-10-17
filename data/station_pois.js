@@ -3,7 +3,7 @@
  *
  * 数据来源：OpenStreetMap contributors，经 Overpass API 查询获得。
  * 许可：ODbL 1.0 —— 使用须保留 © OpenStreetMap contributors 署名并履行 ODbL 义务。
- * 获取时间：2026-10-17T20:49:04+08:00
+ * 获取时间：2026-10-17T21:16:36+08:00
  *
  * 共 949 条：
  *   🎨 艺术 / 展览  205
@@ -79,7 +79,7 @@ export const nearbyPois = [
   { id: "relation/19640872", name: "金融街中心公园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.91498, longitude: 116.355782, website: "https://www.bjxch.gov.cn/zt/yllh/xxxq/pnidpv760753.html", source_url: "https://www.openstreetmap.org/relation/19640872" },
   { id: "way/30784976", name: "陶然亭公园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.873558, longitude: 116.375095, website: "https://www.trt-park.cn/", source_url: "https://www.openstreetmap.org/way/30784976" },
   { id: "way/42361478", name: "青年湖公园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.954048, longitude: 116.396277, website: "https://yllhj.beijing.gov.cn/ggfw/bjsggml/zhgy/dcq/202206/t20220614_2740264.shtml", source_url: "https://www.openstreetmap.org/way/42361478" },
-  { id: "way/29228773", name: "颐和园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.990178, longitude: 116.265925, website: "https://www.summerpalace-china.com/English/index.htm", source_url: "https://www.openstreetmap.org/way/29228773" },
+  { id: "way/29228773", name: "颐和园", category: "🌳 公园 / 自然", subtype: "公园", latitude: 39.990178, longitude: 116.265925, website: "https://www.summerpalace-china.com/", source_url: "https://www.openstreetmap.org/way/29228773" },
   { id: "relation/8758884", name: "香山公园", category: "🌳 公园 / 自然", subtype: "自然保护区", latitude: 39.989405, longitude: 116.181598, website: "https://www.xiangshan-park.cn/cn/", source_url: "https://www.openstreetmap.org/relation/8758884" },
   { id: "relation/9359976", name: "鹫峰国家森林公园", category: "🌳 公园 / 自然", subtype: "自然保护区", latitude: 40.059527, longitude: 116.080661, website: "https://yllhj.beijing.gov.cn/ggfw/bjsggml/zrlgy/zrlgy2/202206/t20220620_2746790.shtml", source_url: "https://www.openstreetmap.org/relation/9359976" },
   { id: "way/1520540042", name: "鹿苑", category: "🌳 公园 / 自然", subtype: "动物园", latitude: 40.063797, longitude: 116.104693, source_url: "https://www.openstreetmap.org/way/1520540042" },
@@ -844,12 +844,12 @@ export const nearbyPois = [
   { id: "way/1473790923", name: "鲁家滩村关帝庙", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 39.872203, longitude: 116.027336, source_url: "https://www.openstreetmap.org/way/1473790923" },
   { id: "node/6813641718", name: "麒麟", category: "🏛 寺庙 / 古迹", subtype: "古迹", latitude: 39.99654, longitude: 116.274327, source_url: "https://www.openstreetmap.org/node/6813641718" },
   { id: "relation/7301352", name: "鼓楼", category: "🏛 寺庙 / 古迹", subtype: "古迹", latitude: 39.93935, longitude: 116.389728, source_url: "https://www.openstreetmap.org/relation/7301352" },
-  { id: "way/1049594280", name: "龙泉寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 40.102288, longitude: 116.085317, website: "http://eng.longquanzs.org/", source_url: "https://www.openstreetmap.org/way/1049594280" },
+  { id: "way/1049594280", name: "龙泉寺", category: "🏛 寺庙 / 古迹", subtype: "寺庙 / 教堂", latitude: 40.102288, longitude: 116.085317, website: "http://www.longquanzs.org/", source_url: "https://www.openstreetmap.org/way/1049594280" },
   { id: "relation/9106276", name: "丰台体育中心体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.86565, longitude: 116.27245, source_url: "https://www.openstreetmap.org/relation/9106276" },
   { id: "way/697557974", name: "京东英特尔电子竞技中心", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.815955, longitude: 116.552876, source_url: "https://www.openstreetmap.org/way/697557974" },
   { id: "way/191693413", name: "北京工人体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.9295, longitude: 116.440997, source_url: "https://www.openstreetmap.org/way/191693413" },
   { id: "way/25375821", name: "北京海洋馆", category: "🏟 场馆 / 运动", subtype: "水族馆", latitude: 39.943269, longitude: 116.334756, source_url: "https://www.openstreetmap.org/way/25375821" },
-  { id: "way/152301551", name: "国家体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.991415, longitude: 116.390287, website: "http://www.n-s.cn/en/", source_url: "https://www.openstreetmap.org/way/152301551" },
+  { id: "way/152301551", name: "国家体育场", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.991415, longitude: 116.390287, website: "https://www.n-s.cn/", source_url: "https://www.openstreetmap.org/way/152301551" },
   { id: "way/55883993", name: "国家体育馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.99509, longitude: 116.383943, source_url: "https://www.openstreetmap.org/way/55883993" },
   { id: "way/29201257", name: "国家游泳中心", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 39.991579, longitude: 116.384173, website: "http://www.water-cube.com/", source_url: "https://www.openstreetmap.org/way/29201257" },
   { id: "way/899874039", name: "国家速滑馆", category: "🏟 场馆 / 运动", subtype: "体育场馆", latitude: 40.01599, longitude: 116.371384, source_url: "https://www.openstreetmap.org/way/899874039" },
@@ -982,5 +982,5 @@ export const poiSource = {
   name: "OpenStreetMap contributors",
   url: "https://www.openstreetmap.org/copyright",
   license: "ODbL 1.0",
-  fetched_at: "2026-10-17T20:49:04+08:00",
+  fetched_at: "2026-10-17T21:16:36+08:00",
 };

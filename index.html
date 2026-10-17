@@ -133,8 +133,10 @@
         </article>
       </section>
 
+      <!-- 没有「返回」：这一屏的上一步是「正在凑方案」的动画，退回去只会又看一遍，
+           而且方案已经重摇了一套，不是用户刚才那套。要换就点「重新生成」。 -->
       <section class="screen" id="screen-plan" data-screen="plan" hidden>
-        <header class="topbar result-nav"><button class="back" data-back type="button">← 返回</button><button class="home-link" data-home type="button">⌂ 首页</button></header>
+        <header class="topbar"><button class="home-link" data-home type="button">⌂ 首页</button></header>
         <p class="brand">🎯 周末方案</p>
         <h2 class="result-title">今天这么过</h2>
         <p class="result-meta" id="plan-subtitle"></p>
@@ -152,7 +154,8 @@
         <h2 class="result-title">今天就去这个？</h2>
         <div class="activity-list" id="pick-list"></div>
         <div class="actions">
-          <button class="btn btn-primary" id="btn-pick-go" type="button">去看看</button>
+          <button class="btn btn-primary" id="btn-pick-lock" type="button">🔒 就这个了</button>
+          <button class="btn btn-ghost" id="btn-pick-go" type="button">去看看</button>
           <button class="btn btn-ghost" id="btn-pick-again" type="button">再抽一个</button>
         </div>
       </section>

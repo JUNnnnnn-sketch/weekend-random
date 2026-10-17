@@ -418,37 +418,58 @@ function damaiSearchUrl(keyword) {
 const TICKETED_VENUE = new Set(["剧场", "Live House / 夜店"]);
 
 /**
- * 地名本身点进哪儿。
+ * 地名旁边那一排按钮。
  *
- * 有官网就进官网。没有的话不进地图——地图回答的是「在哪」，可名字这个位置
- * 问的是「这是个什么地方」，点进去看见一个图钉等于没答。退而求其次按场馆类型
- * 分流：演出场馆进大麦，其余进大众点评，两边都能答上同一类问题。
- * 「没找到官网」这几个字不必写出来——用户要的是地方，不是我们的查找过程。
+ * 原先是把地名本身做成链接，只用一条下划线暗示可点——实际没人会想到去点它。
+ * 现在地名就是地名，想干什么点旁边的按钮，和「📍 地图」长一个样。
+ *
+ * 第一个按钮按场馆类型变：有官网就是官网，演出场馆去大麦，其余去点评。
+ * 地图永远在最后，因为「怎么去」是每个地方都要回答的问题。
  */
-function placeNameLink(place, name) {
-  let href;
-  if (place && place.website) {
-    href = esc(place.website);
-  } else if (place && TICKETED_VENUE.has(place.subtype)) {
-    href = damaiSearchUrl(name);
-  } else {
-    href = dianpingSearchUrl(name);
-  }
-  return `<a href="${href}" target="_blank" rel="noreferrer">${esc(name)}</a>`;
+function placeButtons(place, name) {
+  const site = place && place.website;
+  const ticketed = place && TICKETED_VENUE.has(place.subtype);
+  const first = site
+    ? `<a class="plan-go" href="${esc(site)}" target="_blank" rel="noreferrer">🔗 官网</a>`
+    : ticketed
+      ? `<a class="plan-go" href="${damaiSearchUrl(name)}" target="_blank" rel="noreferrer">🎫 看演出</a>`
+      : `<a class="plan-go" data-dianping="${esc(name)}" href="${dianpingSearchUrl(name)}" target="_blank" rel="noreferrer">🔍 点评</a>`;
+  return `${first}<a class="plan-map" href="${mapSearchUrl(name)}" target="_blank" rel="noreferrer">📍 地图</a>`;
 }
 
-/** 一个地点的两个出口：第一个按场馆类型给官网/演出/点评，地图总是给。 */
+/**
+ * 点评的链接先试着唤起 App，唤不起再退回网页。
+ *
+ * 为什么非这么绕：点评的移动网页端 m.dianping.com 一打开就是短信登录墙，
+ * 不登录连搜索结果都看不到；桌面版要扫码登录 App。两条路在手机上都走不通。
+ * 唯一能直达的是 dianping:// 这个 scheme——装了 App 的人一点就进去了。
+ *
+ * 没装 App 的怎么办：scheme 唤不起时页面会停在原地，1.2 秒后我们自己跳网页版。
+ * 要是 App 起来了，这个页面被切到后台，document.hidden 变 true，就取消跳转。
+ * href 里仍然放着网页地址，所以长按「在新标签页打开」、右键复制链接都照常。
+ */
+const DIANPING_SCHEME = "dianping://searchshoplist?keyword=";
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("a[data-dianping]");
+  if (!link) return;
+  // 桌面端没有 App 可唤，别让用户白等 1.2 秒
+  if (!window.matchMedia("(pointer: coarse)").matches) return;
+  event.preventDefault();
+  const web = link.getAttribute("href");
+  const timer = window.setTimeout(() => {
+    if (document.hidden) return;                 // App 已经接管，不用管了
+    window.location.href = web;
+  }, 1200);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) window.clearTimeout(timer);
+  }, { once: true });
+  window.location.href = DIANPING_SCHEME + encodeURIComponent(link.dataset.dianping);
+});
+
+/** 命运模式的地点也用同一排按钮，两边手感一致。 */
 function placeLinks(place, keyword) {
-  const parts = [];
-  if (place && place.website) {
-    parts.push(`<a href="${esc(place.website)}" target="_blank" rel="noreferrer">官网 ↗</a>`);
-  } else if (place && TICKETED_VENUE.has(place.subtype)) {
-    parts.push(`<a href="${damaiSearchUrl(keyword)}" target="_blank" rel="noreferrer">演出 ↗</a>`);
-  } else {
-    parts.push(`<a href="${dianpingSearchUrl(keyword)}" target="_blank" rel="noreferrer">点评 ↗</a>`);
-  }
-  parts.push(`<a href="${mapSearchUrl(keyword)}" target="_blank" rel="noreferrer">地图 ↗</a>`);
-  return parts.join(" · ");
+  return `<span class="plan-acts">${placeButtons(place, keyword)}</span>`;
 }
 
 /**
@@ -531,24 +552,26 @@ function renderPlan() {
         + (meta ? ` · ${esc(meta)}` : "");
       extra = r.highlight ? esc(r.highlight) : "";
     } else if (step && step.placeMode === "outskirts") {
-      lead = placeNameLink(step.place, step.place.name);
+      lead = esc(step.place.name);
       sub = (i === 0 ? esc(exp.sub_type || exp.main_type) : "和上一项同一个地方")
-        + ` · <a class="plan-map" href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">📍 地图</a>`;
+        + `<span class="plan-acts">${placeButtons(step.place, step.place.name)}</span>`;
       extra = step.hint ? esc(step.hint) : "";
     } else if (step && step.placeMode === "area") {
       // 手作这一类不指定店：OSM 收不到工作室和体验课，硬挂一个商场就是编的
       // ——「凯德MALL 不一定有乐器体验课」。这一带确实能找到，具体哪家交给你搜。
       const spot = planStation ? `${planStation.station.station_name}一带` : "这一带";
       const query = `${spot.replace("一带", "")} ${exp.name}`;
-      lead = `<a href="${dianpingSearchUrl(query)}" target="_blank" rel="noreferrer">${esc(spot)}</a>`;
-      sub = `${esc(exp.sub_type || exp.main_type)} · 点开在大众点评搜这一带的店`;
+      lead = esc(spot);
+      sub = `${esc(exp.sub_type || exp.main_type)}`
+        + `<span class="plan-acts"><a class="plan-go" data-dianping="${esc(query)}"`
+        + ` href="${dianpingSearchUrl(query)}" target="_blank" rel="noreferrer">🔍 搜这一带的店</a></span>`;
       extra = step.hint ? esc(step.hint) : "";
     } else if (step && step.place) {
       const metres = Math.round(step.place.distance_km * 1000);
-      // 名字点进官网，没官网就按场馆类型进大麦或点评；地图单独一个按钮。
-      lead = placeNameLink(step.place, step.place.name);
+      // 地名只是地名，要干什么点旁边的按钮
+      lead = esc(step.place.name);
       sub = `步行约 ${metres} 米`
-        + ` · <a class="plan-map" href="${mapSearchUrl(step.place.name)}" target="_blank" rel="noreferrer">📍 地图</a>`;
+        + `<span class="plan-acts">${placeButtons(step.place, step.place.name)}</span>`;
       extra = step.hint ? esc(step.hint) : "";
     } else {
       sub = "地点你定";
@@ -634,6 +657,13 @@ document.getElementById("recent-cats").querySelectorAll(".chip").forEach((chip) 
 document.getElementById("recent-district").addEventListener("change", (e) => { recentDistrict = e.target.value; renderRecent(); });
 document.getElementById("btn-recent-pick").addEventListener("click", () => { renderPick(); showScreen("pick"); });
 document.getElementById("btn-pick-go").addEventListener("click", () => { if (currentPick && currentPick.source_url) window.open(currentPick.source_url, "_blank", "noreferrer"); });
+// 「最近在玩」原来只能跳出去看，三条路里唯独它走不到票根。
+// 既然另外两条都能「锁定 → 存图带走」，这条没理由是例外。
+document.getElementById("btn-pick-lock").addEventListener("click", () => {
+  if (!currentPick) return;
+  lockWith(`${currentPick.title || currentPick.name}。出门就好。`,
+           document.getElementById("pick-list"));
+});
 document.getElementById("btn-pick-again").addEventListener("click", () => { renderPick(); });
 populateDistricts();
 

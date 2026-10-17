@@ -64,6 +64,22 @@ def haversine_km(lat1, lon1, lat2, lon2):
     return 6371 * 2 * math.atan2(math.sqrt(h), math.sqrt(1 - h))
 
 
+def websites_from_pois():
+    """从 data/station_pois.js 按名字取官网。
+
+    同一个地方常常两张表里都有——颐和园在 OSM 那边是「公园」，在手工表里
+    是「划船」和「看日落」。OSM 那条查到了官网，手工表那条却空着，界面上
+    就会出现「颐和园」点进去是大众点评的怪事。名字一样就是同一个地方，
+    官网没理由只给其中一条。
+    """
+    sites = {}
+    for chunk in re.findall(r"\{ id: .*?\},\n", read("station_pois.js")):
+        site = re.search(r'website: "(.*?)"', chunk)
+        if site:
+            sites.setdefault(re.search(r'name: "(.*?)"', chunk).group(1), site.group(1))
+    return sites
+
+
 def all_station_names():
     """所有真实站名。坐标只覆盖 348/396，但路线用不着坐标，只要站名是真的。"""
     return set(re.findall(r'station_name: "([^"]+)"', read("subway.js")))
@@ -132,6 +148,7 @@ def main():
     station_names = all_station_names()
     coords = load_coords()
     manual_sites = load_sites()
+    poi_sites = websites_from_pois()
     problems = []
 
     places, seen = [], set()
@@ -157,7 +174,9 @@ def main():
         # 官网是人工填的：OSM 和 Wikidata 都查不到这批地方（营地、汤泉馆、
         # 球馆），只能碰到一个记一个。本行的「官网」列优先，其次查
         # data/official_sites.csv 那张统一的待填表。空着就只给点评和地图。
-        site = (row.get("官网") or "").strip() or manual_sites.get(name, "")
+        site = ((row.get("官网") or "").strip()
+                or manual_sites.get(name, "")
+                or poi_sites.get(name, ""))
         if site:
             record["website"] = site
         popularity = row["人气"].strip().rstrip("%")
