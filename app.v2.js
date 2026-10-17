@@ -444,6 +444,14 @@ function damaiSearchUrl(keyword) {
 // 剧场的官网尤其难找——搜出来几乎全是自称「XX剧场官网」的票务代理站，一个都不能挂。
 const TICKETED_VENUE = new Set(["剧场", "Live House / 夜店"]);
 
+/** 路线卡片里的「沿途打卡 / 小贴士」小节。没数据就什么都不画。 */
+function detailList(title, items) {
+  if (!items || !items.length) return "";
+  const rows = items.map((it) =>
+    `<li><strong>${esc(it.title)}</strong>${it.note ? ` ${esc(it.note)}` : ""}</li>`).join("");
+  return `<div class="route-detail"><p class="route-detail-title">${title}</p><ul>${rows}</ul></div>`;
+}
+
 /**
  * 地名旁边那一排按钮。
  *
@@ -558,6 +566,7 @@ function renderPlan() {
     card.className = "place-card plan-card " + (exp.role === "support" ? "is-support" : "is-core");
     const step = planSteps[i];
     const isRoute = step && step.placeMode === "route";
+    let routeDetail = "";
     const swapped = planSwapCounts[i] >= 3;
     const tags = (exp.vibe || []).map((v) => `<span class="tag">${esc(v)}</span>`).join("");
 
@@ -570,13 +579,22 @@ function renderPlan() {
     let extra = "";                    // 再下面的补充
 
     if (isRoute) {
+      // 路线和场所不一样：场所能给个官网让人自己看，路线没有官网。
+      // 「这条线怎么骑才好」——起点终点、沿途打卡、路况补给——
+      // 只能写在数据里，所以这张卡片比别的长。
       const r = step.route;
       lead = esc(r.name);
-      const stops = (r.stops || []).map(esc).join(" → ");
       const meta = [r.length, r.duration].filter(Boolean).join(" · ");
-      sub = `${esc(r.start_station || "")}站出发` + (stops ? ` → ${stops}` : "")
-        + (meta ? ` · ${esc(meta)}` : "");
-      extra = r.highlight ? esc(r.highlight) : "";
+      sub = `${esc(r.start_station || "")}站出发`
+        + (r.end ? ` · 到${esc(r.end)}` : "")
+        + (meta ? ` · ${esc(meta)}` : "")
+        + `<span class="plan-acts"><a class="plan-map" href="${mapSearchUrl(r.end || r.start_station || r.name)}" target="_blank" rel="noreferrer">📍 地图</a></span>`;
+      const stops = (r.stops || []).map(esc).join(" → ");
+      extra = [r.highlight ? esc(r.highlight) : "", stops ? `🚩 ${stops}` : ""]
+        .filter(Boolean).join("<br />");
+      routeDetail = detailList("🚲 几种走法，挑一个", r.ways)
+        + detailList("📍 沿途打卡", r.spots)
+        + detailList("🚲 小贴士", r.tips);
     } else if (step && step.placeMode === "outskirts") {
       lead = esc(step.place.name);
       sub = (i === 0 ? esc(exp.sub_type || exp.main_type) : "和上一项同一个地方")
@@ -612,6 +630,7 @@ function renderPlan() {
       <h3 class="plan-place">${lead}</h3>
       ${sub ? `<p class="plan-sub">${sub}</p>` : ""}
       ${extra ? `<p class="plan-extra">${extra}</p>` : ""}
+      ${routeDetail}
       ${isRoute ? "" : `<p class="plan-time">⏱ ${exp.duration_min}–${exp.duration_max} 分钟</p>`}
       ${tags ? `<p class="plan-vibe">${tags}</p>` : ""}
       ${isRoute ? "" : `<button class="btn btn-ghost btn-swap" type="button" data-index="${i}" ${swapped ? "disabled" : ""}>${swapped ? "命运已定 ✦" : "换一个"}</button>`}`;

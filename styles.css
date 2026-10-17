@@ -635,3 +635,11 @@ h2 {
 .browse-body { padding: 0 14px 12px; display: flex; flex-direction: column; gap: 10px; }
 .browse-place { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 14px; }
 .browse-sub { color: var(--muted); font-size: 12px; }
+
+/* 路线卡片里的「沿途打卡 / 小贴士」。
+   路线没有官网可点，这条线该怎么骑只能写在卡片上，所以它比别的卡片长。 */
+.route-detail { margin-top: 10px; }
+.route-detail-title { color: var(--lime); font-size: 12px; margin-bottom: 4px; }
+.route-detail ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.route-detail li { color: var(--muted); font-size: 13px; line-height: 1.55; }
+.route-detail li strong { color: var(--ink); font-weight: 600; }

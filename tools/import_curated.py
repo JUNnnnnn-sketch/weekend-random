@@ -220,6 +220,24 @@ def main():
             "highlight": row["看点"].strip(),
             "source": row["来源"].strip(),
         }
+        # 走法、打卡点、小贴士：用「；」分条，条内用「｜」分成标题和说明。
+        # 路线和场所不一样——场所能给个官网让人自己看，路线没有官网，
+        # 「这条线怎么骑才好」只能写在数据里。
+        #
+        # 「走法」刻意不拆成多条路线记录：一条线有几种骑法是描述，
+        # 不是系统该替人挑的东西。全摆出来，骑 14 公里还是 55 公里他自己定。
+        for key, column in (("ways", "走法"), ("spots", "打卡点"), ("tips", "小贴士")):
+            parts = []
+            for item in (row.get(column) or "").split("；"):
+                item = item.strip()
+                if not item:
+                    continue
+                head, _, body = item.partition("｜")
+                parts.append({"title": head.strip(), "note": body.strip()} if body else {"title": head.strip()})
+            if parts:
+                record[key] = parts
+        if (row.get("终点") or "").strip():
+            record["end"] = row["终点"].strip()
         if start:
             record["start_station"] = start
         if row["距离"].strip():

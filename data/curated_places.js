@@ -17,7 +17,7 @@
  * 一条路线本身就是整个方案，不是其中一个环节。
  *
  * 地点 223 条（102 条有坐标），路线 18 条。
- * 生成时间：2026-10-17T22:33:25+08:00
+ * 生成时间：2026-10-17T22:54:27+08:00
  * 本文件由 tools/import_curated.py 生成，要改请改那两张 CSV。
  */
 export const curatedPlaces = [
@@ -261,8 +261,8 @@ export const curatedRoutes = [
   {"id": "route/13", "experience": "骑行", "name": "奥林匹克森林公园环线", "stops": ["奥森南园外环"], "duration": "下班后", "season": "all_year", "highlight": "闭环绿道，路很平缓，共享单车就能完成", "source": "点点AI·北京骑行·参考26篇", "start_station": "森林公园南门", "length": "7公里"},
   {"id": "route/14", "experience": "骑行", "name": "营城建都滨水绿道", "stops": ["老护城河沿线"], "duration": "下班后", "season": "all_year", "highlight": "途经白云观、陶然亭等地，人少景美", "source": "点点AI·北京骑行·参考26篇", "start_station": "陶然亭", "length": "9.3公里"},
   {"id": "route/15", "experience": "骑行", "name": "中轴线文化骑行", "stops": ["永定门", "天坛", "前门", "天安门广场"], "duration": "下班后", "season": "all_year", "highlight": "串联十多处文化遗产，能深度感受古都脉络", "source": "点点AI·北京骑行·参考26篇", "start_station": "永定门外", "length": "7.8公里"},
-  {"id": "route/16", "experience": "骑行", "name": "通州大运河线", "stops": ["大运河沿岸骑行专用道"], "duration": "半天", "season": "all_year", "highlight": "被称作京骑行的天花板，沿途风光旖旎", "source": "点点AI·北京骑行·参考26篇", "start_station": "通州北关", "length": "35公里"},
-  {"id": "route/17", "experience": "徒步", "name": "香八拉", "stops": ["香山", "八大处"], "duration": "一天或以上", "season": "all_year", "highlight": "累计爬升800米 初级进阶 部分路段需要手脚并用 路上人多不用担心走错", "source": "点点AI·北京徒步·参考28篇", "start_station": "香山", "length": "12公里"},
-  {"id": "route/18", "experience": "徒步", "name": "桑峪村—潭柘寺—定都阁环线", "stops": ["桑峪村", "潭柘寺", "定都阁"], "duration": "一天或以上", "season": "all_year", "highlight": "不走回头路 石板古道和土路 可经过千年古刹 风景和人文景观结合得好", "source": "点点AI·北京徒步·参考28篇｜门头沟 无地铁直达 需自驾或公交", "length": "8公里"},
-  {"id": "route/19", "experience": "骑行", "name": "长安街及天安门环线", "stops": ["长安街", "天安门"], "duration": "下班后", "season": "all_year", "highlight": "路况很好自行车道宽阔 晚上骑能看长安街和天安门的夜景 非常适合拍照", "source": "点点AI·北京骑行·参考26篇", "start_station": "天安门东"},
+  {"id": "route/16", "experience": "徒步", "name": "香八拉", "stops": ["香山", "八大处"], "duration": "一天或以上", "season": "all_year", "highlight": "累计爬升800米 初级进阶 部分路段需要手脚并用 路上人多不用担心走错", "source": "点点AI·北京徒步·参考28篇", "start_station": "香山", "length": "12公里"},
+  {"id": "route/17", "experience": "徒步", "name": "桑峪村—潭柘寺—定都阁环线", "stops": ["桑峪村", "潭柘寺", "定都阁"], "duration": "一天或以上", "season": "all_year", "highlight": "不走回头路 石板古道和土路 可经过千年古刹 风景和人文景观结合得好", "source": "点点AI·北京徒步·参考28篇｜门头沟 无地铁直达 需自驾或公交", "length": "8公里"},
+  {"id": "route/18", "experience": "骑行", "name": "长安街及天安门环线", "stops": ["长安街", "天安门"], "duration": "下班后", "season": "all_year", "highlight": "路况很好自行车道宽阔 晚上骑能看长安街和天安门的夜景 非常适合拍照", "source": "点点AI·北京骑行·参考26篇", "start_station": "天安门东"},
+  {"id": "route/19", "experience": "骑行", "name": "通州大运河线", "stops": ["大运河沿岸骑行专用道"], "duration": "半天", "season": "all_year", "highlight": "被称作北京骑行的天花板，沿途风光旖旎。路况基本是平坦柏油路，有专门绿道，没有机动车", "source": "点点AI·北京骑行·参考26篇", "ways": [{"title": "亲子入门 约14公里", "note": "大运河森林公园漕运码头停车场出发，沿园内绿道顺时针一圈回到起点，经过运河清风、观景台、红枫广场。走走停停拍照 2-4 小时，沿途有儿童乐园"}, {"title": "经典休闲环线 约20-30公里", "note": "从千荷泻露桥东岸向南骑，经漕运码头，过桥切到西岸再向北返回，形成闭环。人气最高的一条，几乎涵盖所有核心打卡点"}, {"title": "无车党友好 约20多公里", "note": "地铁6号线北运河西站下车，站口找共享单车，沿西岸向南经大光楼骑到千荷泻露桥后折返。不用自带车"}, {"title": "长途挑战往返 约55公里", "note": "漕运码头一路向南骑到杨洼休闲驿站，原路返回。沿途风景更好、人更少，杨洼驿站的牛肉饭和柠檬茶值得一试"}], "spots": [{"title": "千荷泻露桥", "note": "看日出和日落的绝佳地点，拍照出片"}, {"title": "燃灯塔与三光楼", "note": "运河边的历史地标"}, {"title": "城市图书馆", "note": "现代建筑与运河风光相映成趣"}], "tips": [{"title": "补给", "note": "沿途有驿站和自动售卖机，建议自己带水和零食，杨洼驿站是热门补给点"}, {"title": "时间", "note": "想避开人群可以清晨出发，还能看到运河日出"}, {"title": "注意", "note": "公园内有些路段行人较多，共享单车限速也低，注意安全"}], "start_station": "通州北关", "length": "14–55 公里，看走哪条"},
 ];
